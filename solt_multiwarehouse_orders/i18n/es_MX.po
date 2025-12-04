@@ -1,0 +1,80 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* solt_multiwarehouse_orders
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0-20251203\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-12-04 12:00:00+0000\n"
+"PO-Revision-Date: 2025-12-04 12:00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: solt_multiwarehouse_orders
+#: model:ir.model,name:solt_multiwarehouse_orders.model_res_company
+msgid "Companies"
+msgstr "Compañías"
+
+#. module: solt_multiwarehouse_orders
+#: model:ir.model.fields,field_description:solt_multiwarehouse_orders.field_sale_order_line__commitment_date
+msgid "Delivery Date"
+msgstr "Fecha de Entrega"
+
+#. module: solt_multiwarehouse_orders
+#: model:ir.model,name:solt_multiwarehouse_orders.model_res_config_settings
+msgid "Settings"
+msgstr "Configuración"
+
+#. module: solt_multiwarehouse_orders
+#: model:ir.model,name:solt_multiwarehouse_orders.model_sale_order
+msgid "Sales Order"
+msgstr "Pedido de Venta"
+
+#. module: solt_multiwarehouse_orders
+#: model:ir.model,name:solt_multiwarehouse_orders.model_sale_order_line
+msgid "Sales Order Line"
+msgstr "Línea de Pedido de Venta"
+
+#. module: solt_multiwarehouse_orders
+#: model:ir.model.fields,field_description:solt_multiwarehouse_orders.field_res_company__use_sale_multi_stock
+#: model:ir.model.fields,field_description:solt_multiwarehouse_orders.field_res_config_settings__use_sale_multi_stock
+msgid "Use multi warehouse in Sales Orders"
+msgstr "Usar múltiples almacenes en Pedidos de Venta"
+
+#. module: solt_multiwarehouse_orders
+#: model:ir.model.fields,field_description:solt_multiwarehouse_orders.field_sale_order__warehouse_ids
+#: model:ir.model.fields,field_description:solt_multiwarehouse_orders.field_sale_order_line__warehouse_ids
+#: model:ir.model.fields,field_description:solt_multiwarehouse_orders.field_sale_order_line__warehouse_id
+#: model:ir.model.fields,field_description:solt_multiwarehouse_orders.field_sale_order_line__multi_warehouse_id
+msgid "Warehouse"
+msgstr "Almacén"
+
+#. module: solt_multiwarehouse_orders
+#: model:ir.ui.view,arch_db:solt_multiwarehouse_orders.res_config_settings_view_form_tene
+msgid "Allows using multi warehouse in Sales Orders"
+msgstr "Permite usar múltiples almacenes en Pedidos de Venta"
+
+#. module: solt_multiwarehouse_orders
+#: model:ir.model.fields,field_description:solt_multiwarehouse_orders.field_sale_order__can_use_sale_multi_stock
+msgid "Can Use Sale Multi Stock"
+msgstr "Puede Usar Múltiples Almacenes en Ventas"
+
+#. module: solt_multiwarehouse_orders
+#: model:ir.model.fields,field_description:solt_multiwarehouse_orders.field_sale_order_line__warehouse_id_domain
+msgid "Warehouse Id Domain"
+msgstr "Dominio ID de Almacén"
+
+#. module: solt_multiwarehouse_orders
+#: model:ir.model.fields,field_description:solt_multiwarehouse_orders.field_sale_order_line__product_type
+msgid "Product Type"
+msgstr "Tipo de Producto"
+
+#. module: solt_multiwarehouse_orders
+#: model:ir.model.fields,field_description:solt_multiwarehouse_orders.field_sale_order_line__product_is_storable
+msgid "Product Is Storable"
+msgstr "Producto es Almacenable"
