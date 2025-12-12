@@ -70,7 +70,7 @@ pre-commit run --all-files
 
 ## Licencias
 
-Este repositorio está licenciado bajo [AGPL-3.0](LICENSE).
+Este repositorio está licenciado bajo [LGPL-3.0](LICENSE).
 
 Sin embargo, cada módulo puede tener una licencia totalmente diferente. Consulte el archivo `__manifest__.py` de cada módulo, que contiene una clave `license` que explica su licencia.
 
