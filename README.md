@@ -1,79 +1,74 @@
-[![Pre-commit Status](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
+# solt-tiendanube
 
-<!-- /!\ do not modify above this line -->
+Odoo ↔ Tiendanube Connector for Odoo 18.0
 
-# solt-app-tiendanube
+## Description
 
-Módulos de integración con Tiendanube para Odoo.
+This repository contains the **Soltein Tiendanube Connector** - a bi-directional integration between Odoo 18.0 and Tiendanube that synchronizes catalogs, orders, fulfillment and webhooks.
 
-<!-- /!\ do not modify below this line -->
+The connector centralizes product data, pricing, stock availability and shipment statuses for multi-warehouse sellers, eliminating manual tasks and simplifying omnichannel operations.
 
-<!-- prettier-ignore-start -->
+## Features
 
-[//]: # (addons)
+- **Two-way catalog sync** – Push product templates, brands, multi categories, prices, SEO content, and gallery images
+- **Product brand management** – Create and maintain custom brand dictionaries consumed by Tiendanube listings
+- **Multi-category tagging** – Assign additional product categories required by Tiendanube storefronts
+- **Multi-warehouse orders** – Split sales fulfillment by warehouse with per-line delivery dates and routing
+- **Inventory orchestration** – Publish stock figures per warehouse, reserve units, and keep availability aligned
+- **Order intake** – Import orders, customers, payment references, coupons, and delivery methods
+- **Logistics bridge** – Trigger deliveries, update tracking numbers, and notify Tiendanube via secure webhooks
+- **Workflow automation** – Base automations, cron jobs, and webhooks keep both systems aligned
+- **Localization helpers** – Address formatting, measurement units, and regional settings for LATAM stores
 
-## Addons disponibles
+## Module Structure
 
-addon | version    | maintainers | summary
---- |------------| --- | ---
-[solt_api_connector](solt_api_connector/) | 18.0.1.0.0 |  | Conector base para integraciones de API
-[solt_l10n_mx_partner_address](solt_l10n_mx_partner_address/) | 18.0.1.0.0 |  | Localización México - Direcciones de contacto
-[solt_multiwarehouse_orders](solt_multiwarehouse_orders/) | 18.0.1.0.0 |  | Gestión de órdenes multi-almacén
-[solt_product_brand](solt_product_brand/) | 18.0.1.0.0 |  | Gestión de marcas de productos
-[solt_product_multi_category](solt_product_multi_category/) | 18.0.1.0.0 |  | Soporte para múltiples categorías por producto
-[solt_tiendanube](solt_tiendanube/) | 18.0.1.0.0 |  | Integración completa con Tiendanube
-
-[//]: # (end addons)
-
-<!-- prettier-ignore-end -->
-
-## Pre-commit
-
-Este repositorio utiliza [pre-commit](https://pre-commit.com/) para ejecutar validaciones automáticas antes de cada commit, asegurando la calidad y consistencia del código.
-
-### Instalación
-
-1. Instala pre-commit y configura los hooks en tu repositorio local:
-```bash
-   pip install pre-commit
-   pre-commit install
+```
+solt-tiendanube/
+└── solt_tiendanube/          # Main connector module
+    ├── models/               # Business logic (products, orders, brands, etc.)
+    ├── views/                # XML views and menus
+    ├── security/             # Access rights and record rules
+    ├── data/                 # Default data, crons, endpoints
+    ├── controllers/          # HTTP controllers for webhooks
+    ├── static/               # Assets and module description
+    └── i18n/                 # Translations
 ```
 
-2. (Opcional) Para actualizar los hooks a sus últimas versiones:
-```bash
-   pre-commit autoupdate
-```
+## Dependencies
 
-   O para actualizar un repositorio específico:
-```bash
-   pre-commit autoupdate --repo https://github.com/pre-commit/pre-commit-hooks
-```
+| Module | Purpose |
+| --- | --- |
+| `solt_api_connector` | Core API framework for REST APIs, authentication, webhooks, and sync engine |
+| `solt_l10n_mx_partner_address` | Mexican address enrichment for shipping data |
+| `sale`, `sale_stock`, `stock`, `stock_delivery` | Native Odoo models for orders, inventory, and shipments |
 
-### Uso
+## Requirements
 
-Una vez instalado, pre-commit se ejecutará automáticamente en cada `git commit`. Si alguna validación falla:
+- Odoo 18.0 Community or Enterprise
+- Valid Tiendanube API credentials per company
+- Python requirements inherited from base Odoo installation
 
-- El commit será bloqueado
-- Se mostrarán los errores encontrados
-- Algunos hooks corregirán los archivos automáticamente
+## Installation
 
-Después de corregir los errores (o si fueron corregidos automáticamente), vuelve a añadir los archivos modificados y realiza el commit nuevamente:
-```bash
-git add .
-git commit -m "tu mensaje"
-```
+1. Clone this repository inside your custom addons path
+2. Install dependencies (`solt_api_connector`, `solt_l10n_mx_partner_address`)
+3. Update the Apps list and install **Odoo ↔ Tiendanube Connector**
+4. Assign security groups to integration users
 
-Para ejecutar las validaciones manualmente en todos los archivos:
-```bash
-pre-commit run --all-files
-```
+## Configuration
 
-## Licencias
+1. Navigate to **Tiendanube Connector ▸ Settings** and enter API keys
+2. Configure webhook endpoints and activate required events
+3. Map warehouses through **Tiendanube Connector ▸ Warehouse Mapping**
+4. Enable multi-warehouse orders in **Sales ▸ Settings** if needed
+5. Enable cron jobs for your synchronization cadence
+6. Run initial product sync followed by stock and order pulls
 
-Este repositorio está licenciado bajo [LGPL-3.0](LICENSE).
+## Support
 
-Sin embargo, cada módulo puede tener una licencia totalmente diferente. Consulte el archivo `__manifest__.py` de cada módulo, que contiene una clave `license` que explica su licencia.
+- Website: https://www.soltein.mx
+- Email: soporte@soltein.mx
 
-----
+## License
 
-Desarrollado por [Soltein SA de CV](https://soltein.mx/)
+This module is released under the **LGPL-3** license. See the `LICENSE` file for details.
