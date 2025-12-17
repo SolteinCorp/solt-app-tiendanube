@@ -14,4 +14,10 @@
         <field name="domain_force">[('company_id', 'in', company_ids)]</field>
     </record>
 
+    <record id="product_multicompany_brand_rule" model="ir.rule">
+        <field name="name">Regla: Marca de producto multiempresa</field>
+        <field name="model_id" ref="model_solt_product_brand"/>
+        <field name="domain_force"> ['|', ('company_id', 'parent_of', company_ids), ('company_id', '=', False)]</field>
+    </record>
+
 </odoo>

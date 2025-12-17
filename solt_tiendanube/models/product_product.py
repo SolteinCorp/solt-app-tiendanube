@@ -25,6 +25,7 @@ class ProductProduct(models.Model):
     x_date_last_sync = fields.Datetime('Last synchronization', help="Indicates the date de la ultima sincronizacion.", readonly=True)
     promotional_price = fields.Float('Precio promocional', digits='Product Price')
     visible = fields.Boolean("Visible", default=True)
+    product_brand_id = fields.Many2one(related='product_tmpl_id.product_brand_id', store=True, readonly=False)
 
     lst_price = fields.Float(
         'Sales Price', compute='_compute_product_lst_price', store=True,

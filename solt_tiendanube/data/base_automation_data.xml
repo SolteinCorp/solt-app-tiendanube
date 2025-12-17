@@ -2669,9 +2669,9 @@ for record in records:
                          ref('field_product_template__website_description'), ref('field_product_template__website_seo_description'),
                          ref('field_product_template__website_seo_metatitle'), ref('product.field_product_template__attribute_line_ids'),
                          ref('product.field_product_template__name'), ref('field_product_template__nube_free_shipping'),
-                         ref('product.field_product_template__list_price'), ref('solt_product_brand.field_product_template__product_brand_id'),
+                         ref('product.field_product_template__list_price'), ref('field_product_template__product_brand_id'),
                          ref('product.field_product_template__product_tag_ids'), ref('product.field_product_template__type'),
-                         ref('solt_product_multi_category.field_product_template__categ_ids'), ref('product.field_product_template__product_variant_ids')
+                         ref('field_product_template__categ_ids'), ref('product.field_product_template__product_variant_ids')
                      ])]"/>
     </record>
 

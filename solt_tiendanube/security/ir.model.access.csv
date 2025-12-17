@@ -12,3 +12,7 @@ access_solt_warehouse_sync_mapping_user,access.warehouse.sync.mapping.user,model
 access_solt_warehouse_sync_mapping_group_system,solt.warehouse.sync.mapping.group.system,model_solt_warehouse_sync_mapping,base.group_system,1,1,1,1
 access_solt_warehouse_sync_mapping_stock_manager,solt.warehouse.sync.mapping stock_manager,model_solt_warehouse_sync_mapping,stock.group_stock_manager,1,1,1,1
 access_solt_warehouse_sync_mapping_manager,solt.warehouse.sync.mapping manager,model_solt_warehouse_sync_mapping,solt_api_connector.group_api_integration_manager,1,1,1,1
+
+access_product_brand_product_manager,product.brand.manager,model_solt_product_brand,stock.group_stock_manager,1,1,1,1
+access_product_brand_user,product.brand.user,model_solt_product_brand,base.group_user,1,0,0,0
+

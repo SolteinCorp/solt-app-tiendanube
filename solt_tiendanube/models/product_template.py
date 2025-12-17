@@ -44,6 +44,31 @@ class ProductTemplate(models.Model):
         'res.company', 'Company', index=True, default=lambda self: self.env.company)
     nube_video_url = fields.Char("YouTube or Vimeo URL", help="Product video URL hosted on YouTube or Vimeo")
 
+    # Product Brand fields
+    @api.model
+    def _get_brand_domain(self):
+        domain = [('company_id', '=', False)]
+        if self.env.user.has_group('base.group_multi_company'):
+            domain = ['|'] + domain + [('company_id', 'parent_of', self.env.company.id)]
+        else:
+            domain = ['|'] + domain + [('company_id', '=', self.env.company.id)]
+        return domain
+
+    product_brand_id = fields.Many2one(
+        "solt.product.brand", string="Brand", help="Select a brand for the product",
+        domain=lambda self: self._get_brand_domain()
+    )
+
+    # Product Multi Category fields
+    categ_ids = fields.Many2many(
+        comodel_name="product.category",
+        relation="product_categ_rel",
+        column1="product_tmpl_id",
+        column2="categ_id",
+        string="Categories",
+        help="Additional categories for product classification. Categories created by store connectors."
+    )
+
     @api.depends('product_variant_ids.product_depth')
     def _compute_product_depth(self):
         self._compute_template_field_from_variant_field('product_depth')

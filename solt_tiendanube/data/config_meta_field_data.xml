@@ -69,7 +69,7 @@
         <field name="connector_id" ref="tn_connector_api"/>
         <field name="create_dinamic_view" eval="True"/>
         <field name="meta_tab_label">Sincronización</field>
-        <field name="form_view_id" ref="solt_product_brand.view_product_brand_form"/>
+        <field name="form_view_id" ref="view_product_brand_form"/>
     </record>
 
     <record id="tn_meta_field_product_image" model="solt.api.meta.fields">

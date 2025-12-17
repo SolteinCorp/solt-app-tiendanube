@@ -18,6 +18,7 @@ class ResCompany(models.Model):
 
     callback_url = fields.Char(string='Callback URL', help="URL to send synchronization status callbacks", prefetch=False)
     sync_token = fields.Char(string='Sync Token', help="Unique token for synchronization", index=True, prefetch=False)
+    use_sale_multi_stock = fields.Boolean(string='Use multi warehouse in Sales Orders', readonly=False)
 
     def _sync_inventory(self, offset, limit):
         """ Sincronizar la disponibilidad del inventario de los productos vendidos en TN.
