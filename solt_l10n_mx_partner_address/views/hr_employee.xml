@@ -18,16 +18,32 @@
             <xpath expr="//field[@name='private_state_id']" position="replace"/>
             <xpath expr="//field[@name='private_zip']" position="replace"/>
             <xpath expr="//field[@name='private_country_id']" position="replace">
+                <field name="country_enforce_cities" invisible="True"/>
+                <field name="country_enforce_districts" invisible="True"/>
+                <field name="country_enforce_localities" invisible="True"/>
                 <field name="private_country_id"
                        placeholder="Country"
                        class="o_address_country"
                        options='{"no_open": True, "no_create": True}'/>
+                <field name="private_locality_id"
+                       placeholder="Locality..."
+                       domain="[('state_id','=', private_state_id)]"
+                       options='{"no_create": True}'
+                       invisible="not country_enforce_localities"/>
+                <field name="private_locality"
+                       invisible="country_enforce_localities"
+                       placeholder="Locality..."/>
                 <div class="o_address_street">
-                    <field name="private_state_id"
-                           class="o_address_state"
-                           placeholder="State"
-                           options="{'no_open': True, 'no_quick_create': True}"
-                           context="{'default_country_id': private_country_id}"/>
+                    <field name="private_district_id" placeholder="Colony..."
+                           invisible="not country_enforce_districts"/>
+                    <field name="private_colony" placeholder="Colony..."
+                           style="flex: 2 1 auto"
+                           invisible="country_enforce_districts"/>
+                    <field name="private_zip" placeholder="ZIP" class="o_address_zip"/>
+                </div>
+                <field name="private_colony_code" placeholder="Colony Code..."
+                       invisible="country_enforce_districts"/>
+                <div class="o_address_street">
                     <field name="private_city_id"
                            placeholder="City"
                            domain="[('country_id', '=', private_country_id)]"
@@ -36,21 +52,14 @@
                     <field name="private_city"
                            placeholder="City"
                            class="o_address_city"
-                           invisible="country_enforce_cities and (private_city_id or private_city in ['', False])"/>
+                           invisible="country_enforce_cities"
+                    />
+                    <field name="private_state_id"
+                           class="o_address_state"
+                           placeholder="State"
+                           options="{'no_open': True, 'no_quick_create': True}"
+                           context="{'default_country_id': private_country_id}"/>
                 </div>
-                <div class="o_address_street">
-                    <field name="private_locality_id"
-                           placeholder="Locality..."
-                           domain="[('state_id','=', private_state_id)]"
-                           options='{"no_create": True}'/>
-                    <field name="private_locality"
-                           invisible="private_locality_id or private_locality in ['', False]"
-                           placeholder="Locality..."/>
-                </div>
-                <div class="o_address_street">
-                    <field name="private_colony" placeholder="Colony..." style="flex: 2 1 auto"/>
-                </div>
-                <field name="private_zip" placeholder="ZIP" class="o_address_zip"/>
             </xpath>
         </field>
     </record>

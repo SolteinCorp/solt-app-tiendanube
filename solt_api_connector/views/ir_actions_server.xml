@@ -9,7 +9,7 @@
         <field name="arch" type="xml">
 
             <xpath expr="//sheet/group[1]" position="after">
-                <group string="Import data" invisible="not connector_id or use_for_initial_export">
+                <group string="Datos de la importación" invisible="not connector_id or use_for_initial_export">
                     <group>
                         <field name="connector_id" options="{'no_create': True, 'no_open': True}" invisible="not context.get('default_connector_id', False)"/>
                         <field name="use_for_initial_import" invisible="not connector_id"/>
@@ -19,7 +19,7 @@
                     </group>
                 </group>
 
-                <group string="Export data" invisible="not connector_id or use_for_initial_import">
+                <group string="Datos de la importación" invisible="not connector_id or use_for_initial_import">
                     <group>
                         <field name="connector_id" options="{'no_create': True, 'no_open': True}" invisible="not context.get('default_connector_id', False)"/>
                         <field name="use_for_initial_export" invisible="not connector_id"/>

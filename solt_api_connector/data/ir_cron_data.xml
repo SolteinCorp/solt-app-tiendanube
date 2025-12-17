@@ -11,20 +11,22 @@
             <field name="active" eval="False" />
         </record>
 
-        <!-- Clear sync flags cron -->
+        <!-- CRON: Limpiar todos los flags de sincronización   -->
         <record id="ir_cron_clear_all_sync_flags" model="ir.cron">
-            <field name="name">API Connector: Clear all sync flags</field>
+            <field name="name">API Connector: Limpiar todos los flags de sincronización</field>
             <field name="model_id" ref="model_connector_sync_mixin"/>
             <field name="state">code</field>
             <field name="code">model.clear_all_sync_flags()</field>
             <field name="interval_number">1</field>
-            <field name="interval_type">weeks</field>
+            <field name="interval_type">minutes</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
             <field name="active" eval="True"/>
         </record>
 
-        <!-- Initial export cron -->
+        <!-- Cron Job para Exportación Inicial -->
         <record id="ir_cron_data_initial_export_check" model="ir.cron">
-            <field name="name">API Connector: Initial export processing</field>
+            <field name="name">API Connector: Procesamiento de Exportación Inicial API</field>
             <field name="model_id" ref="base.model_ir_actions_server"/>
             <field name="code">model.cron_execute_initial_exports(automatic=True)</field>
             <field name="state">code</field>

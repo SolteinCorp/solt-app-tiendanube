@@ -48,7 +48,7 @@
         <field name="model_id" ref="product.model_product_attribute"/>
         <field name="connector_id" ref="tn_connector_api"/>
         <field name="form_view_id" ref="product.product_attribute_view_form"/>
-        <field name="list_view_id" ref="product.attribute_tree_view"/>
+        <field name="tree_view_id" ref="product.attribute_tree_view"/>
         <field name="create_dinamic_view" eval="True"/>
         <field name="meta_tab_label">Sincronización</field>
     </record>
@@ -87,7 +87,7 @@
         <field name="connector_id" ref="tn_connector_api"/>
         <field name="form_view_id" ref="stock.view_warehouse"/>
         <field name="search_view_id" ref="stock.stock_warehouse_view_search"/>
-        <field name="list_view_id" ref="stock.view_warehouse_tree"/>
+        <field name="tree_view_id" ref="stock.view_warehouse_tree"/>
         <field name="create_dinamic_view" eval="True"/>
         <field name="meta_tab_label">Sincronización</field>
     </record>

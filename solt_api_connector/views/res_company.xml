@@ -8,7 +8,7 @@
         <field name="inherit_id" ref="base.view_company_form"/>
         <field name="arch" type="xml">
             <page name="branches" position="after">
-                <page name="Integration" string="Integration">
+                <page name="Integración" string="Integración">
                     <group>
                         <field name="connector_id" options="{'no_create': True, 'no_open': True}"/>
                         <field name="external_id" readonly="True"/>

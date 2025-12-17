@@ -3,25 +3,24 @@
 # License LGPL-3 or later (http://www.gnu.org/licenses/lgpl.html)
 {
     'name': "API Connector",
-    'summary': "Configurable API orchestration framework for Odoo 18",
-    'description': """API Connector
-===================
+    'description': """Conector de API Genérico (SOLT API Connector)
+=============================================
 
-Model, execute, and monitor integrations with any REST API directly from Odoo. Define multiple
-connections, map payloads visually, orchestrate automations, and log every call with retry and
-webhook support.
-""",
+Este módulo permite configurar conectores a APIs externas de forma genérica y parametrizable:
+* Definir múltiples conexiones a APIs externas
+* Configurar endpoints con diferentes métodos (GET, POST, PUT, DELETE)
+* Mapear campos entre modelos de Odoo y endpoints API
+* Transformar datos en ambas direcciones
+* Integrar con el sistema de automatización de Odoo (base_automation)
+* Configurar webhooks para recibir notificaciones de APIs externas
+* Programar sincronizaciones automáticas
+* Registrar historial de llamadas API""",
     'author': 'Soltein SA de CV',
-    'maintainers': ['soltein'],
-    'website': 'https://www.soltein.mx',
-    'support': 'soporte@soltein.mx',
-    'category': 'Tools/Connectivity',
-    'version': '18.0.1.0.1',
+    'category': 'Soltein SA de CV/Tools',
+    'version': '17.0.1.0.1',
+    'website': 'https://soltein.mx',
     'license': 'LGPL-3',
     'depends': ['base', 'base_automation', 'social_media'],
-    'application': True,
-    'installable': True,
-    'auto_install': False,
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
@@ -37,10 +36,8 @@ webhook support.
     'assets': {
         'web.assets_backend': [
             'solt_api_connector/static/src/scss/**/*',
-        ],
-        'web.assets_common': [
-            'solt_api_connector/static/description/icon.png',
-        ],
+        ]
     },
-    'images': ['solt_api_connector/static/description/icon_module.png'],
+    'installable': True,
+    'application': True,
 }

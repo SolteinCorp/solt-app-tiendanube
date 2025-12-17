@@ -56,7 +56,6 @@
                                    class="o_website_sale_image_list" context="{'default_name': name}"
                                    options="{'create_text':'Add image'}" nolabel="1"/>
                         </group>
-
                     </page>
                 </notebook>
 
@@ -111,6 +110,7 @@
                     </notebook>
                 </xpath>
                 <xpath expr="//button[@name='action_open_label_layout']" position="after">
+                    <field name='is_product_variant' invisible='1'/>
                     <button string="Sync Cost" type="object"
                             name="action_sync_cost"
                             invisible="not company_id or product_variant_count &gt; 1 and not is_product_variant"
