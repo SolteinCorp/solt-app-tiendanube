@@ -6,25 +6,30 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <button name="test_connection" string="Probar Conexión" type="object" class="btn-primary"
+                    <button string="Activate" name="toggle_active" type="object" invisible="active"
+                            class="btn-primary"
+                            confirm="This action will activate the connector. Continue?"/>
+                    <button string="Deactivate" name="toggle_active" type="object" invisible="not active"
+                            class="btn-primary"
+                            confirm="This action will deactivate the connector. Continue?"/>
+                    <button name="test_connection" string="Test Connection" type="object" class="btn-primary"
                             invisible="auth_type in ['none'] or not active"/>
-                    <button name="action_all_active" string="Activar Webhook/Automatizaciones" type="object" class="btn-primary"
+                    <button name="action_all_active" string="Activate Webhooks/Automations" type="object" class="btn-secondary"
                             invisible="not active"
-                            confirm="La acción va a activar todos los registros de Webhook/Automatizaciones.¿Deseas continuar?"/>
-                    <button name="action_all_inactive" string="Desactivar Webhook/Automatizaciones" type="object" class="btn-primary"
+                            confirm="This action will activate all webhook/automation records. Continue?"/>
+                    <button name="action_all_inactive" string="Deactivate Webhooks/Automations" type="object" class="btn-secondary"
                             invisible="not active"
-                            confirm="La acción va a desactivar todos los registros de Webhook/Automatizaciones.¿Deseas continuar?"/>
+                            confirm="This action will deactivate all webhook/automation records. Continue?"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button name="action_view_call_logs" type="object" class="oe_stat_button" icon="fa-list"
-                                title="Ver llamadas API">
-                            <field name="call_log_count" widget="statinfo" string="Llamadas API"/>
+                        <button name="action_view_call_logs" type="object" class="oe_stat_button" icon="fa-list">
+                            <field name="call_log_count" widget="statinfo" string="API Calls"/>
                         </button>
                     </div>
                     <div class="oe_title">
                         <h1>
-                            <field name="name" placeholder="Nombre del conector"/>
+                            <field name="name" placeholder="Connector name"/>
                         </h1>
                     </div>
                     <group>
@@ -54,7 +59,7 @@
                     </group>
                     <notebook>
                         <field name="id" invisible="1"/>
-                        <page string="Webhook/Automatizaciones" name="automations" invisible="not id">
+                        <page string="Webhooks/Automations" name="automations" invisible="not id">
                             <field name="automation_ids"
                                    context="{'default_solt_connector_id': id, 'active_test': False}">
                                 <tree decoration-muted="(not active)">
@@ -64,22 +69,21 @@
                                     <field name="model_id"/>
                                     <field name="active"/>
                                     <button name="toggle_active" icon="fa-unlock fa-2x" type="object"
-                                            title="Activar Webhook/Automations"
+                                            title="Activate Webhook/Automations"
                                             invisible="active or not parent.active"
-                                            confirm="La acción va a activar la regla.¿Deseas continuar?"
+                                            confirm="This action will activate the rule. Continue?"
                                     />
                                     <button name="toggle_active" icon="fa-archive fa-2x" type="object"
-                                            title="Desactivar Webhook/Automations"
-                                            invisible="not active or not parent.active"
-                                            confirm="La acción va a desactivar la regla y no se ejecutará.¿Deseas continuar?"
+                                            title="Deactivate Webhook/Automations"
+                                            confirm="This action will deactivate the rule and prevent execution. Continue?"
                                     />
                                 </tree>
                             </field>
                         </page>
-                        <page string="Endpoints" name="endpoints">
+                        <page string="Endpoints" name="endpoints" invisible="not id">
                             <field name="endpoint_ids"/>
                         </page>
-                        <page string="Companies" name="companies">
+                        <page string="Companies" name="companies" invisible="not id">
                             <field name="company_ids">
                                 <tree create="False" edit="False" delete="False" editable="bottom">
                                     <field name="name"/>
@@ -87,22 +91,23 @@
                                 </tree>
                             </field>
                         </page>
-                        <page string="Headers Adicionales" name="headers">
+                        <page string="Additional Headers" name="headers">
                             <field name="headers" widget="ace"/>
                         </page>
-                        <page name="meta_fields" string="Configuración campos predeterminados">
-                            <p colspan="2" class="mb-4">Esta sección muestra una lista de todos los campos dinámicos a adicionar por default en los modelos odoo configurados.</p>
+                        <page name="meta_fields" string="Default field configuration" invisible="not id">
+                            <p colspan="2" class="mb-4">This section lists all default dynamic fields to add to configured Odoo models.</p>
                             <button name="action_create_all_meta_fields"
                                     colspan="2"
-                                    string="Crear campos meta"
+                                    string="Create meta fields"
                                     type="object"
-                                    confirm="La acción va a adicionar los campos dinámicos en los modelos odoo configurado y en las vistas configuradas."/>
-                            <field name="meta_field_ids" nolabel="1" mode="tree,form" context="{'default_connector_id': active_id}">
+                                    invisible="not active"
+                                    confirm="This action will add dynamic fields to the configured Odoo models and views."/>
+                            <field name="meta_field_ids" nolabel="1" mode="list,form" context="{'default_connector_id': id}">
                                 <tree>
                                     <field name="name"/>
                                     <field name="model_id"/>
                                 </tree>
-                                <form string="Campos meta">
+                                <form string="Meta fields">
                                     <group>
                                         <group>
                                             <field name="name" required="1"/>
@@ -110,61 +115,62 @@
                                         </group>
                                         <group>
                                             <field name="model_id" domain="[('transient','=',False)]"
-                                               required="1"
-                                               options="{'no_create': True}"/>
+                                                   required="1"
+                                                   options="{'no_create': True}"/>
                                         </group>
                                     </group>
                                     <notebook invisible="not model_id">
-                                        <page string="Metadatos" name="config_meta">
+                                        <page string="Metadata" name="config_meta">
                                             <group>
                                                 <group>
                                                     <field name="create_dinamic_view"/>
-                                                    <field name="meta_tab_label" invisible="not create_dinamic_view"/>
+                                                    <field name="meta_tab_label" string="Tab label" invisible="not create_dinamic_view"/>
                                                     <field name="model" invisible="True"/>
                                                 </group>
                                                 <group>
                                                     <button name="action_create_meta_fields"
                                                             colspan="2"
-                                                            string="Crear campos meta"
+                                                            string="Create meta fields"
                                                             type="object"
-                                                            confirm="La acción va a adicionar los campos dinámicos en el modelo odoo configurado y en las vistas configuradas."/>
+                                                            invisible="not parent.active"
+                                                            confirm="This action will add the dynamic fields to the configured Odoo model and its views."/>
                                                 </group>
                                             </group>
-                                            <group string="Vistas">
-                                                  <group name="form_view_group">
-                                                      <field name="form_view_id"
-                                                               domain="[('model','=',model),('type','=','form')]"/>
-                                                      <field name="extended_form_view_id"
-                                                               domain="[('id','=',0)]" invisible="not create_dinamic_view"/>
-                                                      <field name="tree_view_id"
-                                                               domain="[('model','=',model),('type','=','tree'),('mode','=','primary')]"/>
-                                                      <field name="extended_tree_view_id"
-                                                               domain="[('id','=',0)]" invisible="not create_dinamic_view"/>
-                                                  </group>
-                                                  <group name="search_view_group">
-                                                      <field name="search_view_id"
-                                                               domain="[('model','=',model),('type','=','search'),('mode','=','primary')]"/>
-                                                        <field name="extended_search_view_id"
-                                                               domain="[('id','=',0)]" invisible="not create_dinamic_view"/>
-                                                  </group>
+                                            <group string="Views">
+                                                <group name="form_view_group">
+                                                    <field name="form_view_id"
+                                                           domain="[('model','=',model),('type','=','form')]"/>
+                                                    <field name="extended_form_view_id"
+                                                           domain="[('id','=',0)]" invisible="not create_dinamic_view"/>
+                                                    <field name="list_view_id"
+                                                           domain="[('model','=',model),('type','=','list'),('mode','=','primary')]"/>
+                                                    <field name="extended_list_view_id"
+                                                           domain="[('id','=',0)]" invisible="not create_dinamic_view"/>
+                                                </group>
+                                                <group name="search_view_group">
+                                                    <field name="search_view_id"
+                                                           domain="[('model','=',model),('type','=','search'),('mode','=','primary')]"/>
+                                                    <field name="extended_search_view_id"
+                                                           domain="[('id','=',0)]" invisible="not create_dinamic_view"/>
+                                                </group>
 
                                             </group>
-                                              <group string="Campos">
-                                                  <field name="ir_meta_field_ids" nolabel="1" colspan="2"
-                                                         context="{'default_model_id': model_id,'default_model': model}">
-                                                        <tree delete="0" create="0">
-                                                            <field name="name"/>
-                                                            <field name="field_description"/>
-                                                            <field name="ttype"/>
-                                                        </tree>
-                                                  </field>
-                                              </group>
+                                            <group string="Fields">
+                                                <field name="ir_meta_field_ids" nolabel="1" colspan="2"
+                                                       context="{'default_model_id': model_id,'default_model': model}">
+                                                    <tree delete="0" create="0">
+                                                        <field name="name"/>
+                                                        <field name="field_description"/>
+                                                        <field name="ttype"/>
+                                                    </tree>
+                                                </field>
+                                            </group>
                                         </page>
                                     </notebook>
                                 </form>
                             </field>
                         </page>
-                        <page string="Acciones de Carga Inicial" name="initial_import" invisible="not id">
+                        <page string="Initial Import Actions" name="initial_import" invisible="not id">
                             <field name="ini_import_acion_server_ids" context="{'default_connector_id': id, 'default_use_for_initial_import': True}">
                                 <tree>
                                     <field name="sequence" widget="handle"/>
@@ -174,8 +180,8 @@
                                     <field name="last_import_date" optional="show"/>
                                     <field name="import_result" optional="hide"/>
                                     <field name="importing_state" widget="badge" decoration-warning="importing_state == 'scheduled'"
-                                       decoration-info="importing_state == 'running'" decoration-success="importing_state == 'done'"
-                                       decoration-danger="importing_state == 'error'" optional="show"/>
+                                           decoration-info="importing_state == 'running'" decoration-success="importing_state == 'done'"
+                                           decoration-danger="importing_state == 'error'" optional="show"/>
                                     <field name="use_for_initial_import" column_invisible="True"/>
                                     <button name="execute_initial_import" icon="fa-cloud-download fa-2x" type="object"
                                             title="Importar"
@@ -184,7 +190,7 @@
                                 </tree>
                             </field>
                         </page>
-                        <page string="Acciones de Exportación Inicial" name="initial_export" invisible="not id">
+                        <page string="Initial Export Actions" name="initial_export" invisible="not id">
                             <field name="ini_export_action_server_ids" context="{'default_connector_id': id, 'default_use_for_initial_export': True}">
                                 <tree>
                                     <field name="sequence" widget="handle"/>
@@ -194,12 +200,11 @@
                                     <field name="last_export_date" optional="show"/>
                                     <field name="export_result" optional="hide"/>
                                     <field name="exporting_state" widget="badge" decoration-warning="exporting_state == 'scheduled'"
-                                       decoration-info="exporting_state == 'running'" decoration-success="exporting_state == 'done'"
-                                       decoration-danger="exporting_state == 'error'" optional="show"/>
+                                           decoration-info="exporting_state == 'running'" decoration-success="exporting_state == 'done'"
+                                           decoration-danger="exporting_state == 'error'" optional="show"/>
                                     <field name="use_for_initial_export" column_invisible="True"/>
                                     <button name="execute_initial_export" icon="fa-cloud-upload fa-2x" type="object"
-                                            title="Importar"
-                                            invisible="not connector_id or not parent.active or not use_for_initial_export"
+                                            title="Export"
                                     />
                                 </tree>
                             </field>
@@ -210,8 +215,8 @@
         </field>
     </record>
 
-    <record id="view_solt_api_connector_tree" model="ir.ui.view">
-        <field name="name">solt.api.connector.tree</field>
+    <record id="view_solt_api_connector_list" model="ir.ui.view">
+        <field name="name">solt.api.connector.list</field>
         <field name="model">solt.api.connector</field>
         <field name="arch" type="xml">
             <tree decoration-muted="(not active)">
@@ -231,80 +236,79 @@
                 <field name="name"/>
                 <field name="base_url"/>
                 <separator/>
-                <filter string="Todos" name="all" domain="['|', ('active', '=', False), ('active', '=', True)]"/>
-                <separator/>
-                <filter string="Inactivos" name="inactive" domain="[('active', '=', False)]"/>
-                <group expand="0" string="Agrupar Por">
-                    <filter string="Tipo de Autenticación" name="group_by_auth" context="{'group_by':'auth_type'}"/>
+                <filter string="All" name="all" domain="['|', ('active', '=', False), ('active', '=', True)]"/>
+                <filter string="Inactive" name="inactive" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Authentication Type" name="group_by_auth" context="{'group_by':'auth_type'}"/>
                 </group>
             </search>
         </field>
     </record>
 
     <record id="view_solt_api_connector_kanban" model="ir.ui.view">
-            <field name="name">solt.api.connector.kanban</field>
-            <field name="model">solt.api.connector</field>
-            <field name="arch" type="xml">
-                <kanban class="o_connector_kanban">
-                    <field name="name"/>
-                    <field name="active"/>
-                    <templates>
-                        <t t-name="kanban-box">
-                            <t t-set="styles" t-value="record.active.raw_value ? '' : 'opacity: 0.5;'"/>
+        <field name="name">solt.api.connector.kanban</field>
+        <field name="model">solt.api.connector</field>
+        <field name="arch" type="xml">
+            <kanban class="o_connector_kanban">
+                <field name="name"/>
+                <field name="active"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <t t-set="styles" t-value="record.active.raw_value ? '' : 'opacity: 0.5;'"/>
 
-                            <div class="oe_kanban_global_click o_kanban_record_has_image_fill" t-att-style="styles">
-                                <t t-set="module_name" t-value="'solt_api_connector'"/>
+                        <div class="oe_kanban_global_click o_kanban_record_has_image_fill" t-att-style="styles">
+                            <t t-set="module_name" t-value="'solt_api_connector'"/>
 
-                                <div id="image_div" class="o_kanban_image_fill_left d-none d-md-block"
-                                     t-att-style="'background-image:url(/' + module_name + '/static/description/icon.png); min-width:150px;'"/>
+                            <div id="image_div" class="o_kanban_image_fill_left d-none d-md-block"
+                                 t-att-style="'background-image:url(/' + module_name + '/static/description/icon.png); min-width:150px;'"/>
 
-                                <div class="oe_kanban_details d-flex flex-column px-2">
-                                    <h2 class=""><field name="name"/></h2>
-                                    <div class="row mb-3">
-                                        <div class="col text-center">
-                                            <a class="hoverable-card d-block pt-2 pb-2 text-black" href="#">
-                                                <span class="h2 d-block">
-                                                    <field name="company_count" />
-                                                </span>
-                                                total tiendas sincronizadas
-                                            </a>
-                                        </div>
-                                        <div class="col text-center" id="orders_info">
-                                            <a/>
-                                        </div>
+                            <div class="oe_kanban_details d-flex flex-column px-2">
+                                <h2 class=""><field name="name"/></h2>
+                                <div class="row mb-3">
+                                    <div class="col text-center">
+                                        <a class="hoverable-card d-block pt-2 pb-2 text-black" href="#">
+                                            <span class="h2 d-block">
+                                                <field name="company_sync_count"/> / <field name="company_count"/>
+                                            </span>
+                                            stores synced / total stores
+                                        </a>
                                     </div>
-
-                                    <ul id="ul_list" class="mb-3"/>
-
-                                    <div class="btn-group" role="group" aria-label="Acciones de integración" groups="solt_api_connector.group_api_integration_manager">
-                                        <button string="Activar" name="toggle_active" type="object" invisible="active"
-                                                class="btn btn-outline-success d-inline-block"
-                                                confirm="La acción va a activar el conector.¿Deseas continuar?"/>
-                                        <button string="Desactivar" name="toggle_active" type="object" invisible="not active"
-                                                class="btn btn-outline-danger d-inline-block"
-                                                confirm="La acción va a desactivar el conector.¿Deseas continuar?"/>
+                                    <div class="col text-center" id="orders_info">
+                                        <a/>
                                     </div>
                                 </div>
 
-                            </div>
-                        </t>
-                    </templates>
-                </kanban>
-            </field>
-        </record>
+                                <ul id="ul_list" class="mb-3"/>
 
-    <!-- Acciones de menú -->
+                                <div class="btn-group" role="group" aria-label="Integration actions" groups="solt_api_connector.group_api_integration_manager">
+                                    <button string="Activate" name="toggle_active" type="object" invisible="active"
+                                            class="btn btn-outline-success d-inline-block"
+                                            confirm="This action will activate the connector. Continue?"/>
+                                    <button string="Deactivate" name="toggle_active" type="object" invisible="not active"
+                                            class="btn btn-outline-danger d-inline-block"
+                                            confirm="This action will deactivate the connector. Continue?"/>
+                                </div>
+                            </div>
+
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Menu actions -->
     <record id="action_solt_api_connector" model="ir.actions.act_window">
-        <field name="name">Conectores API</field>
+        <field name="name">API Connectors</field>
         <field name="res_model">solt.api.connector</field>
-        <field name="view_mode">kanban,tree,form</field>
+        <field name="view_mode">kanban,list,form</field>
         <field name="context">{'search_default_all': 1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                Crear un nuevo conector API
+                Create a new API connector
             </p>
             <p>
-                Los conectores API permiten conectar Odoo con servicios externos.
+                API connectors allow Odoo to connect with external services.
             </p>
         </field>
     </record>

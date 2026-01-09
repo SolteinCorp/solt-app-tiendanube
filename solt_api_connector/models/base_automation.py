@@ -7,10 +7,14 @@ from odoo import models, fields, api
 class BaseAutomation(models.Model):
     _inherit = 'base.automation'
 
-    connector_id = fields.Many2one('solt.api.connector', string='API Connector', prefetch=False,
-                                   help="API Connector relacionado con esta regla de automatización")
-    is_api_sync = fields.Boolean(string='Es sincronización API', compute='_compute_is_api_sync', store=True, prefetch=False)
-    sequence = fields.Integer(string="Secuencia", default=10)
+    connector_id = fields.Many2one('solt.api.connector', string='Connector')
+    endpoint_id = fields.Many2one('solt.api.endpoint', string='Endpoint')
+    sync_direction = fields.Selection([
+        ('to_store', 'To external store'),
+        ('from_store', 'From external store'),
+    ], string='Sync direction', default='to_store')
+    is_api_sync = fields.Boolean(string='Is API Sync', compute='_compute_is_api_sync', store=True, prefetch=False)
+    sequence = fields.Integer(string="Sequence", default=10)
 
     @api.depends('trigger', 'trigger_field_ids', 'trg_selection_field_id', 'trg_field_ref')
     def _compute_filter_domain(self):
@@ -31,14 +35,14 @@ class BaseAutomation(models.Model):
         return super(BaseAutomation, self).toggle_active()
 
     def _get_trigger_fields(self, record):
-        """ Return any of the trigger fields has been modified on ``record``.
-        Optionally exclude computed fields if requested in context."""
+        """Return the trigger fields that have been modified on ``record``.
+        Optionally exclude computed fields when requested via context."""
         self_sudo = self.sudo()
         _fields = []
         modified_fields = []
         ignore_computed = self._context.get('ignore_computed_fields', False)
         if not self_sudo.trigger_field_ids:
-            # todos los campos son triggers implícitos
+            # Every field is an implicit trigger
             fields_list = list(record._fields.keys())
         else:
             fields_list = self_sudo.trigger_field_ids.mapped('name')
@@ -55,7 +59,7 @@ class BaseAutomation(models.Model):
             if field in models.MAGIC_COLUMNS:
                 continue
 
-            # verificamos si el campo es computado
+            # Skip computed fields when requested
             if ignore_computed and field in record._fields:
                 field_obj = record._fields[field]
                 if field_obj.compute and not field_obj.store:

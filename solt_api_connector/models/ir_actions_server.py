@@ -26,30 +26,30 @@ class ServerAction(models.Model):
     # To return an action, assign: action = {...}\n\n\n\n"""
 
     connector_id = fields.Many2one('solt.api.connector', string='API Connector', prefetch=False,
-                                   help="API Connector relacionado con esta acción de servidor")
-    use_for_initial_import = fields.Boolean(default=False, string="Usar para carga inicial",
-                                            help="Indica si la acción se usará para carga inicial")
-    last_import_date = fields.Datetime('Última importación', readonly=True)
+                                   help="API Connector linked to this server action")
+    use_for_initial_import = fields.Boolean(default=False, string="Use for initial import",
+                                            help="Mark when this server action is part of the initial import flow")
+    last_import_date = fields.Datetime('Last import', readonly=True)
     importing_state = fields.Selection([
-        ('idle', 'No en proceso'),
-        ('scheduled', 'Programada'),
-        ('running', 'En ejecución'),
-        ('done', 'Completada'),
+        ('idle', 'Idle'),
+        ('scheduled', 'Scheduled'),
+        ('running', 'Running'),
+        ('done', 'Completed'),
         ('error', 'Error')
-    ], string='Estado de importación', default='idle', readonly=True)
-    import_result = fields.Text('Resultado de importación', readonly=True)
+    ], string='Import status', default='idle', readonly=True)
+    import_result = fields.Text('Import result', readonly=True)
     # Campos para exportación inicial
-    use_for_initial_export = fields.Boolean(default=False, string="Usar para envío inicial",
-                                            help="Indica si la acción se usará para envío inicial")
-    last_export_date = fields.Datetime('Último envío', readonly=True)
+    use_for_initial_export = fields.Boolean(default=False, string="Use for initial export",
+                                            help="Mark when this server action is part of the initial export flow")
+    last_export_date = fields.Datetime('Last export', readonly=True)
     exporting_state = fields.Selection([
-        ('idle', 'No en proceso'),
-        ('scheduled', 'Programada'),
-        ('running', 'En ejecución'),
-        ('done', 'Completada'),
+        ('idle', 'Idle'),
+        ('scheduled', 'Scheduled'),
+        ('running', 'Running'),
+        ('done', 'Completed'),
         ('error', 'Error')
-    ], string='Estado de envío', default='idle', readonly=True)
-    export_result = fields.Text('Resultado de envío', readonly=True)
+    ], string='Export status', default='idle', readonly=True)
+    export_result = fields.Text('Export result', readonly=True)
     code = fields.Text(string='Python Code', groups='base.group_system,solt_api_connector.group_api_integration_manager',
                        default=DEFAULT_PYTHON_CODE,
                        help="Write Python code that the action will execute. Some variables are "
@@ -65,9 +65,9 @@ class ServerAction(models.Model):
         """Programa la ejecución de la importación via cron"""
         self.ensure_one()
         if not self.connector_id:
-            raise UserError(_("Debe configurar el conector para la importación."))
+            raise UserError(_("You must set the connector before running the import."))
         if not self.use_for_initial_import:
-            raise UserError(_("Debe marcar el check Usar para carga inicial."))
+            raise UserError(_("Enable 'Use for initial import'."))
 
             # Actualizar el estado a programado
         self.write({
@@ -81,8 +81,8 @@ class ServerAction(models.Model):
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
-                'title': _('Importación programada'),
-                'message': _(f'La importación de {self.model_id.name} se ha programado y se ejecutará en segundo plano.'),
+                'title': _('Import scheduled'),
+                'message': _('The import of %s was scheduled and will run in the background.') % self.model_id.name,
                 'sticky': False,
                 'type': 'info',
             }
@@ -98,7 +98,7 @@ class ServerAction(models.Model):
             action = self.browse(server_action_id)
             if action.exists() and action.use_for_initial_import:
                 result = action._process_initial_import()
-                _logger.info(_("Acción '%s': %s") % (action.name, result))
+                _logger.info(_("Import action '%s': %s") % (action.name, result))
         else:
             actions = self.sudo().search([
                 ('use_for_initial_import', '=', True),
@@ -108,9 +108,9 @@ class ServerAction(models.Model):
             for action in actions:
                 try:
                     result = action._process_initial_import()
-                    _logger.info(_("Acción '%s': %s") % (action.name, result))
+                    _logger.info(_("Import action '%s': %s") % (action.name, result))
                 except Exception as e:
-                    _logger.error(_("Error en acción '%s': %s") % (action.name, str(e)))
+                    _logger.error(_("Error in import action '%s': %s") % (action.name, str(e)))
 
         if automatic:
             # auto-commit for batch processing
@@ -124,7 +124,7 @@ class ServerAction(models.Model):
 
         try:
             self.run()
-            result = _("Importación exitosa!.")
+            result = _("Import completed successfully.")
 
             self.write({
                 'importing_state': 'done',
@@ -133,8 +133,8 @@ class ServerAction(models.Model):
             })
 
         except Exception as e:
-            _logger.error("Error en la importación inicial: %s", str(e))
-            result = _("Error en la importación: %s") % str(e)
+            _logger.error("Error during initial import: %s", str(e))
+            result = _("Error during import: %s") % str(e)
             self.write({
                 'importing_state': 'error',
                 'import_result': result
@@ -146,9 +146,9 @@ class ServerAction(models.Model):
         """Programa la ejecución de la exportación via cron"""
         self.ensure_one()
         if not self.connector_id:
-            raise UserError(_("Debe configurar el conector para la exportación."))
+            raise UserError(_("You must set the connector before running the export."))
         if not self.use_for_initial_export:
-            raise UserError(_("Debe marcar el check Usar para envío inicial."))
+            raise UserError(_("Enable 'Use for initial export'."))
 
         # Actualizar el estado a programado
         self.write({
@@ -162,9 +162,8 @@ class ServerAction(models.Model):
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
-                'title': _('Exportación programada'),
-                'message': _(
-                    f'La exportación de {self.model_id.name} se ha programado y se ejecutará en segundo plano.'),
+                'title': _('Export scheduled'),
+                'message': _('The export of %s was scheduled and will run in the background.') % self.model_id.name,
                 'sticky': False,
                 'type': 'info',
             }
@@ -180,7 +179,7 @@ class ServerAction(models.Model):
             action = self.browse(server_action_id)
             if action.exists() and action.use_for_initial_export:
                 result = action._process_initial_export()
-                _logger.info(_("Acción de exportación '%s': %s") % (action.name, result))
+                _logger.info(_("Export action '%s': %s") % (action.name, result))
         else:
             actions = self.sudo().search([
                 ('use_for_initial_export', '=', True),
@@ -190,9 +189,9 @@ class ServerAction(models.Model):
             for action in actions:
                 try:
                     result = action._process_initial_export()
-                    _logger.info(_("Acción de exportación '%s': %s") % (action.name, result))
+                    _logger.info(_("Export action '%s': %s") % (action.name, result))
                 except Exception as e:
-                    _logger.error(_("Error en acción de exportación '%s': %s") % (action.name, str(e)))
+                    _logger.error(_("Error in export action '%s': %s") % (action.name, str(e)))
 
         if automatic:
             # auto-commit for batch processing
@@ -206,7 +205,7 @@ class ServerAction(models.Model):
 
         try:
             self.run()
-            result = _("Exportación exitosa!.")
+            result = _("Export completed successfully.")
 
             self.write({
                 'exporting_state': 'done',
@@ -215,10 +214,11 @@ class ServerAction(models.Model):
             })
 
         except Exception as e:
-            _logger.error("Error en la exportación inicial: %s", str(e))
-            result = _("Error en la exportación: %s") % str(e)
+            _logger.error("Initial export error: %s", str(e))
+            result = _("Error during export: %s") % str(e)
             self.write({
                 'exporting_state': 'error',
                 'export_result': result
             })
         return result
+

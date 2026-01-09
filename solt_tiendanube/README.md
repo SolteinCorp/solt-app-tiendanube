@@ -1,94 +1,81 @@
 # Odoo ↔ Tiendanube Connector
 
-**Version:** 17.0.1.0.7  
-**Category:** Sales/Multichannel  
-**License:** LGPL-3
+## Overview / Overview
 
-## Overview / Descripción General
-
-> **Basado en el listado de la app de Tiendanube:** Esta solución oficial conecta Tiendanube con Odoo para centralizar catálogos, pedidos, inventarios y envíos, eliminando tareas manuales y simplificando operaciones omnicanal.
+> **Based on the Tiendanube app listing:** This official solution connects Tiendanube with Odoo to centralize catalogs, orders, inventories and shipments, eliminating manual tasks and simplifying omnichannel operations.
 >
-> Este conector sincroniza catálogos multicanal (atributos, variantes, imágenes, SEO), importa pedidos de Tiendanube a flujos de venta nativos, envía actualizaciones de cumplimiento (envíos, guías, cancelaciones) y ofrece dashboards con alertas para la toma de decisiones en tiempo real.
+> This connector synchronizes multichannel catalogs (attributes, variants, images, SEO), pulls Tiendanube orders into native sales flows, pushes fulfillment updates (shipments, guides, cancellations) and offers dashboards with alerts for real-time decision making.
 
-El **Soltein Tiendanube Connector** mantiene Odoo 17.0 sincronizado con Tiendanube: productos, imágenes adicionales, precios, inventario, pedidos, envíos y facturas fluyen automáticamente entre ambas plataformas. Los comerciantes multi-empresa pueden orquestar múltiples almacenes, mantener catálogos de marca y automatizar reglas de cumplimiento sin salir de Odoo.
+The **Soltein Tiendanube Connector** keeps Odoo 18.0 synchronized with Tiendanube: products, extra images, prices, inventory, orders, shipments, and invoices flow automatically between both platforms. Multi-company merchants can orchestrate multiple warehouses, maintain branded catalogs, and automate fulfillment rules without leaving Odoo.
 
-## Key Features / Características Principales
+## Key features / Key features
 
-| Feature | Descripción |
+- **Two-way catalog sync** – Push product templates, brands, multi categories, prices, SEO content, and gallery images.
+- **Product brand management** – Create and maintain custom brand dictionaries consumed by Tiendanube listings.
+- **Multi-category tagging** – Assign additional product categories required by Tiendanube storefronts.
+- **Multi-warehouse orders** – Split sales fulfillment by warehouse with per-line delivery dates and routing.
+- **Inventory orchestration** – Publish stock figures per warehouse, reserve units, and keep availability aligned with Tiendanube.
+- **Order intake** – Import orders, customers, payment references, coupons, and delivery methods into native sales orders.
+- **Logistics bridge** – Trigger deliveries, update tracking numbers, and notify Tiendanube via secure webhooks.
+- **Workflow automation** – Base automations, cron jobs, and webhooks keep both systems aligned without manual clicks.
+- **Localization helpers** – Address formatting, measurement units, and regional settings designed for LATAM stores.
+
+## Dependency Stack / Dependency Architecture
+
+| Module | Purpose |
 | --- | --- |
-| **Sincronización bidireccional de catálogo** | Envía plantillas de productos, marcas, múltiples categorías, precios, contenido SEO e imágenes de galería. |
-| **Orquestación de inventario** | Publica cifras de stock por almacén, reserva unidades y mantiene la disponibilidad alineada con Tiendanube. |
-| **Importación de pedidos** | Importa pedidos, clientes, referencias de pago, cupones y métodos de entrega a órdenes de venta nativas. |
-| **Puente logístico** | Activa entregas, actualiza números de rastreo y notifica a Tiendanube vía webhooks seguros. |
-| **Automatización de flujos** | Automatizaciones base, cron jobs y webhooks mantienen ambos sistemas alineados sin clics manuales. |
-| **Helpers de localización** | Formato de direcciones, unidades de medida y configuraciones regionales diseñadas para tiendas LATAM. |
+| `solt_api_connector` | Core framework that models REST APIs, handles authentication, webhooks, schedulers, call logs, and provides the reusable sync engine used by every vertical connector. |
+| `solt_tiendanube` | Tiendanube-specific configuration (endpoints, payload mappings, cron jobs, UI) built on top of `solt_api_connector`. Includes product brand management, multi-category tagging, and multi-warehouse order routing. |
+| `solt_l10n_mx_partner_address` | Mexican address enrichment so Tiendanube shipping data maps cleanly into Odoo. |
+| Standard dependencies (`sale`, `sale_stock`, `stock`, `stock_delivery`) | Native Odoo models for orders, inventory, shipments, and carriers that the connector orchestrates. |
 
-## Dependency Stack / Arquitectura de Dependencias
+## Included Features / Funcionalidades Incluidas
 
-| Módulo | Propósito |
+| Feature | Description |
 | --- | --- |
-| `solt_api_connector` | Framework core que modela APIs REST, maneja autenticación, webhooks, schedulers, logs de llamadas y provee el motor de sincronización reutilizable. |
-| `sale` | Módulo nativo de Odoo para gestión de órdenes de venta. |
-| `sale_stock` | Integración entre ventas e inventario. |
-| `stock` | Módulo nativo de Odoo para gestión de inventario. |
-| `solt_l10n_mx_partner_address` | Enriquecimiento de direcciones mexicanas para mapear datos de envío de Tiendanube a Odoo. |
-| `stock_delivery` | Módulo nativo de Odoo para transportistas y envíos. |
+| **Core connector** | Sync engines, UI, endpoints, cron jobs for Tiendanube integration |
+| **Product Brand** | Custom `solt.product.brand` model with multi-company support |
+| **Multi Categories** | `categ_ids` field for auxiliary product categories classification |
+| **Multi-Warehouse Orders** | Per-line warehouse assignment and delivery dates in sales orders |
+| **API orchestration** | Leverages `solt_api_connector` for imports/exports, hooks, schedulers |
 
-## Modelos Incluidos / Included Models
+## Requirements
 
-| Modelo | Propósito |
-| --- | --- |
-| `product.template` | Extensión para sincronización de productos con Tiendanube |
-| `product.product` | Variantes de producto sincronizadas |
-| `product.category` | Categorías de producto mapeadas a Tiendanube |
-| `sale.order` | Órdenes de venta importadas desde Tiendanube |
-| `sale.order.line` | Líneas de pedido con datos de Tiendanube |
-| `res.partner` | Clientes sincronizados desde Tiendanube |
-| `stock.picking` | Envíos y actualizaciones de tracking |
-| `stock.warehouse` | Mapeo de almacenes para sincronización de stock |
-| `account.move` | Facturas vinculadas a pedidos de Tiendanube |
-| `solt.api.connector` | Configuración del conector API |
-| `solt.product.brand` | Marcas de productos para Tiendanube |
-| `solt.product.image` | Imágenes adicionales de productos |
-| `solt.register.webhook` | Registro y gestión de webhooks |
-| `warehouse.sync.mapping` | Mapeo de almacenes para sincronización |
+- Odoo 18.0 Community or Enterprise
+- Dependencies listed in `__manifest__.py`
+- Valid Tiendanube API credentials per company
+- Python requirements inherited from base Odoo installation
 
-## Requirements / Requisitos
+## Installation
 
-- Odoo 17.0 Community o Enterprise
-- Dependencias listadas en `__manifest__.py`
-- Credenciales de API válidas de Tiendanube por compañía
-- Requisitos de Python heredados de la instalación base de Odoo
+1. Clone this repository inside your custom addons path.
+2. Install connector dependencies (`solt_api_connector`, `solt_l10n_mx_partner_address`).
+3. Update the Apps list and install **Odoo ↔ Tiendanube Connector**.
+4. Assign the new security groups to integration users.
 
-## Installation / Instalación
+## Configuration
 
-1. Clonar este repositorio dentro del path de addons personalizados.
-2. Instalar las dependencias del conector (`solt_api_connector`, helpers de workflow, etc.).
-3. Actualizar la lista de Apps e instalar **Odoo ↔ Tiendanube Connector**.
-4. Asignar los nuevos grupos de seguridad a usuarios de integración.
+1. Navigate to **Tiendanube Connector ▸ Settings** and enter the API keys / App ID.
+2. Configure webhook endpoints and activate the required events.
+3. Map warehouses through **Tiendanube Connector ▸ Warehouse Mapping**.
+4. Enable multi-warehouse orders in **Sales ▸ Settings** if needed.
+5. Enable cron jobs that fit your synchronization cadence.
+6. Run an initial product sync followed by stock and order pulls.
 
-## Configuration / Configuración
+## Next Steps Before Publishing
 
-1. Navegar a **Tiendanube Connector ▸ Settings** e ingresar las API keys / App ID.
-2. Configurar endpoints de webhook y activar los eventos requeridos.
-3. Mapear almacenes mediante **Tiendanube Connector ▸ Warehouse Mapping**.
-4. Habilitar cron jobs según la cadencia de sincronización deseada.
-5. Ejecutar sincronización inicial de productos seguida de pulls de stock y pedidos.
-
-## Next Steps Before Publishing / Próximos Pasos
-
-1. Capturar 3–5 screenshots (dashboard, order sync, configuración) y agregarlos a `static/description/` como `screenshot_X.png`.
-2. Instalar en una base de datos limpia, ejecutar smoke test y exportar traducciones:
+1. Capture 3–5 screenshots (dashboard, order sync, configuration) and add them to `static/description/` as `screenshot_X.png`.
+2. Install on a clean DB, run smoke test, and export translations:
    ```bash
    ./odoo-bin -c odoo.conf -d test_tiendanube --stop-after-init -i solt_tiendanube
    ./odoo-bin -c odoo.conf -d test_tiendanube --i18n-export=solt_tiendanube/i18n/es_MX.po --modules=solt_tiendanube
    ```
-3. Empaquetar el módulo:
+3. Package the module:
    ```bash
    cd ..
-   zip -r solt_tiendanube_17.0.1.0.7.zip solt_tiendanube -x "*/__pycache__/*" "*.pyc"
+   zip -r solt_tiendanube_18.0.1.0.7.zip solt_tiendanube -x "*/__pycache__/*" "*.pyc"
    ```
-4. Subir en Odoo Apps con screenshots actualizados y categoría `Sales/Multichannel`.
+4. Submit on Odoo Apps with updated screenshots and manifest category `Sales/Multichannel`.
 
 ## Support / Soporte
 

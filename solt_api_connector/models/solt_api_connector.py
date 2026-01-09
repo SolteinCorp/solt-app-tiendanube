@@ -17,44 +17,43 @@ class SoltApiConnector(models.Model):
     _name = 'solt.api.connector'
     _description = 'API Connector'
 
-    name = fields.Char('Nombre', required=True)
-    base_url = fields.Char('URL Base', required=True, help="URL base de la API (ej: https://api.example.com)")
-    active = fields.Boolean('Activo', default=True)
+    name = fields.Char('Name', required=True)
+    base_url = fields.Char('Base URL', required=True, help="Base API URL (e.g. https://api.example.com)")
+    active = fields.Boolean('Active', default=True)
     auth_type = fields.Selection([
-        ('none', 'Sin autenticación'),
-        ('basic', 'Autenticación Básica'),
-        ('bearer', 'Token Bearer'),
-        ('api_key', 'API Key'),
-    ], string='Tipo de Autenticación', default='none', required=True)
-    username = fields.Char('Usuario', help="Para autenticación básica")
-    password = fields.Char('Contraseña', help="Para autenticación básica")
-    token = fields.Char('Token', help="Para autenticación tipo Bearer o API Key")
-    api_key_name = fields.Char('Nombre de API Key', help="Nombre del parámetro para la API Key")
-    api_key_in = fields.Selection([('header', 'Header'), ('query', 'Query Parameter')], string='Ubicación de API Key', default='header')
-    timeout = fields.Integer('Timeout (segundos)', default=30)
-    headers = fields.Json('Headers adicionales', help="Headers adicionales en formato JSON")
+        ('none', 'No authentication'),
+        ('basic', 'Basic authentication'),
+        ('bearer', 'Bearer token'),
+        ('api_key', 'API key'),
+    ], string='Authentication type', default='none', required=True)
+    username = fields.Char('Username', help="Used for Basic authentication")
+    password = fields.Char('Password', help="Used for Basic authentication")
+    token = fields.Char('Token', help="Used for Bearer or API key auth")
+    api_key_name = fields.Char('API key name', help="Parameter name for the API key")
+    api_key_in = fields.Selection([('header', 'Header'), ('query', 'Query parameter')], string='API key location', default='header')
+    timeout = fields.Integer('Timeout (seconds)', default=30)
+    headers = fields.Json('Extra headers', help="JSON structure with extra headers")
     endpoint_ids = fields.One2many('solt.api.endpoint', 'connector_id', string='Endpoints')
-    automation_ids = fields.One2many('base.automation', 'connector_id', string='Reglas de Automatización', context={'active_test': False},
-                                     help="Reglas de automatización asociadas a este conector")
-    company_ids = fields.One2many('res.company', 'connector_id', string='Compañías', help="Compañías asociadas a este conector")
-    # En el modelo SoltApiConnector
-    call_log_count = fields.Integer(string='Número de llamadas', compute='_compute_call_log_count')
-    # Campos dinamicos
-    meta_field_ids = fields.One2many('solt.api.meta.fields', 'connector_id', string="Campo meta")
+    automation_ids = fields.One2many('base.automation', 'connector_id', string='Automations',
+                                     domain=['|', ('active', '=', True), ('active', '=', False)],
+                                     context={'active_test': False},
+                                     help="Automation rules associated with this connector")
+    company_ids = fields.One2many('res.company', 'connector_id', string='Companies', help="Companies linked to this connector")
+    call_log_count = fields.Integer(string='Call logs', compute='_compute_call_log_count')
+    meta_field_ids = fields.One2many('solt.api.meta.fields', 'connector_id', string="Meta fields")
     ini_import_acion_server_ids = fields.One2many('ir.actions.server', 'connector_id',
                                                   domain=[('use_for_initial_import', '=', True)],
-                                                  string='Acciones de importacion inicial')
-    company_count = fields.Integer(compute="_compute_company_count", string="Total de empresas sincronizadas")
-    company_sync_count = fields.Integer(compute="_compute_company_count", string="Total de empresas sincronizadas")
-    # Campos para exportación inicial
+                                                  string='Initial import actions')
+    company_count = fields.Integer(compute="_compute_company_count", string="Companies with connector")
+    company_sync_count = fields.Integer(compute="_compute_company_count", string="Companies with external config")
     ini_export_action_server_ids = fields.One2many('ir.actions.server', 'connector_id',
-                                                   string='Acciones de exportación inicial',
+                                                   string='Initial export actions',
                                                    domain=[('use_for_initial_export', '=', True)],
-                                                   help="Acciones de servidor configuradas para exportación inicial")
+                                                   help="Server actions used for first-time exports")
 
     @api.depends()
     def _compute_call_log_count(self):
-        """Calcula el número de logs de llamadas para este conector"""
+        """Calculates the number of call logs for this connector"""
         for connector in self:
             connector.call_log_count = self.env['solt.api.call.log'].search_count([
                 ('connector_id', '=', connector.id)
@@ -68,13 +67,13 @@ class SoltApiConnector(models.Model):
                 connector.company_ids.filtered(lambda c: c.external_id and c.bearer_token))
 
     def action_view_call_logs(self):
-        """Abre la vista de logs de llamadas filtradas por este conector"""
+        """Opens the call logs view filtered by this connector"""
         self.ensure_one()
         return {
-            'name': _('Logs de Llamadas API'),
+            'name': _('API Call Logs'),
             'type': 'ir.actions.act_window',
             'res_model': 'solt.api.call.log',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('connector_id', '=', self.id)],
             'context': {'default_connector_id': self.id},
             'target': 'current',
@@ -82,40 +81,40 @@ class SoltApiConnector(models.Model):
 
     @api.model
     def execute_endpoint(self, endpoint_code, record=None, params=None, data=None):
-        """Ejecuta un endpoint dado su código y un diccionario de argumentos"""
+        """Executes an endpoint given its code and a dictionary of arguments"""
         endpoint = self.env['solt.api.endpoint'].search([('code', '=', endpoint_code)], limit=1)
         if not endpoint:
-            raise ValidationError(_("No se encontró el endpoint con el código: %s") % endpoint_code)
+            raise ValidationError(_("Endpoint not found: %s") % endpoint_code)
         try:
             response = endpoint.execute_request(record, params, data)
         except Exception as e:
-            _logger.error(f"Error procesando respuesta: {str(e)}")
+            _logger.error(f"Error processing response: {str(e)}")
             raise UserError(str(e))
         return response
 
     def _get_auth_headers(self):
-        """Prepara los headers de autenticación según el tipo configurado"""
+        """Prepares the authentication headers according to the configured type"""
         headers = {}
         if self.auth_type == 'basic':
             if not self.username or not self.password:
-                raise ValidationError(_("Se requiere usuario y contraseña para autenticación básica."))
+                raise ValidationError(_("Username and password are required for Basic authentication."))
             auth_str = f"{self.username}:{self.password}"
             headers['Authorization'] = f"Basic {base64.b64encode(auth_str.encode()).decode()}"
         elif self.auth_type == 'bearer':
             if not self.token:
-                raise ValidationError(_("Se requiere token para autenticación Bearer."))
+                raise ValidationError(_("Token is required for Bearer authentication."))
             headers['Authorization'] = f"Bearer {self.token}"
         elif self.auth_type == 'api_key' and self.api_key_in == 'header':
             if not self.token or not self.api_key_name:
-                raise ValidationError(_("Se requiere nombre y valor de API Key."))
+                raise ValidationError(_("API key name and value are required."))
             headers[self.api_key_name] = self.token
-        # Agregar headers adicionales si existen
+        # Add extra headers if they exist
         if self.headers:
             headers.update(json.loads(self.headers))
         return headers
 
     def _prepare_api_url(self, endpoint):
-        """Prepara la URL completa incluyendo la URL base y el endpoint"""
+        """Prepares the full URL including the base URL and the endpoint"""
         if endpoint.startswith('https://') or endpoint.startswith('http://'):
             return endpoint.rstrip('/')
         base = self.base_url.rstrip('/')
@@ -123,7 +122,7 @@ class SoltApiConnector(models.Model):
         return f"{base}/{endpoint_path}"
 
     def test_connection(self):
-        """Prueba la conexión básica a la API"""
+        """Tests the basic connection to the API"""
         try:
             headers = self._get_auth_headers()
             response = requests.get(self.base_url, headers=headers, timeout=self.timeout)
@@ -132,8 +131,8 @@ class SoltApiConnector(models.Model):
                     'type': 'ir.actions.client',
                     'tag': 'display_notification',
                     'params': {
-                        'title': _('Conexión exitosa'),
-                        'message': _('La conexión a la API fue establecida correctamente.'),
+                        'title': _('Connection successful'),
+                        'message': _('The API connection was established successfully.'),
                         'sticky': False,
                         'type': 'success',
                     }
@@ -143,8 +142,8 @@ class SoltApiConnector(models.Model):
                     'type': 'ir.actions.client',
                     'tag': 'display_notification',
                     'params': {
-                        'title': _('Error de conexión'),
-                        'message': _('La API respondió con código: %s - %s') % (response.status_code, response.text),
+                        'title': _('Connection error'),
+                        'message': _('API responded with code: %s - %s') % (response.status_code, response.text),
                         'sticky': True,
                         'type': 'warning',
                     }
@@ -154,7 +153,7 @@ class SoltApiConnector(models.Model):
                 'type': 'ir.actions.client',
                 'tag': 'display_notification',
                 'params': {
-                    'title': _('Error de conexión'),
+                    'title': _('Connection error'),
                     'message': str(e),
                     'sticky': True,
                     'type': 'danger',
@@ -174,7 +173,7 @@ class SoltApiConnector(models.Model):
     @api.ondelete(at_uninstall=False)
     def _unlink_except_active(self):
         if any(connector.active for connector in self):
-            raise UserError(_('No puedes eliminar el conector de API en estado activo.'))
+            raise UserError(_('You cannot delete an active API connector.'))
 
     def toggle_active(self):
         res = super().toggle_active()
@@ -226,4 +225,3 @@ class SoltApiConnector(models.Model):
             ])
             ini_export_action_server_ids.unlink()
         return super(SoltApiConnector, self).unlink()
-

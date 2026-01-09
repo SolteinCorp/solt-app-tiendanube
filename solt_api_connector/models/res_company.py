@@ -8,18 +8,16 @@ from odoo import api, fields, models, tools, _, Command, SUPERUSER_ID
 class ResCompany(models.Model):
     _inherit = 'res.company'
 
-    external_id = fields.Char("ID externo")
-    bearer_token = fields.Char("Token")
-    connector_id = fields.Many2one('solt.api.connector', string='Configurador de API')
+    external_id = fields.Char("External ID")
+    bearer_token = fields.Char("Bearer token")
+    connector_id = fields.Many2one('solt.api.connector', string='API connector')
     state_initial_load = fields.Selection([
-        ('not_executed', 'Sin ejecutar'),
-        ('completed', 'Completado'),
-    ], string="Estado carga inicial", default="not_executed")
-    sync_token = fields.Char(string='Token de Sincronización', prefetch=False,
-                             help="Token único para sincronización con el middleware")
+        ('not_executed', 'Not executed'),
+        ('completed', 'Completed'),
+    ], string="Initial load status", default="not_executed")
 
     # social media
-    social_pinterest = fields.Char('Cuenta de Pinterest', prefetch=False)
+    social_pinterest = fields.Char('Pinterest account', prefetch=False)
     social_blog = fields.Char('Blog', prefetch=False)
 
     @api.model_create_multi
@@ -69,6 +67,10 @@ class ResCompany(models.Model):
 
             # Make sure that the selected currencies are enabled
             companies.currency_id.sudo().filtered(lambda c: not c.active).active = True
+
+            companies_needs_l10n = companies.filtered('country_id')
+            if companies_needs_l10n:
+                companies_needs_l10n.install_l10n_modules()
 
             return companies
         else:

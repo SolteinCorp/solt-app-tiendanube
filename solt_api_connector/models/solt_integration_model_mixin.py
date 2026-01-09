@@ -9,9 +9,10 @@ _logger = logging.getLogger(__name__)
 
 class SoltIntegrationModelMixin(models.AbstractModel):
     _name = 'solt.integration.model.mixin'
-    _description = 'Modelo de integración Mixin'
+    _description = 'Integration Model Mixin'
 
     def convert_translated_field_to_odoo_format(self, value, split_code=True):
+        """Return the best translation match for the current environment languages."""
         if not isinstance(value, dict):
             return value
         languages = self.env.lang
@@ -38,6 +39,7 @@ class SoltIntegrationModelMixin(models.AbstractModel):
         return translation
 
     def convert_translated_field_to_api_format(self, value, split_code=True):
+        """Build a translation dict for API payloads based on installed languages."""
         translation = {}
         languages = self.env.lang
         if not languages:
@@ -62,19 +64,17 @@ class SoltIntegrationModelMixin(models.AbstractModel):
 
     def _check_can_update_record(self, values):
         """
-        Valida si con el dict values se producirá un cambio real en el registro:
-        - Para campos simples: compara directamente old != new.
-        - Para Many2one/reference: compara old.id vs new (int o id en dict).
-        - Para One2many/M2M: compara conjuntos de IDs actuales vs nuevos (incluso tras comandos).
-        - Omite campos que empiecen por 'x_' o que no existan en el modelo.
-        :param values: dict con valores a validar
-        :return: True o False
+        Validate whether the provided values would trigger a real change on the record:
+        - Simple fields: direct comparison.
+        - Many2one/reference: compare IDs.
+        - One2many/Many2many: compare resulting ID sets (after commands).
+        - Ignore fields starting with 'x_' or not present in the model.
         """
         if not isinstance(values, dict):
             return False
 
         def _extract_rel_ids(field, val):
-            """Dado un valor val para un campo relacional, extrae el set de IDs resultante."""
+            """Given a relational value, extract the resulting set of record IDs."""
             ftype = field.type
             # Many2one / reference
             if ftype in ('many2one', 'reference'):
@@ -153,4 +153,3 @@ class SoltIntegrationModelMixin(models.AbstractModel):
         connector_id = self._get_connector()
         endpoint = self.env['solt.api.endpoint'].search([('code', '=', code), ('connector_id', '=', connector_id.id)], limit=1)
         return endpoint
-

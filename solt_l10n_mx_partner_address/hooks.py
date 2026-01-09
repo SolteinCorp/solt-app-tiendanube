@@ -73,10 +73,13 @@ def post_init_hook(env):
         district_vals_list = []
         with tools.file_open("solt_l10n_mx_partner_address/data/res.city.district.csv") as csv_file:
             for row in csv.DictReader(csv_file):
+                city_id = env.ref(row['city_id'], raise_if_not_found=False)
+                if not city_id:
+                    continue
                 district_vals_list.append({
                     'name': row['name'],
                     'zip_code': row['zipcode'],
-                    'city_id': env.ref(row['city_id'], raise_if_not_found=False).id,
+                    'city_id': city_id.id,
                 })
 
         districties = district_obj.create(district_vals_list)

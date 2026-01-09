@@ -18,27 +18,27 @@ class SoltApiEndpoint(models.Model):
     _name = 'solt.api.endpoint'
     _description = 'API Endpoint'
 
-    name = fields.Char('Nombre', required=True)
+    name = fields.Char('Name', required=True)
     code = fields.Char('Code', required=True)
-    connector_id = fields.Many2one('solt.api.connector', string='Conector API', required=True, ondelete='cascade')
-    endpoint_path = fields.Char('Ruta del Endpoint', required=True, help="Ruta del endpoint. Puedes usar variables como {{variable}}")
-    method = fields.Selection([('GET', 'GET'), ('POST', 'POST'), ('PUT', 'PUT'), ('PATCH', 'PATCH'), ('DELETE', 'DELETE')], string='Método HTTP', default='GET', required=True)
-    model_id = fields.Many2one('ir.model', string='Modelo Odoo')
+    connector_id = fields.Many2one('solt.api.connector', string='API Connector', required=True, ondelete='cascade')
+    endpoint_path = fields.Char('Endpoint path', required=True, help="Endpoint path. You can use variables such as {{variable}}")
+    method = fields.Selection([('GET', 'GET'), ('POST', 'POST'), ('PUT', 'PUT'), ('PATCH', 'PATCH'), ('DELETE', 'DELETE')], string='HTTP method', default='GET', required=True)
+    model_id = fields.Many2one('ir.model', string='Odoo model')
     request_mapping = fields.Json(
-        'Mapeo de Solicitud',
-        help="""Define cómo se transforman los datos de Odoo a la API externa.
+        'Request mapping',
+        help="""Defines how Odoo data is transformed into the external API payload.
 
-Formato de solicitud (Odoo → API):
+Request format (Odoo → API):
 {
-  "campo_api": "valor_fijo",                       # Valor constante directamente
-  "otro_campo": {"field": "campo_odoo.subcampo"},  # Campo de Odoo (con notación de punto)
-  "dato_number": {"field": "campo_odoo", "type": "float"},  # Con conversión de tipo
-  "dato_custom": {"field": "campo_odoo", "transform": "value.upper()"},  # Con transformación
-  "parametro": {"payload": "param_name"},          # Valor del payload/parámetros
-  "items": {                                       # Para campos one2many/arrays
+  "api_field": "fixed_value",                       # Constant value
+  "other_field": {"field": "odoo_field.subfield"},  # Odoo field (dot notation)
+  "number_data": {"field": "odoo_field", "type": "float"},  # Type conversion
+  "custom_data": {"field": "odoo_field", "transform": "value.upper()"},  # Transformation
+  "param": {"payload": "param_name"},          # Payload/parameter value
+  "items": {                                       # one2many/array support
     "source": "line_ids",
     "items": [
-      {"nombre": {"field": "name"}, "cantidad": {"field": "quantity"}}
+      {"name": {"field": "name"}, "qty": {"field": "quantity"}}
     ]
   }
 }
@@ -46,46 +46,45 @@ Formato de solicitud (Odoo → API):
         default="{}")
 
     response_mapping = fields.Json(
-        'Mapeo de Respuesta',
-        help="""Define cómo se transforman los datos recibidos de la API externa a Odoo.
+        'Response mapping',
+        help="""Defines how API responses are transformed into Odoo data.
 
-Formato de respuesta (API → Odoo):
+Response format (API → Odoo):
 {
-  "campo_odoo": "data['nombre_campo']",             # Expresión Python directa
-  "otro_campo": "data.get('campo', 'valor_default')",  # Con manejo de valores por defecto
-  "campo_fecha": "fields.Date.to_date(data['fecha'])",  # Con conversión de tipo
-  "partner_id": "env['res.partner'].search([('ref', '=', data['cliente_id'])], limit=1).id",  # Campo relacional
-  "state": "'paid' if float(data['monto']) > 0 else 'draft'",  # Expresión condicional
-  "line_ids": "[{'product_id': env['product.product'].search([('default_code', '=', item['codigo'])], limit=1).id, 'quantity': float(item['cantidad'])} for item in data.get('items', [])]"  # One2many
+  "odoo_field": "data['field_name']",             # Direct Python expression
+  "other_field": "data.get('field', 'default')",  # With defaults
+  "date_field": "fields.Date.to_date(data['date'])",  # Type conversion
+  "partner_id": "env['res.partner'].search([('ref', '=', data['client_id'])], limit=1).id",  # Relational field
+  "state": "'paid' if float(data['amount']) > 0 else 'draft'",  # Conditional expression
+  "line_ids": "[{'product_id': env['product.product'].search([('default_code', '=', item['code'])], limit=1).id, 'quantity': float(item['qty'])} for item in data.get('items', [])]"  # one2many
 }
 
-Las expresiones tienen acceso a:
-- data: datos recibidos de la API
-- env: environment de Odoo
-- record: registro actual (en actualizaciones)
-- fields: módulo fields de Odoo para conversiones
-- y otras variables como datetime, json, re
+Expressions can access:
+- data: response data
+- env: Odoo environment
+- record: current record (for updates)
+- fields: Odoo fields helper for conversions
+- plus datetime, json, re, etc.
 """,
         default="{}")
 
-    request_param = fields.Json('Parámetros de solicitud',
-                                     help="JSON para definir parámetros de solicitud adicionales para la API",
+    request_param = fields.Json('Request parameters',
+                                     help="JSON definition for additional request parameters",
                                      default="{}")
-    headers = fields.Json('Headers adicionales', help="Headers adicionales en formato JSON")
-    pagination_enabled = fields.Boolean('Habilitar paginación', default=False)
-    pagination_param = fields.Char('Parámetro de página', default='page')
-    pagination_size_param = fields.Char('Parámetro de tamaño', default='limit')
-    pagination_size = fields.Integer('Tamaño de página', default=100)
-    sequence = fields.Integer(string="Secuencia", default=10)
-    check_required_request_field = fields.Boolean("Validar campos requeridos")
-    required_request_field = fields.Json("Campos requeridos", help="Campos requeridos de la API que se deben enviar en el request. "
-                                                                   "Campo de tipo char con los nombres de los campos de la API separados por ,")
-    request_as_array = fields.Boolean('Request como Array', default=False,
-        help="Si está marcado, el request será enviado como un array directo basado en la configuración del mapeo"
+    headers = fields.Json('Extra headers', help="Additional headers in JSON format")
+    pagination_enabled = fields.Boolean('Enable pagination', default=False)
+    pagination_param = fields.Char('Page parameter', default='page')
+    pagination_size_param = fields.Char('Page size parameter', default='limit')
+    pagination_size = fields.Integer('Page size', default=100)
+    sequence = fields.Integer(string="Sequence", default=10)
+    check_required_request_field = fields.Boolean("Validate required fields")
+    required_request_field = fields.Json("Required fields", help="API fields that must be sent in the request. Comma-separated char field with API field names")
+    request_as_array = fields.Boolean('Send request as array', default=False,
+        help="When enabled, the request will be sent as a raw array based on the mapping configuration"
     )
 
     _sql_constraints = [
-        ('code_unique', 'UNIQUE(code)', 'El código del endpoint debe ser único.'),
+        ('code_unique', 'UNIQUE(code)', 'Endpoint code must be unique.'),
     ]
 
     @api.constrains('required_request_field')
@@ -130,7 +129,7 @@ Las expresiones tienen acceso a:
 
     # prepare request data Odoo → API
     def _prepare_request_data(self, record=None, data=None):
-        """Prepara los datos para enviar según el formato configurado"""
+        """Prepares data to send according to the configured format"""
         if not data:
             data = {}
         if not self.request_mapping:
@@ -138,7 +137,7 @@ Las expresiones tienen acceso a:
         try:
             mapping_config = json.loads(self.request_mapping)
 
-            # Verificar si es un contexto de actualización PUT
+            # Check PUT context to send only modified fields
             modified_fields = self._context.get('modified_fields', [])
             if modified_fields and self.method == 'PUT':
                 required_api_field = {}
@@ -156,25 +155,21 @@ Las expresiones tienen acceso a:
                         should_include = True
                     elif 'expression' in field_config:
                         expression = field_config['expression']
-                        # Buscar patrones como "record.campo" o "item.campo"
                         field_patterns = [
-                            r'record\.(\w+)',  # record.product_tag_ids
-                            r'item\.(\w+)',  # item.qty_available
-                            r'\.(\w+)',  # .mapped('name') - buscar el campo antes del punto
+                            r'record\.(\w+)',
+                            r'item\.(\w+)',
+                            r'\.(\w+)',
                         ]
                         found_fields = set()
                         for pattern in field_patterns:
                             matches = re.findall(pattern, expression)
                             found_fields.update(matches)
 
-                        # Verificar si algun campo encontrado esta en los modified_fields
                         if found_fields.intersection(modified_fields):
                             should_include = True
-
                         elif required_api_field and field_key in required_api_field:
                             if required_api_field[field_key] in modified_fields:
                                 should_include = True
-
                     if should_include:
                         filtered_mapping[field_key] = field_config
                 if filtered_mapping:
@@ -185,11 +180,11 @@ Las expresiones tienen acceso a:
                 return self._prepare_array_request_data(mapping_config, record, data)
             return self._process_compact_mapping_to_api(mapping_config, record, data)
         except Exception as e:
-            _logger.error(f"Error en _prepare_request_data: {str(e)}")
-            raise UserError(_("Error al preparar los datos de solicitud: %s") % e)
+            _logger.error(f"Error in _prepare_request_data: {str(e)}")
+            raise UserError(_("Error preparing request data: %s") % e)
 
     def _process_compact_mapping_to_api(self, mapping_config, record=None, data=None, eval_context=None):
-        """Procesa el mapeo compacto desde Odoo hacia API externa"""
+        """Processes compact mapping from Odoo to external API"""
         result = {}
         if eval_context is None or not eval_context:
             eval_context = self._get_eval_context(data, record)
@@ -220,7 +215,7 @@ Las expresiones tienen acceso a:
         return result
 
     def _get_field_value(self, record, field_path):
-        """Obtiene el valor de un campo de un registro de Odoo"""
+        """Gets the value of a field from an Odoo record"""
         field_value = record
         path_parts = field_path.split('.')
         for idx, field_name in enumerate(path_parts):
@@ -248,7 +243,7 @@ Las expresiones tienen acceso a:
         return field_value
 
     def _apply_transform(self, value, transform_code, eval_context):
-        """Aplica una transformación a un valor"""
+        """Applies a transformation to a value"""
         ctx = dict(eval_context)
         ctx['value'] = value
         try:
@@ -258,7 +253,7 @@ Las expresiones tienen acceso a:
             return value
 
     def _process_one2many_field(self, record, field_config, eval_context):
-        """Procesa un campo one2many/many2many"""
+        """Processes a one2many/many2many field"""
         source_records = getattr(record, field_config['source'], [])
         if not source_records:
             return []
@@ -304,7 +299,7 @@ Las expresiones tienen acceso a:
         return items_result
 
     def _prepare_array_request_data(self, mapping_config, record=None, data=None):
-        """Prepara datos para requests que requieren formato de array directo"""
+        """Prepares data for requests requiring direct array format"""
         try:
             # Verificar si hay configuración de array_source (array simple)
             if 'array_source' in mapping_config:
@@ -318,7 +313,7 @@ Las expresiones tienen acceso a:
             raise UserError(_("Error al preparar datos de array: %s") % e)
 
     def _prepare_simple_array_request(self, mapping_config, record=None, data=None):
-        """Prepara array simple basado en array_source"""
+        """Prepares simple array based on array_source"""
         array_source = mapping_config.get('array_source')
         item_mapping = mapping_config.get('item_mapping', {})
 
@@ -349,7 +344,7 @@ Las expresiones tienen acceso a:
         return result
 
     def _prepare_complex_array_request(self, mapping_config, record=None, data=None):
-        """Prepara estructura compleja con múltiples objetos y arrays anidados"""
+        """Prepares complex structure with multiple objects and nested arrays"""
         if not record:
             return []
 
@@ -390,7 +385,7 @@ Las expresiones tienen acceso a:
 
     # process response data API → Odoo
     def _process_response(self, response_data, target_record=None):
-        """Procesa la respuesta de la API según el mapeo configurado"""
+        """Processes the API response according to the configured mapping"""
         if not self.model_id or not self.response_mapping:
             return {'raw_response': response_data}
         try:
@@ -399,7 +394,7 @@ Las expresiones tienen acceso a:
             # response_data es una list. Ej: Response de un metodo GET que devuelve un listado de data
             # sin paginacion
             if isinstance(response_data, list):
-                _logger.info(f"Procesando respuesta de lista directa con {len(response_data)} elementos")
+                _logger.info(f"Processing direct list response with {len(response_data)} elements")
                 processed_items = []
 
                 for item in response_data:
@@ -413,21 +408,18 @@ Las expresiones tienen acceso a:
                 }
             # response_data es una list con paginacion
             elif isinstance(response_data, dict):
-                # Detectar si es una respuesta con lista de elementos (paginada)
                 result_list = None
                 result_key = None
 
-                # Buscar cualquier clave que contenga una lista (paginación)
                 for key, value in response_data.items():
                     if isinstance(value, list) and value and key in ["items"]:
                         result_list = value
                         result_key = key
                         break
 
-                # Si encontramos una lista paginada, procesamos cada elemento
                 if result_list and result_key:
                     _logger.info(
-                        f"Procesando respuesta paginada con {len(result_list)} elementos en clave '{result_key}'")
+                        f"Processing paginated response with {len(result_list)} elements in key '{result_key}'")
                     processed_items = []
 
                     for item in result_list:
@@ -444,17 +436,18 @@ Las expresiones tienen acceso a:
                     values_to_write = self._process_simple_mapping_to_odoo(mapping_config, response_data, target_record)
                     return {'raw_response': response_data, 'values': values_to_write}
             else:
-                _logger.warning(f"Tipo de respuesta no soportado: {type(response_data)}")
+                _logger.warning(f"Unsupported response type: {type(response_data)}")
                 return {
                     'raw_response': response_data,
                     'error': True,
-                    'error_message': 'Tipo de respuesta no soportado'}
+                    'error_message': 'Unsupported response type'}
+
         except Exception as e:
             _logger.error(f"Error procesando respuesta: {str(e)}")
             return {'raw_response': response_data, 'error': str(e)}
 
     def _process_simple_mapping_to_odoo(self, mapping_config, api_data, target_record=None):
-        """Procesa el mapeo simple desde API externa hacia Odoo usando expresiones Python"""
+        """Processes simple mapping from external API to Odoo using Python expressions"""
         result = {}
         eval_context = self._get_eval_context(api_data, target_record)
         eval_context['data'] = api_data
@@ -477,7 +470,7 @@ Las expresiones tienen acceso a:
         return result
 
     def _get_api_value(self, api_data, source_path):
-        """Obtiene el valor de un campo de los datos de la API"""
+        """Gets the value of a field from the API data"""
         value = api_data
         for key in source_path.split('.'):
             if isinstance(value, dict) and key in value:
@@ -487,7 +480,7 @@ Las expresiones tienen acceso a:
         return value
 
     def _process_relation_field(self, relation_config, api_value):
-        """Procesa un campo relacional (many2one)"""
+        """Processes a relational field (many2one)"""
         model_name = relation_config.get('model')
         field_name = relation_config.get('field', 'id')
         create_if_missing = relation_config.get('create', False)
@@ -506,7 +499,7 @@ Las expresiones tienen acceso a:
         return None
 
     def _convert_field_value(self, value, target_type):
-        """Convierte un valor al tipo especificado"""
+        """Converts a value to the specified type"""
         try:
             if target_type == 'string':
                 return str(value)
@@ -526,7 +519,7 @@ Las expresiones tienen acceso a:
 
     # utils methods
     def _get_eval_context(self, data=None, record=None):
-        """Obtiene el contexto para evaluación de expresiones"""
+        """Obtains the context for expression evaluation"""
         model_name = self.model_id.sudo().model if self.model_id else self._context.get('active_model')
         model = self.env[model_name] if model_name else None
 
@@ -541,7 +534,7 @@ Las expresiones tienen acceso a:
                 func = getattr(model, func_name)
                 return func(*args, **kwargs)
             else:
-                raise UserError(f"La función '{func_name}' no se encontró en el contexto.")
+                raise UserError(_("Function '%s' not found in evaluation context.") % func_name)
 
         return {
             'env': self.env,
@@ -562,7 +555,7 @@ Las expresiones tienen acceso a:
         }
 
     def _prepare_endpoint_path(self, record=None, data=None):
-        """Prepara la ruta del endpoint evaluando las variables entre {}"""
+        """Prepares the endpoint path by evaluating variables in {}"""
         if not self.endpoint_path:
             return ''
         endpoint_path = self.endpoint_path.strip()
@@ -572,12 +565,12 @@ Las expresiones tienen acceso a:
                 value = safe_eval(expr.strip(), eval_context)
                 endpoint_path = endpoint_path.replace(f'{{{expr}}}', str(value) if value is not None else '')
             except Exception as e:
-                _logger.error(f"Error al evaluar expresión '{expr}' en endpoint_path: {str(e)}")
-                raise UserError(_("Error al evaluar la ruta del endpoint: %s") % e)
+                _logger.error(f"Error evaluating expression '{expr}' in endpoint_path: {str(e)}")
+                raise UserError(_("Error evaluating endpoint path: %s") % e)
         return endpoint_path
 
     def _get_auth_headers(self, data=None, record=None):
-        """Obtiene los headers de autenticación del conector y los evalúa en el contexto"""
+        """Gets the connector's authentication headers and evaluates them in the context"""
         headers = self.connector_id._get_auth_headers()
         if self.headers:
             try:
@@ -587,12 +580,12 @@ Las expresiones tienen acceso a:
                     custom_headers[key] = safe_eval(value, eval_context)
                 headers.update(custom_headers)
             except Exception as e:
-                _logger.error(f"Error al evaluar headers personalizados: {str(e)}")
-                raise UserError(_("Error al evaluar los headers personalizados: %s") % e)
+                _logger.error(f"Error evaluating custom headers: {str(e)}")
+                raise UserError(_("Error evaluating custom headers: %s") % e)
         return headers
 
     def execute_request(self, record=None, params=None, data=None, request_data=None):
-        """Ejecuta una solicitud a la API según la configuración del endpoint"""
+        """Executes a request to the API according to the endpoint configuration"""
         # Si es GET y la paginación está habilitada, usar el método de paginación
         if self.method == 'GET' and self.pagination_enabled:
             return self._execute_paginated_request(record, params, data)
@@ -643,11 +636,11 @@ Las expresiones tienen acceso a:
                 result['status_code'] = status_code
                 return result
             else:
-                # Si error, devolvemos un diccionario con la información del error
                 return {
                     'status_code': status_code,
                     'error': True,
-                    'error_message': _(f"Error en la llamada a la API: Código {status_code}, Descripcion {response_data.get('description')}, Mensaje {response_data.get('message', '')}"),
+                    'error_message': _(
+                        f"Error en la llamada a la API: Código {status_code}, Descripcion {response_data.get('description')}, Mensaje {response_data.get('message', '')}"),
                     'raw_response': response_data
                 }
         except requests.exceptions.RequestException as e:
@@ -662,7 +655,7 @@ Las expresiones tienen acceso a:
             raise UserError(_("Error de conexión: %s") % str(e))
 
     def _send_request(self, url, params, data, headers, timeout):
-        """Envía la solicitud HTTP según el método configurado"""
+        """Sends the HTTP request according to the configured method"""
         if self.method == 'GET':
             return requests.get(url, params=params, headers=headers, timeout=timeout)
         elif self.method == 'POST':
@@ -678,7 +671,7 @@ Las expresiones tienen acceso a:
 
     # pagination methods
     def _execute_paginated_request(self, record=None, params=None, data=None):
-        """Ejecuta solicitudes paginadas a la API y combina los resultados"""
+        """Executes paginated requests to the API and combines the results"""
         start_time = fields.Datetime.now()
         all_results = []  # Lista para almacenar todos los resultados
         current_page = 1

@@ -1,20 +1,22 @@
-
 from odoo import models, fields, _
 
 
 class IrCron(models.Model):
     _inherit = 'ir.cron'
 
-    server_action_to_import_id = fields.Many2one('ir.actions.server', string='Acción de servidor para importar',
-                                                 readonly=True)
+    server_action_to_import_id = fields.Many2one(
+        'ir.actions.server',
+        string='Server action for import',
+        readonly=True,
+    )
     server_action_to_export_id = fields.Many2one(
         'ir.actions.server',
-        string='Acción de Servidor para Exportación',
-        help="Acción de servidor específica para ejecutar exportación inicial"
+        string='Server action for export',
+        help="Server action used to run the initial export",
     )
 
     def method_direct_trigger(self):
-        """Override para preservar el server_action_id"""
+        """Override to preserve server_action_id on manual trigger."""
         server_action_id = self.env.context.get('server_action_id', False)
         if server_action_id:
             self.write({'server_action_to_import_id': server_action_id})
