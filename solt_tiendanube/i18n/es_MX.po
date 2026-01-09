@@ -1434,6 +1434,10 @@ msgstr "Almacén"
 #. module: solt_tiendanube
 #: model:ir.actions.act_window,name:solt_tiendanube.tnube_menu_solt_sync_mapping_view_action
 #: model_terms:ir.ui.view,arch_db:solt_tiendanube.solt_warehouse_sync_mapping_view_list
+#: model:ir.actions.act_window,name:solt_tiendanube.tnube_register_webhook_view_action
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.tnube_register_webhook_view_form
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.tnube_register_webhook_view_list
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.tnube_register_webhook_view_search
 msgid "Warehouse Sync Mapper"
 msgstr "Mapeador de Sincronización de Almacenes"
 
@@ -1499,3 +1503,639 @@ msgstr "variante(s)"
 #: code:addons/solt_tiendanube/models/product_template.py:0
 msgid "{} product images were migrated."
 msgstr "Se migraron {} imágenes de productos."
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Official Odoo-Tiendanube Integration to Centralize Your eCommerce"
+msgstr "Integración Oficial Odoo-Tiendanube para Centralizar tu eCommerce"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Automatically Sync Products, Inventory, Orders and Customers"
+msgstr "Sincroniza Automáticamente Productos, Inventario, Pedidos y Clientes"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "The <strong>Odoo-Tiendanube</strong> application is an integration connector that acts as a bridge between your Tiendanube online store and your Odoo ERP system. It is a tool designed to automate data and process management between both platforms, eliminating manual tasks and reducing operational errors."
+msgstr "La aplicación <strong>Odoo-Tiendanube</strong> es un conector de integración que actúa como puente entre tu tienda en línea de Tiendanube y tu sistema ERP Odoo. Es una herramienta diseñada para automatizar la gestión de datos y procesos entre ambas plataformas, eliminando tareas manuales y reduciendo errores operativos."
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Integrate your online store with your management system and keep products, inventory, orders and customers automatically synchronized between Tiendanube and Odoo. This integration prioritizes security (HTTPS and OAuth 2.0) and offers a guided setup so you can get started without advanced technical knowledge."
+msgstr "Integra tu tienda en línea con tu sistema de gestión y mantén productos, inventario, pedidos y clientes sincronizados automáticamente entre Tiendanube y Odoo. Esta integración prioriza la seguridad (HTTPS y OAuth 2.0) y ofrece una configuración guiada para que puedas comenzar sin conocimientos técnicos avanzados."
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "<strong>Odoo-Tiendanube</strong> is a connector that integrates Tiendanube with Odoo ERP to centralize your ecommerce operation: catalog, stock, prices, orders, customers and invoicing are managed from a single place, reducing manual tasks and errors."
+msgstr "<strong>Odoo-Tiendanube</strong> es un conector que integra Tiendanube con Odoo ERP para centralizar tu operación de ecommerce: catálogo, stock, precios, pedidos, clientes y facturación se gestionan desde un solo lugar, reduciendo tareas manuales y errores."
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Key Features:"
+msgstr "Características Principales:"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Bidirectional Product Sync"
+msgstr "Sincronización Bidireccional de Productos"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Publish, update and unpublish catalogs from Odoo to Tiendanube automatically"
+msgstr "Publica, actualiza y despublica catálogos desde Odoo a Tiendanube automáticamente"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Real-time Stock"
+msgstr "Stock en Tiempo Real"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Adjust inventory levels instantly, preventing stockouts or overstock"
+msgstr "Ajusta niveles de inventario instantáneamente, previniendo agotamientos o exceso de stock"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Integrated Sales"
+msgstr "Ventas Integradas"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Transfer orders from Tiendanube to Odoo at the moment of purchase"
+msgstr "Transfiere pedidos de Tiendanube a Odoo en el momento de la compra"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Category Management"
+msgstr "Gestión de Categorías"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Synchronize product categories between both platforms"
+msgstr "Sincroniza categorías de productos entre ambas plataformas"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Unified Customers"
+msgstr "Clientes Unificados"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Automatically register and update buyer data"
+msgstr "Registra y actualiza automáticamente los datos de los compradores"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Multi-warehouse"
+msgstr "Multi-almacén"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Supports multiple warehouses, syncing stock with each one"
+msgstr "Soporta múltiples almacenes, sincronizando stock con cada uno"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Product Images"
+msgstr "Imágenes de Productos"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Sync complete image galleries for products"
+msgstr "Sincroniza galerías de imágenes completas para productos"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Automated Fulfillment"
+msgstr "Cumplimiento Automatizado"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Update shipping status and tracking from Odoo"
+msgstr "Actualiza el estado de envío y seguimiento desde Odoo"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Real-time Webhooks"
+msgstr "Webhooks en Tiempo Real"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Receive instant notifications of changes in Tiendanube"
+msgstr "Recibe notificaciones instantáneas de cambios en Tiendanube"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Enterprise Security"
+msgstr "Seguridad Empresarial"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "HTTPS, OAuth 2.0, and secure tokens"
+msgstr "HTTPS, OAuth 2.0 y tokens seguros"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Community"
+msgstr "Community"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Enterprise"
+msgstr "Enterprise"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "(On-premises)"
+msgstr "(En local)"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "What Problems Does It Solve?"
+msgstr "¿Qué Problemas Resuelve?"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Inventory Discrepancies"
+msgstr "Discrepancias de Inventario"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Eliminates mismatches between platforms through automatic updates"
+msgstr "Elimina desajustes entre plataformas mediante actualizaciones automáticas"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Manual Processes and Errors"
+msgstr "Procesos Manuales y Errores"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Reduces management time and minimizes human errors"
+msgstr "Reduce el tiempo de gestión y minimiza errores humanos"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Fragmented Business Vision"
+msgstr "Visión Empresarial Fragmentada"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Provides centralized data in Odoo for deeper analysis"
+msgstr "Proporciona datos centralizados en Odoo para un análisis más profundo"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Sales Channel Limitations"
+msgstr "Limitaciones de Canales de Venta"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Facilitates multichannel expansion without multiplying operational tasks"
+msgstr "Facilita la expansión multicanal sin multiplicar tareas operativas"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "High Operating Costs"
+msgstr "Altos Costos Operativos"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Automates processes reducing the need for manual intervention"
+msgstr "Automatiza procesos reduciendo la necesidad de intervención manual"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Key Benefits"
+msgstr "Beneficios Clave"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Centralized Operation"
+msgstr "Operación Centralizada"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Manage everything from a single system (Odoo)"
+msgstr "Gestiona todo desde un solo sistema (Odoo)"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Fewer Errors"
+msgstr "Menos Errores"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Automation drastically reduces manual mistakes"
+msgstr "La automatización reduce drásticamente los errores manuales"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "HTTPS, OAuth 2.0, secure tokens and data encryption"
+msgstr "HTTPS, OAuth 2.0, tokens seguros y cifrado de datos"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Guided Setup"
+msgstr "Configuración Guiada"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Step-by-step installation process without needing experts"
+msgstr "Proceso de instalación paso a paso sin necesidad de expertos"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Support in Mexico"
+msgstr "Soporte en México"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Technical support during business hours GMT-6 timezone"
+msgstr "Soporte técnico durante horario laboral zona horaria GMT-6"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "How Does It Work?"
+msgstr "¿Cómo Funciona?"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "1. Configure"
+msgstr "1. Configurar"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Set up your Tiendanube credentials in Odoo"
+msgstr "Configura tus credenciales de Tiendanube en Odoo"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "2. Connect"
+msgstr "2. Conectar"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Authorize the secure OAuth 2.0 connection"
+msgstr "Autoriza la conexión segura OAuth 2.0"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "3. Sync"
+msgstr "3. Sincronizar"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Products, stock, orders and customers flow automatically"
+msgstr "Productos, stock, pedidos y clientes fluyen automáticamente"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "4. Manage"
+msgstr "4. Gestionar"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Control everything from Odoo's centralized dashboard"
+msgstr "Controla todo desde el panel centralizado de Odoo"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Synchronization Details"
+msgstr "Detalles de Sincronización"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Products"
+msgstr "Productos"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Name, description, SKU"
+msgstr "Nombre, descripción, SKU"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Prices and special prices"
+msgstr "Precios y precios especiales"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Product variants"
+msgstr "Variantes de producto"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Categories and tags"
+msgstr "Categorías y etiquetas"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Image galleries"
+msgstr "Galerías de imágenes"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Weight and dimensions"
+msgstr "Peso y dimensiones"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Orders"
+msgstr "Pedidos"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Order details and lines"
+msgstr "Detalles y líneas de pedido"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Customer information"
+msgstr "Información del cliente"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Shipping addresses"
+msgstr "Direcciones de envío"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Payment status"
+msgstr "Estado de pago"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Fulfillment tracking"
+msgstr "Seguimiento de cumplimiento"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Order notes"
+msgstr "Notas del pedido"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Inventory"
+msgstr "Inventario"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Real-time stock levels"
+msgstr "Niveles de stock en tiempo real"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Multi-warehouse support"
+msgstr "Soporte multi-almacén"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Automatic adjustments"
+msgstr "Ajustes automáticos"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Low stock alerts"
+msgstr "Alertas de stock bajo"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Reservation handling"
+msgstr "Manejo de reservas"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Variant stock tracking"
+msgstr "Seguimiento de stock por variante"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Technical Requirements"
+msgstr "Requisitos Técnicos"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Odoo Requirements"
+msgstr "Requisitos de Odoo"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Odoo 18.0 (Community or Enterprise)"
+msgstr "Odoo 18.0 (Community o Enterprise)"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Sales, Inventory, and Contacts modules"
+msgstr "Módulos de Ventas, Inventario y Contactos"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "HTTPS enabled server"
+msgstr "Servidor con HTTPS habilitado"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Public URL for webhooks"
+msgstr "URL pública para webhooks"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Subscription Required"
+msgstr "Suscripción Requerida"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "A subscription is required to use this service."
+msgstr "Se requiere una suscripción para usar este servicio."
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "View plans and pricing here"
+msgstr "Ver planes y precios aquí"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Tiendanube Requirements"
+msgstr "Requisitos de Tiendanube"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Active Tiendanube store"
+msgstr "Tienda Tiendanube activa"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "API access enabled"
+msgstr "Acceso API habilitado"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Admin permissions"
+msgstr "Permisos de administrador"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Products configured"
+msgstr "Productos configurados"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Enterprise-Grade Security"
+msgstr "Seguridad de Nivel Empresarial"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "OAuth 2.0"
+msgstr "OAuth 2.0"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Industry standard authentication protocol"
+msgstr "Protocolo de autenticación estándar de la industria"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "HTTPS"
+msgstr "HTTPS"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "All communications encrypted in transit"
+msgstr "Todas las comunicaciones encriptadas en tránsito"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Secure Tokens"
+msgstr "Tokens Seguros"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Encrypted credential storage"
+msgstr "Almacenamiento de credenciales encriptado"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Audit Logs"
+msgstr "Registros de Auditoría"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Complete activity tracking"
+msgstr "Seguimiento completo de actividad"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Professional Services by Soltein"
+msgstr "Servicios Profesionales por Soltein"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Odoo Implementation"
+msgstr "Implementación de Odoo"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Cloud Hosting"
+msgstr "Hospedaje en la Nube"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Customization"
+msgstr "Personalización"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Functional Training"
+msgstr "Capacitación Funcional"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Technical Training"
+msgstr "Capacitación Técnica"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Support &amp; Maintenance"
+msgstr "Soporte y Mantenimiento"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Dedicated Developer"
+msgstr "Desarrollador Dedicado"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Version Migration"
+msgstr "Migración de Versión"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "API Integration"
+msgstr "Integración de API"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Vertical Apps"
+msgstr "Aplicaciones Verticales"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Years of Experience"
+msgstr "Años de Experiencia"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Implementations"
+msgstr "Implementaciones"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Gold"
+msgstr "Gold"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Official Odoo Partner"
+msgstr "Partner Oficial de Odoo"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Guadalajara, Mexico"
+msgstr "Guadalajara, México"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Get In Touch"
+msgstr "Contáctanos"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Mon-Fri 9:00-18:00 GMT-6"
+msgstr "Lun-Vie 9:00-18:00 GMT-6"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Guadalajara, Jalisco, MX"
+msgstr "Guadalajara, Jalisco, MX"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "License:"
+msgstr "Licencia:"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Author:"
+msgstr "Autor:"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Odoo Version:"
+msgstr "Versión de Odoo:"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
+msgid "Official Gold Partner of Odoo in Mexico."
+msgstr "Partner Gold Oficial de Odoo en México."
+
