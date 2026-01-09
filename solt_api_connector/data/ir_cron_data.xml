@@ -8,7 +8,7 @@
             <field name="code">model.cron_execute_initial_imports(True)</field>
             <field name="interval_number">4</field>
             <field name="interval_type">hours</field>
-            <field name="active" eval="False" />
+            <field name="active" eval="False"/>
         </record>
 
         <!-- Clear sync flags cron -->
@@ -31,7 +31,7 @@
             <field name="active" eval="False"/>
             <field name="interval_number">4</field>
             <field name="interval_type">hours</field>
-            <field name="active" eval="False" />
+            <field name="active" eval="False"/>
         </record>
     </data>
 </odoo>

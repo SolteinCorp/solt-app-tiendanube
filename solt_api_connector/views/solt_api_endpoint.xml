@@ -52,14 +52,14 @@
                                 <div class="mb-1">Simple array
                                     <pre class="o_format_json_structure">
                                         <code>
-                                        {
+                                            {
                                             "array_source": "product_variant_ids", // Odoo One2many or Many2many field
                                             "item_mapping": {
-                                                "id": {"field": "external_id", "type": "integer"},
-                                                "values": {"expression": "[{'en': av.name} for av in item.attribute_value_ids]"},
-                                                "price": {"field": "list_price", "transform": "f'{float(value):.2f}'"}
+                                            "id": {"field": "external_id", "type": "integer"},
+                                            "values": {"expression": "[{'en': av.name} for av in item.attribute_value_ids]"},
+                                            "price": {"field": "list_price", "transform": "f'{float(value):.2f}'"}
                                             }
-                                        }
+                                            }
                                         </code>
                                     </pre>
                                 </div>
@@ -67,26 +67,26 @@
                                     Nested arrays
                                     <pre class="o_format_json_structure">
                                         <code>
-                                        {
+                                            {
                                             "id": {"field": "external_id", "type": "integer"},
                                             "variants": {
-                                              "source": "product_variant_ids",
-                                              "items": [
-                                                {
-                                                  "id": {"field": "external_id", "type": "integer"},
-                                                  "price": {"field": "list_price", "type": "float"},
-                                                  "inventory_levels": {
-                                                    "source": "stock_quant_ids",
-                                                    "items": [
-                                                      {
-                                                        "stock": {"field": "quantity", "type": "integer"}
-                                                      }
-                                                    ]
-                                                  }
-                                                }
-                                              ]
+                                            "source": "product_variant_ids",
+                                            "items": [
+                                            {
+                                            "id": {"field": "external_id", "type": "integer"},
+                                            "price": {"field": "list_price", "type": "float"},
+                                            "inventory_levels": {
+                                            "source": "stock_quant_ids",
+                                            "items": [
+                                            {
+                                            "stock": {"field": "quantity", "type": "integer"}
                                             }
-                                        }
+                                            ]
+                                            }
+                                            }
+                                            ]
+                                            }
+                                            }
                                         </code>
                                     </pre>
                                 </div>
@@ -117,33 +117,33 @@
                                 <div class="mb-1">
                                     <pre class="o_format_json_structure">
                                         <code>
-                                        {
-                                        "name": "data['name']", // Direct access to a field
-                                        "reference": "data.get('ref', '')", // With default value
-                                        "date_order": "fields.Date.to_date(data['date'])", // Type conversion
-                                        "amount_total": "float(data['amount']) * 1.16", // Mathematical operation
-                                        "state": "'paid' if float(data['amount']) > 0 else 'draft'", // Conditional
+                                            {
+                                            "name": "data['name']", // Direct access to a field
+                                            "reference": "data.get('ref', '')", // With default value
+                                            "date_order": "fields.Date.to_date(data['date'])", // Type conversion
+                                            "amount_total": "float(data['amount']) * 1.16", // Mathematical operation
+                                            "state": "'paid' if float(data['amount']) > 0 else 'draft'", // Conditional
 
-                                        // Relational field (many2one)
-                                        "partner_id": "env['res.partner'].search([('ref', '=', data['customer_id'])],
-                                        limit=1).id",
+                                            // Relational field (many2one)
+                                            "partner_id": "env['res.partner'].search([('ref', '=', data['customer_id'])],
+                                            limit=1).id",
 
-                                        // Create record if it doesn't exist
-                                        "partner_id": "env['res.partner'].search([('ref', '=', data['customer_id'])],
-                                        limit=1).id or env['res.partner'].create({'ref': data['customer_id'], 'name':
-                                        data['customer_name']}).id",
+                                            // Create record if it doesn't exist
+                                            "partner_id": "env['res.partner'].search([('ref', '=', data['customer_id'])],
+                                            limit=1).id or env['res.partner'].create({'ref': data['customer_id'], 'name':
+                                            data['customer_name']}).id",
 
-                                        // one2many lines using list comprehension
-                                        "line_ids": "[Command.create({'product_id':
-                                        env['product.product'].search([('default_code', '=', item['code'])], limit=1).id,
-                                        'quantity': float(item['qty']), 'price_unit': float(item['price'])}) for item in
-                                        data.get('items', [])]"
+                                            // one2many lines using list comprehension
+                                            "line_ids": "[Command.create({'product_id':
+                                            env['product.product'].search([('default_code', '=', item['code'])], limit=1).id,
+                                            'quantity': float(item['qty']), 'price_unit': float(item['price'])}) for item in
+                                            data.get('items', [])]"
 
-                                        // Execute functions by passing their name and parameters
+                                            // Execute functions by passing their name and parameters
                                             "name": "method('func_name', data.get('name'))"
-                                        }
-                                    </code>
-                                </pre>
+                                            }
+                                        </code>
+                                    </pre>
                                 </div>
                                 <div class="mt-3">Expressions have access to:</div>
                                 <ul class="mt-2">
@@ -187,7 +187,7 @@
                             }'/>
                         </page>
                         <page string="Headers" name="headers">
-                            <field name="headers" widget="ace"  placeholder='{
+                            <field name="headers" widget="ace" placeholder='{
                           "client_id": "15612",
                           "redirect_uri": "https://example.com/callback"
                         }'/>
@@ -197,7 +197,7 @@
                             <group>
                                 <field name="check_required_request_field"/>
                             </group>
-                            <field name="required_request_field"  widget="ace" placeholder='{
+                            <field name="required_request_field" widget="ace" placeholder='{
                              "id": "x_external_id"
                             }' required="check_required_request_field == True" invisible="check_required_request_field == False"/>
                         </page>

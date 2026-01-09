@@ -4,8 +4,8 @@
 
 ## Overview / Resumen
 
-| English | Español |
-| --- | --- |
+| English                                                                                                                                                                 | Español                                                                                                                                                                         |
+|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | API Connector lets you model REST APIs visually inside Odoo, orchestrate endpoints, transform payloads, trigger automations, and keep a full audit trail of every call. | API Connector te permite modelar APIs REST dentro de Odoo, orquestar endpoints, transformar cargas, disparar automatizaciones y mantener un historial completo de cada llamada. |
 
 ## Key Features

@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 # Copyright 2024 Soltein SA. de CV.
 # License LGPL-3 or later (http://www.gnu.org/licenses/lgpl.html)
-import json
 import logging
 
-from odoo import models, fields, api, _
-from odoo.exceptions import UserError
+from odoo import _, api, fields, models
 
 _logger = logging.getLogger(__name__)
 

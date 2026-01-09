@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 # Copyright 2024 Soltein SA. de CV.
 # License LGPL-3 or later (http://www.gnu.org/licenses/lgpl.html)
-import json
-
 import base64
+import json
 import logging
+
 import requests
 
-from odoo import models, fields, _, api
-from odoo.exceptions import ValidationError, UserError
+from odoo import _, api, fields, models
+from odoo.exceptions import UserError, ValidationError
 
 _logger = logging.getLogger(__name__)
 
@@ -20,12 +20,7 @@ class SoltApiConnector(models.Model):
     name = fields.Char('Name', required=True)
     base_url = fields.Char('Base URL', required=True, help="Base API URL (e.g. https://api.example.com)")
     active = fields.Boolean('Active', default=True)
-    auth_type = fields.Selection([
-        ('none', 'No authentication'),
-        ('basic', 'Basic authentication'),
-        ('bearer', 'Bearer token'),
-        ('api_key', 'API key'),
-    ], string='Authentication type', default='none', required=True)
+    auth_type = fields.Selection([('none', 'No authentication'), ('basic', 'Basic authentication'), ('bearer', 'Bearer token'), ('api_key', 'API key'), ], string='Authentication type', default='none', required=True)
     username = fields.Char('Username', help="Used for Basic authentication")
     password = fields.Char('Password', help="Used for Basic authentication")
     token = fields.Char('Token', help="Used for Bearer or API key auth")
@@ -34,50 +29,31 @@ class SoltApiConnector(models.Model):
     timeout = fields.Integer('Timeout (seconds)', default=30)
     headers = fields.Json('Extra headers', help="JSON structure with extra headers")
     endpoint_ids = fields.One2many('solt.api.endpoint', 'connector_id', string='Endpoints')
-    automation_ids = fields.One2many('base.automation', 'connector_id', string='Automations',
-                                     domain=['|', ('active', '=', True), ('active', '=', False)],
-                                     context={'active_test': False},
-                                     help="Automation rules associated with this connector")
+    automation_ids = fields.One2many('base.automation', 'connector_id', string='Automations', domain=['|', ('active', '=', True), ('active', '=', False)], context={'active_test': False}, help="Automation rules associated with this connector")
     company_ids = fields.One2many('res.company', 'connector_id', string='Companies', help="Companies linked to this connector")
     call_log_count = fields.Integer(string='Call logs', compute='_compute_call_log_count')
     meta_field_ids = fields.One2many('solt.api.meta.fields', 'connector_id', string="Meta fields")
-    ini_import_acion_server_ids = fields.One2many('ir.actions.server', 'connector_id',
-                                                  domain=[('use_for_initial_import', '=', True)],
-                                                  string='Initial import actions')
+    ini_import_acion_server_ids = fields.One2many('ir.actions.server', 'connector_id', domain=[('use_for_initial_import', '=', True)], string='Initial import actions')
     company_count = fields.Integer(compute="_compute_company_count", string="Companies with connector")
     company_sync_count = fields.Integer(compute="_compute_company_count", string="Companies with external config")
-    ini_export_action_server_ids = fields.One2many('ir.actions.server', 'connector_id',
-                                                   string='Initial export actions',
-                                                   domain=[('use_for_initial_export', '=', True)],
-                                                   help="Server actions used for first-time exports")
+    ini_export_action_server_ids = fields.One2many('ir.actions.server', 'connector_id', string='Initial export actions', domain=[('use_for_initial_export', '=', True)], help="Server actions used for first-time exports")
 
     @api.depends()
     def _compute_call_log_count(self):
         """Calculates the number of call logs for this connector"""
         for connector in self:
-            connector.call_log_count = self.env['solt.api.call.log'].search_count([
-                ('connector_id', '=', connector.id)
-            ])
+            connector.call_log_count = self.env['solt.api.call.log'].search_count([('connector_id', '=', connector.id)])
 
     @api.depends('company_ids')
     def _compute_company_count(self):
         for connector in self:
             connector.company_count = len(connector.company_ids)
-            connector.company_sync_count = len(
-                connector.company_ids.filtered(lambda c: c.external_id and c.bearer_token))
+            connector.company_sync_count = len(connector.company_ids.filtered(lambda c: c.external_id and c.bearer_token))
 
     def action_view_call_logs(self):
         """Opens the call logs view filtered by this connector"""
         self.ensure_one()
-        return {
-            'name': _('API Call Logs'),
-            'type': 'ir.actions.act_window',
-            'res_model': 'solt.api.call.log',
-            'view_mode': 'list,form',
-            'domain': [('connector_id', '=', self.id)],
-            'context': {'default_connector_id': self.id},
-            'target': 'current',
-        }
+        return {'name': _('API Call Logs'), 'type': 'ir.actions.act_window', 'res_model': 'solt.api.call.log', 'view_mode': 'list,form', 'domain': [('connector_id', '=', self.id)], 'context': {'default_connector_id': self.id}, 'target': 'current', }
 
     @api.model
     def execute_endpoint(self, endpoint_code, record=None, params=None, data=None):
@@ -127,38 +103,11 @@ class SoltApiConnector(models.Model):
             headers = self._get_auth_headers()
             response = requests.get(self.base_url, headers=headers, timeout=self.timeout)
             if 200 <= response.status_code < 300:
-                return {
-                    'type': 'ir.actions.client',
-                    'tag': 'display_notification',
-                    'params': {
-                        'title': _('Connection successful'),
-                        'message': _('The API connection was established successfully.'),
-                        'sticky': False,
-                        'type': 'success',
-                    }
-                }
+                return {'type': 'ir.actions.client', 'tag': 'display_notification', 'params': {'title': _('Connection successful'), 'message': _('The API connection was established successfully.'), 'sticky': False, 'type': 'success', }}
             else:
-                return {
-                    'type': 'ir.actions.client',
-                    'tag': 'display_notification',
-                    'params': {
-                        'title': _('Connection error'),
-                        'message': _('API responded with code: %s - %s') % (response.status_code, response.text),
-                        'sticky': True,
-                        'type': 'warning',
-                    }
-                }
+                return {'type': 'ir.actions.client', 'tag': 'display_notification', 'params': {'title': _('Connection error'), 'message': _('API responded with code: %s - %s') % (response.status_code, response.text), 'sticky': True, 'type': 'warning', }}
         except Exception as e:
-            return {
-                'type': 'ir.actions.client',
-                'tag': 'display_notification',
-                'params': {
-                    'title': _('Connection error'),
-                    'message': str(e),
-                    'sticky': True,
-                    'type': 'danger',
-                }
-            }
+            return {'type': 'ir.actions.client', 'tag': 'display_notification', 'params': {'title': _('Connection error'), 'message': str(e), 'sticky': True, 'type': 'danger', }}
 
     def action_all_active(self):
         for connector in self.with_context(active_test=False):
@@ -201,27 +150,17 @@ class SoltApiConnector(models.Model):
     def unlink(self):
         for connector in self:
             # delete ini_import_acion_server_ids
-            ini_import_acion_server_ids = self.env['ir.actions.server'].with_context(active_test=False).search([
-                ('connector_id', '=', connector.id),
-                ('use_for_initial_import', '=', True)
-            ])
+            ini_import_acion_server_ids = self.env['ir.actions.server'].with_context(active_test=False).search([('connector_id', '=', connector.id), ('use_for_initial_import', '=', True)])
             ini_import_acion_server_ids.unlink()
             # delete meta fields config
-            meta_field_ids = self.env['solt.api.meta.fields'].with_context(active_test=False).search([
-                ('connector_id', '=', connector.id)
-            ])
+            meta_field_ids = self.env['solt.api.meta.fields'].with_context(active_test=False).search([('connector_id', '=', connector.id)])
             meta_field_ids.unlink()
 
             # delete automations config
-            automation_ids = self.env['base.automation'].with_context(active_test=False).search([
-                ('connector_id', '=', connector.id)
-            ])
+            automation_ids = self.env['base.automation'].with_context(active_test=False).search([('connector_id', '=', connector.id)])
             automation_ids.unlink()
 
             # delete ini_export_action_server_ids
-            ini_export_action_server_ids = self.env['ir.actions.server'].with_context(active_test=False).search([
-                ('connector_id', '=', connector.id),
-                ('use_for_initial_export', '=', True)
-            ])
+            ini_export_action_server_ids = self.env['ir.actions.server'].with_context(active_test=False).search([('connector_id', '=', connector.id), ('use_for_initial_export', '=', True)])
             ini_export_action_server_ids.unlink()
         return super(SoltApiConnector, self).unlink()

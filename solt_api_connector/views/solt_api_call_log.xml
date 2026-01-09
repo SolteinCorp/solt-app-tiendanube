@@ -16,7 +16,7 @@
                         <group>
                             <field name="connector_id"/>
                             <field name="endpoint_id"/>
-                            <field name="request_method" />
+                            <field name="request_method"/>
                             <field name="request_url" widget="url"/>
                         </group>
                         <group>

@@ -1,15 +1,14 @@
+import base64
 import json
 import logging
 import re
-import requests
-import base64
-import re
 
-from odoo import models, fields, _, tools, api
+import requests
+
+from odoo import _, api, fields, models, tools
 from odoo.exceptions import UserError, ValidationError
-from odoo.tools.safe_eval import safe_eval
 from odoo.tools.float_utils import float_compare
-from odoo.tools.image import base64_to_image
+from odoo.tools.safe_eval import safe_eval
 
 _logger = logging.getLogger(__name__)
 
@@ -24,9 +23,7 @@ class SoltApiEndpoint(models.Model):
     endpoint_path = fields.Char('Endpoint path', required=True, help="Endpoint path. You can use variables such as {{variable}}")
     method = fields.Selection([('GET', 'GET'), ('POST', 'POST'), ('PUT', 'PUT'), ('PATCH', 'PATCH'), ('DELETE', 'DELETE')], string='HTTP method', default='GET', required=True)
     model_id = fields.Many2one('ir.model', string='Odoo model')
-    request_mapping = fields.Json(
-        'Request mapping',
-        help="""Defines how Odoo data is transformed into the external API payload.
+    request_mapping = fields.Json('Request mapping', help="""Defines how Odoo data is transformed into the external API payload.
 
 Request format (Odoo → API):
 {
@@ -42,12 +39,9 @@ Request format (Odoo → API):
     ]
   }
 }
-""",
-        default="{}")
+""", default="{}")
 
-    response_mapping = fields.Json(
-        'Response mapping',
-        help="""Defines how API responses are transformed into Odoo data.
+    response_mapping = fields.Json('Response mapping', help="""Defines how API responses are transformed into Odoo data.
 
 Response format (API → Odoo):
 {
@@ -65,12 +59,9 @@ Expressions can access:
 - record: current record (for updates)
 - fields: Odoo fields helper for conversions
 - plus datetime, json, re, etc.
-""",
-        default="{}")
+""", default="{}")
 
-    request_param = fields.Json('Request parameters',
-                                     help="JSON definition for additional request parameters",
-                                     default="{}")
+    request_param = fields.Json('Request parameters', help="JSON definition for additional request parameters", default="{}")
     headers = fields.Json('Extra headers', help="Additional headers in JSON format")
     pagination_enabled = fields.Boolean('Enable pagination', default=False)
     pagination_param = fields.Char('Page parameter', default='page')
@@ -79,13 +70,9 @@ Expressions can access:
     sequence = fields.Integer(string="Sequence", default=10)
     check_required_request_field = fields.Boolean("Validate required fields")
     required_request_field = fields.Json("Required fields", help="API fields that must be sent in the request. Comma-separated char field with API field names")
-    request_as_array = fields.Boolean('Send request as array', default=False,
-        help="When enabled, the request will be sent as a raw array based on the mapping configuration"
-    )
+    request_as_array = fields.Boolean('Send request as array', default=False, help="When enabled, the request will be sent as a raw array based on the mapping configuration")
 
-    _sql_constraints = [
-        ('code_unique', 'UNIQUE(code)', 'Endpoint code must be unique.'),
-    ]
+    _sql_constraints = [('code_unique', 'UNIQUE(code)', 'Endpoint code must be unique.'), ]
 
     @api.constrains('required_request_field')
     def _check_required_request_field(self):
@@ -113,9 +100,8 @@ Expressions can access:
         for endpoint in self:
             if endpoint.request_as_array:
                 if not endpoint.request_mapping:
-                    raise ValidationError(
-                        _(f"El endpoint {endpoint.code}, tiene configurado realizar el Request como un array de jsons, "
-                          f"pero no se encuentra una configuración en el Mapeo de la Solicitud."))
+                    raise ValidationError(_(f"El endpoint {endpoint.code}, tiene configurado realizar el Request como un array de jsons, "
+                                            f"pero no se encuentra una configuración en el Mapeo de la Solicitud."))
                 mapping_config = json.loads(endpoint.request_mapping)
                 is_request_as_array = False
                 for field_key, field_config in mapping_config.items():
@@ -155,11 +141,7 @@ Expressions can access:
                         should_include = True
                     elif 'expression' in field_config:
                         expression = field_config['expression']
-                        field_patterns = [
-                            r'record\.(\w+)',
-                            r'item\.(\w+)',
-                            r'\.(\w+)',
-                        ]
+                        field_patterns = [r'record\.(\w+)', r'item\.(\w+)', r'\.(\w+)', ]
                         found_fields = set()
                         for pattern in field_patterns:
                             matches = re.findall(pattern, expression)
@@ -365,17 +347,12 @@ Expressions can access:
                         if field_value is not None and 'type' in field_config:
                             field_value = self._convert_field_value(field_value, field_config['type'])
                         if field_value is not None and 'transform' in field_config:
-                            field_value = self._apply_transform(field_value, field_config['transform'],
-                                                                base_eval_context)
+                            field_value = self._apply_transform(field_value, field_config['transform'], base_eval_context)
                         if field_value is not None:
                             result[field_key] = field_value
                     elif 'source' in field_config and 'items' in field_config:
                         # Array anidado - procesar
-                        result[field_key] = self._process_one2many_field(
-                            record,
-                            field_config,
-                            base_eval_context
-                        )
+                        result[field_key] = self._process_one2many_field(record, field_config, base_eval_context)
                 else:
                     result[field_key] = field_config
             except Exception as e:
@@ -402,10 +379,7 @@ Expressions can access:
                     if values_to_write:
                         processed_items.append(values_to_write)
 
-                return {
-                    'raw_response': response_data,
-                    'values': processed_items,
-                }
+                return {'raw_response': response_data, 'values': processed_items, }
             # response_data es una list con paginacion
             elif isinstance(response_data, dict):
                 result_list = None
@@ -418,8 +392,7 @@ Expressions can access:
                         break
 
                 if result_list and result_key:
-                    _logger.info(
-                        f"Processing paginated response with {len(result_list)} elements in key '{result_key}'")
+                    _logger.info(f"Processing paginated response with {len(result_list)} elements in key '{result_key}'")
                     processed_items = []
 
                     for item in result_list:
@@ -427,20 +400,14 @@ Expressions can access:
                         if values_to_write:
                             processed_items.append(values_to_write)
 
-                    return {
-                        'raw_response': response_data,
-                        'values': processed_items,
-                    }
+                    return {'raw_response': response_data, 'values': processed_items, }
                 # es un dict simple
                 else:
                     values_to_write = self._process_simple_mapping_to_odoo(mapping_config, response_data, target_record)
                     return {'raw_response': response_data, 'values': values_to_write}
             else:
                 _logger.warning(f"Unsupported response type: {type(response_data)}")
-                return {
-                    'raw_response': response_data,
-                    'error': True,
-                    'error_message': 'Unsupported response type'}
+                return {'raw_response': response_data, 'error': True, 'error_message': 'Unsupported response type'}
 
         except Exception as e:
             _logger.error(f"Error procesando respuesta: {str(e)}")
@@ -536,23 +503,8 @@ Expressions can access:
             else:
                 raise UserError(_("Function '%s' not found in evaluation context.") % func_name)
 
-        return {
-            'env': self.env,
-            'model': model,
-            'record': record,
-            'uid': self._uid,
-            'user': self.env.user,
-            'time': tools.safe_eval.time,
-            'datetime': tools.safe_eval.datetime,
-            'dateutil': tools.safe_eval.dateutil,
-            'payload': data,
-            'data': data,
-            'Command': fields.Command,
-            'method': execute_function,
-            'float_compare': float_compare,
-            'b64encode': base64.b64encode,
-            'b64decode': base64.b64decode,
-        }
+        return {'env':    self.env, 'model': model, 'record': record, 'uid': self._uid, 'user': self.env.user, 'time': tools.safe_eval.time, 'datetime': tools.safe_eval.datetime, 'dateutil': tools.safe_eval.dateutil, 'payload': data, 'data': data, 'Command': fields.Command,
+                'method': execute_function, 'float_compare': float_compare, 'b64encode': base64.b64encode, 'b64decode': base64.b64decode, }
 
     def _prepare_endpoint_path(self, record=None, data=None):
         """Prepares the endpoint path by evaluating variables in {}"""
@@ -606,26 +558,14 @@ Expressions can access:
         connector = self.connector_id
         url = connector._prepare_api_url(self._prepare_endpoint_path(record, data))
         headers = self._get_auth_headers(data, record)
-        log_vals = {
-            'connector_id': connector.id,
-            'endpoint_id': self.id,
-            'request_url': url,
-            'request_method': self.method,
-            'request_headers': json.dumps(headers),
-            'request_params': json.dumps(request_params),
-            'request_body': json.dumps(request_data) if request_data else False,
-        }
+        log_vals = {'connector_id': connector.id, 'endpoint_id': self.id, 'request_url': url, 'request_method': self.method, 'request_headers': json.dumps(headers), 'request_params': json.dumps(request_params),
+                'request_body':     json.dumps(request_data) if request_data else False, }
         try:
             _logger.info(f"Request: {request_data}")
             response = self._send_request(url, request_params, request_data, headers, connector.timeout)
             end_time = fields.Datetime.now()
             status_code = response.status_code
-            log_vals.update({
-                'response_code': status_code,
-                'response_body': response.text,
-                'success': 200 <= status_code < 300,
-                'duration': (end_time - start_time).total_seconds(),
-            })
+            log_vals.update({'response_code': status_code, 'response_body': response.text, 'success': 200 <= status_code < 300, 'duration': (end_time - start_time).total_seconds(), })
             self.env['solt.api.call.log'].create(log_vals)
             try:
                 response_data = response.json() if response.text else {}
@@ -636,21 +576,10 @@ Expressions can access:
                 result['status_code'] = status_code
                 return result
             else:
-                return {
-                    'status_code': status_code,
-                    'error': True,
-                    'error_message': _(
-                        f"Error en la llamada a la API: Código {status_code}, Descripcion {response_data.get('description')}, Mensaje {response_data.get('message', '')}"),
-                    'raw_response': response_data
-                }
+                return {'status_code': status_code, 'error': True, 'error_message': _(f"Error en la llamada a la API: Código {status_code}, Descripcion {response_data.get('description')}, Mensaje {response_data.get('message', '')}"), 'raw_response': response_data}
         except requests.exceptions.RequestException as e:
             end_time = fields.Datetime.now()
-            log_vals.update({
-                'response_code': 0,
-                'response_body': str(e),
-                'success': False,
-                'duration': (end_time - start_time).total_seconds(),
-            })
+            log_vals.update({'response_code': 0, 'response_body': str(e), 'success': False, 'duration': (end_time - start_time).total_seconds(), })
             self.env['solt.api.call.log'].create(log_vals)
             raise UserError(_("Error de conexión: %s") % str(e))
 
@@ -695,27 +624,15 @@ Expressions can access:
             request_params[self.pagination_size_param] = self.pagination_size
 
         while has_more_pages:
-            log_vals = {
-                'connector_id': connector.id,
-                'endpoint_id': self.id,
-                'request_url': url,
-                'request_method': self.method,
-                'request_headers': json.dumps(headers),
-                'request_params': json.dumps(request_params),
-                'request_body': json.dumps(request_data) if request_data else False,
-            }
+            log_vals = {'connector_id': connector.id, 'endpoint_id': self.id, 'request_url': url, 'request_method': self.method, 'request_headers': json.dumps(headers), 'request_params': json.dumps(request_params),
+                    'request_body':     json.dumps(request_data) if request_data else False, }
 
             try:
                 page_start_time = fields.Datetime.now()
                 response = self._send_request(url, request_params, request_data, headers, connector.timeout)
                 page_end_time = fields.Datetime.now()
 
-                log_vals.update({
-                    'response_code': response.status_code,
-                    'response_body': response.text,
-                    'success': 200 <= response.status_code < 300,
-                    'duration': (page_end_time - page_start_time).total_seconds(),
-                })
+                log_vals.update({'response_code': response.status_code, 'response_body': response.text, 'success': 200 <= response.status_code < 300, 'duration': (page_end_time - page_start_time).total_seconds(), })
                 self.env['solt.api.call.log'].create(log_vals)
 
                 if 200 <= response.status_code < 300:
@@ -738,21 +655,14 @@ Expressions can access:
                         if self.pagination_param:
                             request_params[self.pagination_param] = current_page
                 elif response.status_code == 404 and combined_response is not None:
-                    _logger.error(_("Error en la llamada a la API (página %s): Código %s - %s") %
-                                    (current_page, response.status_code, response.text))
+                    _logger.error(_("Error en la llamada a la API (página %s): Código %s - %s") % (current_page, response.status_code, response.text))
                     has_more_pages = False
                 else:
-                    raise UserError(_("Error en la llamada a la API (página %s): Código %s - %s") %
-                                    (current_page, response.status_code, response.text))
+                    raise UserError(_("Error en la llamada a la API (página %s): Código %s - %s") % (current_page, response.status_code, response.text))
 
             except requests.exceptions.RequestException as e:
                 page_end_time = fields.Datetime.now()
-                log_vals.update({
-                    'response_code': 0,
-                    'response_body': str(e),
-                    'success': False,
-                    'duration': (page_end_time - page_start_time).total_seconds(),
-                })
+                log_vals.update({'response_code': 0, 'response_body': str(e), 'success': False, 'duration': (page_end_time - page_start_time).total_seconds(), })
                 self.env['solt.api.call.log'].create(log_vals)
                 raise UserError(_("Error de conexión en página %s: %s") % (current_page, str(e)))
 

@@ -3,7 +3,7 @@
 import logging
 from datetime import timedelta
 
-from odoo import models, fields, api
+from odoo import api, fields, models
 
 _logger = logging.getLogger(__name__)
 
@@ -17,29 +17,18 @@ class ConnectorSyncMixin(models.AbstractModel):
     _description = 'Connector Sync Mixin'
 
     is_being_synced = fields.Boolean('In synchronization', default=False, copy=False, prefetch=False)
-    sync_source = fields.Selection([
-        ('odoo', 'From Odoo'),
-        ('store', 'From Store')
-    ], string='Synchronization source', copy=False, prefetch=False)
+    sync_source = fields.Selection([('odoo', 'From Odoo'), ('store', 'From Store')], string='Synchronization source', copy=False, prefetch=False)
     sync_timestamp = fields.Datetime('Synchronization time', copy=False, prefetch=False)
     x_external_id = fields.Char('External ID', readonly=True)
     x_store_external_id = fields.Char('Store external ID', readonly=True)
-    x_state_sync = fields.Selection([
-        ('yes', 'In sync'),
-        ('no', 'Pending sync'),
-        ('error', 'Error'),
-    ], string='Sync status', default='no', readonly=True)
+    x_state_sync = fields.Selection([('yes', 'In sync'), ('no', 'Pending sync'), ('error', 'Error'), ], string='Sync status', default='no', readonly=True)
     x_exclud_from_sync = fields.Boolean('Exclude from sync', default=False)
     x_date_last_sync = fields.Datetime('Last synchronization', readonly=True)
 
     def mark_as_syncing(self, source):
         """Marks the record as being synchronized"""
         self.ensure_one()
-        self.write({
-            'is_being_synced': True,
-            'sync_source': source,
-            'sync_timestamp': fields.Datetime.now()
-        })
+        self.write({'is_being_synced': True, 'sync_source': source, 'sync_timestamp': fields.Datetime.now()})
 
     def can_sync_to_store(self):
         """Determines if this record can be synchronized to the store"""
@@ -58,18 +47,11 @@ class ConnectorSyncMixin(models.AbstractModel):
         synchronization status for more than the threshold time.
         """
         time_threshold = fields.Datetime.now() - timedelta(minutes=3)
-        records_to_clear = self.search([
-            ('is_being_synced', '=', True),
-            ('sync_timestamp', '<', time_threshold)
-        ])
+        records_to_clear = self.search([('is_being_synced', '=', True), ('sync_timestamp', '<', time_threshold)])
 
         if records_to_clear:
-            _logger.info(
-                f"Clearing synchronization flags for {len(records_to_clear)} records of the model {self._name}")
-            records_to_clear.write({
-                'is_being_synced': False,
-                'sync_source': False
-            })
+            _logger.info(f"Clearing synchronization flags for {len(records_to_clear)} records of the model {self._name}")
+            records_to_clear.write({'is_being_synced': False, 'sync_source': False})
 
         return True
 

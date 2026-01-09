@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Copyright 2024 Soltein SA. de CV.
 # License LGPL-3 or later (http://www.gnu.org/licenses/lgpl.html)
-from odoo import models, fields, api
+from odoo import api, fields, models
 
 
 class BaseAutomation(models.Model):
@@ -9,10 +9,7 @@ class BaseAutomation(models.Model):
 
     connector_id = fields.Many2one('solt.api.connector', string='Connector')
     endpoint_id = fields.Many2one('solt.api.endpoint', string='Endpoint')
-    sync_direction = fields.Selection([
-        ('to_store', 'To external store'),
-        ('from_store', 'From external store'),
-    ], string='Sync direction', default='to_store')
+    sync_direction = fields.Selection([('to_store', 'To external store'), ('from_store', 'From external store'), ], string='Sync direction', default='to_store')
     is_api_sync = fields.Boolean(string='Is API Sync', compute='_compute_is_api_sync', store=True, prefetch=False)
     sequence = fields.Integer(string="Sequence", default=10)
 
