@@ -42,5 +42,5 @@ webhook support.
             'solt_api_connector/static/description/icon.png',
         ],
     },
-    'images': ['solt_api_connector/static/description/icon_module.png'],
+    'images': ['static/description/icon_module.png'],
 }

@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <record id="res_locality_view_tree" model="ir.ui.view">
-            <field name="name">res.locality.tree</field>
+        <record id="res_locality_view_list" model="ir.ui.view">
+            <field name="name">res.locality.list</field>
             <field name="model">res.locality</field>
             <field name="arch" type="xml">
-                <tree>
+                <list>
                     <field name="code"/>
                     <field name="name"/>
                     <field name="state_id"/>
                     <field name="country_id"/>
-                </tree>
+                </list>
             </field>
         </record>
 
@@ -57,7 +57,7 @@
             <field name="name">Localities</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">res.locality</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">list,form</field>
             <field name="help">
                 Display and manage the list of all localities that can be assigned to
                 your partner records.
