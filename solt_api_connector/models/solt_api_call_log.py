@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 # Copyright 2024 Soltein SA. de CV.
 # License LGPL-3 or later (http://www.gnu.org/licenses/lgpl.html)
-import json
 import logging
 
-from odoo import models, fields, api, _
-from odoo.exceptions import UserError
+from odoo import _, api, fields, models
 
 _logger = logging.getLogger(__name__)
 
@@ -39,6 +37,6 @@ class SoltApiCallLog(models.Model):
                 date_str = fields.Datetime.to_string(record.create_date)
                 endpoint_name = record.endpoint_id.name if record.endpoint_id else _('Unknown endpoint')
                 http_method = record.request_method or 'GET'
-                record.name = f"{date_str} - {http_method} {endpoint_name}"
+                record.name = "%s - %s %s" % (date_str, http_method, endpoint_name)
             else:
                 record.name = _('New API call')

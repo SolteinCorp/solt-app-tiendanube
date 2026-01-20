@@ -12,9 +12,6 @@ class ProductTemplate(models.Model):
     _name = 'product.template'
     _inherit = ['product.template', 'solt.integration.model.mixin', 'connector.sync.mixin']
 
-    is_storable = fields.Boolean(
-        'Track Inventory', store=True, compute='_compute_is_storable', readonly=False,
-        default=False, precompute=True, help='A storable product is a product for which you manage stock.')
     product_depth = fields.Float(
         'Depth', compute='_compute_product_depth', digits='Stock Weight',
         inverse='_set_product_depth', store=True)
@@ -46,19 +43,6 @@ class ProductTemplate(models.Model):
     company_id = fields.Many2one(
         'res.company', 'Company', index=True, default=lambda self: self.env.company)
     nube_video_url = fields.Char("YouTube or Vimeo URL", help="Product video URL hosted on YouTube or Vimeo")
-    product_brand_id = fields.Many2one(
-        "solt.product.brand", string="Brand", help="Select a brand for the product",
-        domain=lambda self: self._get_brand_domain()
-    )
-    # Product Multi Category fields
-    categ_ids = fields.Many2many(
-        comodel_name="product.category",
-        relation="product_categ_rel",
-        column1="product_tmpl_id",
-        column2="categ_id",
-        string="Categories",
-        help="Additional categories for product classification. Categories created by store connectors."
-    )
 
     # Product Brand fields
     @api.model
@@ -70,9 +54,20 @@ class ProductTemplate(models.Model):
             domain = ['|'] + domain + [('company_id', '=', self.env.company.id)]
         return domain
 
-    @api.depends('type')
-    def _compute_is_storable(self):
-        self.filtered(lambda t: t.type != 'consu' and t.is_storable).is_storable = False
+    product_brand_id = fields.Many2one(
+        "solt.product.brand", string="Brand", help="Select a brand for the product",
+        domain=lambda self: self._get_brand_domain()
+    )
+
+    # Product Multi Category fields
+    categ_ids = fields.Many2many(
+        comodel_name="product.category",
+        relation="product_categ_rel",
+        column1="product_tmpl_id",
+        column2="categ_id",
+        string="Categories",
+        help="Additional categories for product classification. Categories created by store connectors."
+    )
 
     @api.depends('product_variant_ids.product_depth')
     def _compute_product_depth(self):
@@ -932,7 +927,7 @@ class ProductTemplate(models.Model):
                         _logger.warning(f"No product variant found with external ID: {external_id}")
                         return
 
-                    if product_id.type == 'consu' and product_id.is_storable:
+                    if product_id.is_storable:
                         inventory_levels_data = variant.get('inventory_levels')
                         for inv_level in inventory_levels_data:
                             external_wh_id = str(inv_level.get('location_id'))

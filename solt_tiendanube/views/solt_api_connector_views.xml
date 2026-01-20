@@ -1,5 +1,4 @@
 <odoo>
-    <data>
         <!-- Inherit Form View to Modify it -->
         <record id="nube_view_solt_api_connector_kanban_inherit" model="ir.ui.view">
             <field name="name">nube.connector.order.kanban.inherit</field>
@@ -43,5 +42,4 @@
 
             </field>
         </record>
-    </data>
 </odoo>

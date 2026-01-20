@@ -1,5 +1,4 @@
 <odoo>
-    <data>
         <!-- Inherit Form View to Modify it -->
         <record id="nube_product_template_form_inherit" model="ir.ui.view">
             <field name="name">nube.product.template.form.inherit</field>
@@ -20,7 +19,7 @@
                                 <field name="nube_video_url"/>
                             </group>
                         </group>
-                        <group string="Dimensions" invisible="type not in ['consu', 'combo'] or product_variant_count &gt; 1 and not is_product_variant">
+                        <group string="Dimensions" invisible="not is_storable or product_variant_count &gt; 1 and not is_product_variant">
                             <label for="product_height" invisible="product_variant_count &gt; 1 and not is_product_variant"/>
                             <div class="o_row" name="product_height"
                                  invisible="product_variant_count &gt; 1 and not is_product_variant">
@@ -56,19 +55,24 @@
                                    class="o_website_sale_image_list" context="{'default_name': name}"
                                    options="{'create_text':'Add image'}" nolabel="1"/>
                         </group>
+
                     </page>
                 </notebook>
 
-                <header position="inside">
+                <!-- In Odoo 19, product_template_form_view has no header, so we add buttons to button_box -->
+                <div name="button_box" position="inside">
                     <button string="Sync Cost" type="object"
                             name="action_sync_cost"
+                            class="oe_stat_button"
+                            icon="fa-refresh"
                             invisible="not company_id or product_variant_count &gt; 1 and not is_product_variant"
                             confirm="This action will sync the product cost in the store. Do you want to continue?"/>
                     <button name="action_migrate_images" string="Migrate Images"
-                            type="object" class="btn-secondary"
+                            type="object" class="oe_stat_button"
+                            icon="fa-image"
                             invisible="not image_1920 or is_product_variant"
                             groups="solt_tiendanube.group_migrate_image"/>
-                </header>
+                </div>
 
             </field>
         </record>
@@ -84,8 +88,8 @@
                     <notebook>
                         <page name="integration_nube_page_easy" string="Tiendanube Integration">
                             <group>
-                                <group string="Dimensions"
-                                       invisible="type not in ['consu', 'combo']">
+                            <group string="Dimensions"
+                                   invisible="not is_storable">
                                     <label for="product_height"/>
                                     <div class="o_row" name="product_height">
                                         <field name="product_height" class="oe_inline"/>
@@ -109,13 +113,15 @@
                         </page>
                     </notebook>
                 </xpath>
-                <xpath expr="//button[@name='action_open_label_layout']" position="after">
-                    <field name='is_product_variant' invisible='1'/>
+                <!-- In Odoo 19, use button_box instead of action_open_label_layout which no longer exists -->
+                <div name="button_box" position="inside">
                     <button string="Sync Cost" type="object"
                             name="action_sync_cost"
+                            class="oe_stat_button"
+                            icon="fa-refresh"
                             invisible="not company_id or product_variant_count &gt; 1 and not is_product_variant"
                             confirm="This action will sync the product cost in the store. Do you want to continue?"/>
-                </xpath>
+                </div>
             </field>
         </record>
 
@@ -149,7 +155,7 @@
         <record id="action_server_migrate_product_images" model="ir.actions.server">
             <field name="name">Migrate Images to Product Image</field>
             <field name="model_id" ref="product.model_product_template"/>
-            <field name="groups_id" eval="[(4, ref('solt_tiendanube.group_migrate_image'))]"/>
+            <field name="group_ids" eval="[(4, ref('solt_tiendanube.group_migrate_image'))]"/>
             <field name="binding_model_id" ref="product.model_product_template"/>
             <field name="binding_view_types">list</field>
             <field name="state">code</field>
@@ -158,5 +164,4 @@
                     action = records.action_migrate_images()
             </field>
         </record>
-    </data>
 </odoo>

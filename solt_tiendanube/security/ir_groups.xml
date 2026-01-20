@@ -3,7 +3,6 @@
 
     <record id="group_migrate_image" model="res.groups">
         <field name="name">Migrar imágenes</field>
-        <field name="category_id" ref="base.module_category_hidden"/>
     </record>
 
 </odoo>

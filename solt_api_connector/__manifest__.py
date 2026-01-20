@@ -3,7 +3,7 @@
 # License LGPL-3 or later (http://www.gnu.org/licenses/lgpl.html)
 {
     'name': "API Connector",
-    'summary': "Configurable API orchestration framework for Odoo 18",
+    'summary': "Configurable API orchestration framework for Odoo 19",
     'description': """API Connector
 ===================
 
@@ -16,7 +16,7 @@ webhook support.
     'website': 'https://www.soltein.mx',
     'support': 'soporte@soltein.mx',
     'category': 'Tools/Connectivity',
-    'version': '17.0.1.0.1',
+    'version': '19.0.1.0.1',
     'license': 'LGPL-3',
     'depends': ['base', 'base_automation', 'social_media'],
     'application': True,

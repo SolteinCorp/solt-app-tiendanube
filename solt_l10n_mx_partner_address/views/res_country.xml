@@ -11,7 +11,7 @@
             </xpath>
         </field>
     </record>
-
+    
     <record model="ir.ui.view" id="view_res_country_city_extended_form">
         <field name="name">view_res_country_extended_form</field>
         <field name="model">res.country</field>

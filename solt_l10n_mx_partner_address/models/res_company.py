@@ -110,19 +110,19 @@ class ResCompany(models.Model):
     @api.onchange('state_id')
     def _onchange_state_id(self):
         if self.state_id and self.country_enforce_cities and (not self.city_id or self.state_id != self.city_id.state_id):
-            cities = self.env['res.city'].search([('state_id', '=', self.state_id.id)], limit=1)
-            if cities:
-                self.city_id = cities[0].id
-                self.city = cities[0].name
+            cities = self.env['res.city'].search([('state_id', '=', self.state_id.id)])
+            self.city_id = cities[0].id
+            self.city = cities[0].name
 
     @api.onchange('city_id')
     def _onchange_city_id(self):
         if self.city_id and self.country_enforce_districts and (not self.district_id or self.city_id != self.district_id.city_id):
-            districts = self.env['res.city.district'].search([('city_id', '=', self.state_id.id)], limit=1)
-            if districts:
-                self.district_id = districts[0].id
-                self.l10n_mx_colony = districts[0].name
-                self.l10n_mx_colony_code = districts[0].code or ''
+            districts = self.env['res.city.district'].search([
+                ('city_id', '=', self.state_id.id),
+            ])
+            self.district_id = districts[0].id
+            self.l10n_mx_colony = districts[0].name
+            self.l10n_mx_colony_code = districts[0].code or ''
 
     def _get_view(self, view_id=None, view_type='form', **options):
         arch, view = super()._get_view(view_id, view_type, **options)

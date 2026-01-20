@@ -608,9 +608,9 @@ if record.external_id and record.bearer_token:
     if not found_product_id:
         _logger.info(f"Producto no encontrado en odoo con el ID Externo {payload.get('id')}")
     else:
+        product_name = found_product_id.name
         try:
             found_product_id = found_product_id.with_company(record)
-            product_name = found_product_id.name
             _logger.info(f"Producto {found_product_id.name} encontrada con ID externo {found_product_id.x_external_id}. Eliminar")
             # evitar que se ejecute la RA de eliminar Categ
             # found_product_id.sudo().write({'x_exclud_from_sync': True})
@@ -1173,7 +1173,7 @@ if record.external_id and record.bearer_token and str(record.external_id) == str
         found_so_id = env['sale.order'].search([('x_external_id', '=', data.get('id')), ('state', 'not in', ['cancel'])])
         found_so_id = found_so_id.with_company(record).with_user(admin_user)
         found_picking_id = env['stock.picking'].search([('x_external_id', '=', data.get('fulfillment_id')), ('state', 'not in', ['cancel'])])
-        found_picking_id = found_so_id.with_company(record).with_user(admin_user)
+        found_picking_id = found_picking_id.with_company(record).with_user(admin_user)
         if 200 <= response.get('status_code') < 300:
             if not found_so_id or not found_picking_id:
                 _logger.info(f"Orden no encontrada con ID externo {data.get('id')} o Entrega no encontrada con ID externo {data.get('fulfillment_id')}.")

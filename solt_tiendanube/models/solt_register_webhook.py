@@ -22,8 +22,11 @@ class SoltRegisterWebhook(models.Model):
     connector_id = fields.Many2one('solt.api.connector', related='automation_id.connector_id', string='Conector')
     is_connector_active = fields.Boolean(related="connector_id.active")
 
-    _sql_constraints = [
-        ('event_url_unique', 'UNIQUE(event, webhook_url)', 'Event and URL must be unique.'),
+    _constraints = [
+        models.Constraint(
+            'UNIQUE(event, webhook_url)',
+            'Event and URL must be unique.',
+        ),
     ]
 
     def _register_webhook(self, connector):
@@ -58,7 +61,7 @@ class SoltRegisterWebhook(models.Model):
     def toggle_active(self):
         res = super().toggle_active()
         for record in self.with_context(active_test=False):
-            wh_action = self._context.get('wh_action', False)
+            wh_action = self.env.context.get('wh_action', False)
             sync_values = {
                 'x_date_last_sync': datetime.now(),
                 'x_store_external_id': self.env.company.external_id or '',

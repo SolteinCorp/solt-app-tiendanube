@@ -230,7 +230,7 @@
         <field name="name">solt.api.endpoint.list</field>
         <field name="model">solt.api.endpoint</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
                 <field name="code"/>
@@ -238,7 +238,7 @@
                 <field name="endpoint_path"/>
                 <field name="method"/>
                 <field name="model_id"/>
-            </tree>
+            </list>
         </field>
     </record>
 

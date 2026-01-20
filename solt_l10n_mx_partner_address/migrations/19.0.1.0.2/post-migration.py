@@ -5,7 +5,6 @@ from odoo.tools import file_open
 
 
 def migrate(cr, version):
-    """Post-migration: load city districts from CSV file."""
     env = api.Environment(cr, SUPERUSER_ID, {})
     district_obj = env['res.city.district']
     imd_obj = env['ir.model.data']
@@ -25,7 +24,7 @@ def migrate(cr, version):
     if districties:
         env.cr.execute('''
 INSERT INTO ir_model_data (name, res_id, module, model, noupdate)
-   SELECT
+   SELECT 
         'colony_' || lower(replace(res_city_district.name, ' ', '_')) || '_' || res_city_district.zip_code || '_' || res_city_district.id,
          res_city_district.id,
         'solt_l10n_mx_partner_address',

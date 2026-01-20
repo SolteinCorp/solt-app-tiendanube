@@ -62,7 +62,7 @@
                         <page string="Webhooks/Automations" name="automations" invisible="not id">
                             <field name="automation_ids"
                                    context="{'default_solt_connector_id': id, 'active_test': False}">
-                                <tree decoration-muted="(not active)">
+                                <list decoration-muted="(not active)">
                                     <field name="sequence" widget="handle"/>
                                     <field name="name"/>
                                     <field name="trigger"/>
@@ -75,9 +75,10 @@
                                     />
                                     <button name="toggle_active" icon="fa-archive fa-2x" type="object"
                                             title="Deactivate Webhook/Automations"
+                                            invisible="not active or not parent.active"
                                             confirm="This action will deactivate the rule and prevent execution. Continue?"
                                     />
-                                </tree>
+                                </list>
                             </field>
                         </page>
                         <page string="Endpoints" name="endpoints" invisible="not id">
@@ -85,13 +86,13 @@
                         </page>
                         <page string="Companies" name="companies" invisible="not id">
                             <field name="company_ids">
-                                <tree create="False" edit="False" delete="False" editable="bottom">
+                                <list create="False" edit="False" delete="False" editable="bottom">
                                     <field name="name"/>
                                     <field name="external_id"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
-                        <page string="Additional Headers" name="headers">
+                        <page string="Additional Headers" name="headers" invisible="not id">
                             <field name="headers" widget="ace"/>
                         </page>
                         <page name="meta_fields" string="Default field configuration" invisible="not id">
@@ -103,10 +104,10 @@
                                     invisible="not active"
                                     confirm="This action will add dynamic fields to the configured Odoo models and views."/>
                             <field name="meta_field_ids" nolabel="1" mode="list,form" context="{'default_connector_id': id}">
-                                <tree>
+                                <list>
                                     <field name="name"/>
                                     <field name="model_id"/>
-                                </tree>
+                                </list>
                                 <form string="Meta fields">
                                     <group>
                                         <group>
@@ -158,11 +159,11 @@
                                             <group string="Fields">
                                                 <field name="ir_meta_field_ids" nolabel="1" colspan="2"
                                                        context="{'default_model_id': model_id,'default_model': model}">
-                                                    <tree delete="0" create="0">
+                                                    <list delete="0" create="0">
                                                         <field name="name"/>
                                                         <field name="field_description"/>
                                                         <field name="ttype"/>
-                                                    </tree>
+                                                    </list>
                                                 </field>
                                             </group>
                                         </page>
@@ -172,7 +173,7 @@
                         </page>
                         <page string="Initial Import Actions" name="initial_import" invisible="not id">
                             <field name="ini_import_acion_server_ids" context="{'default_connector_id': id, 'default_use_for_initial_import': True}">
-                                <tree>
+                                <list>
                                     <field name="sequence" widget="handle"/>
                                     <field name="name"/>
                                     <field name="model_id"/>
@@ -187,12 +188,12 @@
                                             title="Importar"
                                             invisible="not connector_id or not parent.active or not use_for_initial_import"
                                     />
-                                </tree>
+                                </list>
                             </field>
                         </page>
                         <page string="Initial Export Actions" name="initial_export" invisible="not id">
                             <field name="ini_export_action_server_ids" context="{'default_connector_id': id, 'default_use_for_initial_export': True}">
-                                <tree>
+                                <list>
                                     <field name="sequence" widget="handle"/>
                                     <field name="name"/>
                                     <field name="model_id"/>
@@ -206,7 +207,7 @@
                                     <button name="execute_initial_export" icon="fa-cloud-upload fa-2x" type="object"
                                             title="Export"
                                     />
-                                </tree>
+                                </list>
                             </field>
                         </page>
                     </notebook>
@@ -219,12 +220,12 @@
         <field name="name">solt.api.connector.list</field>
         <field name="model">solt.api.connector</field>
         <field name="arch" type="xml">
-            <tree decoration-muted="(not active)">
+            <list decoration-muted="(not active)">
                 <field name="name"/>
                 <field name="base_url"/>
                 <field name="auth_type"/>
                 <field name="active"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -238,7 +239,7 @@
                 <separator/>
                 <filter string="All" name="all" domain="['|', ('active', '=', False), ('active', '=', True)]"/>
                 <filter string="Inactive" name="inactive" domain="[('active', '=', False)]"/>
-                <group expand="0" string="Group By">
+                <group>
                     <filter string="Authentication Type" name="group_by_auth" context="{'group_by':'auth_type'}"/>
                 </group>
             </search>
@@ -253,7 +254,7 @@
                 <field name="name"/>
                 <field name="active"/>
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <t t-set="styles" t-value="record.active.raw_value ? '' : 'opacity: 0.5;'"/>
 
                         <div class="oe_kanban_global_click o_kanban_record_has_image_fill" t-att-style="styles">

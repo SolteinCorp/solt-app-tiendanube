@@ -1,11 +1,11 @@
 # API Connector
 
-> Configurable API orchestration framework for Odoo 17 (Community & Enterprise)
+> Configurable API orchestration framework for Odoo 18 (Community & Enterprise)
 
 ## Overview / Resumen
 
-| English | Español |
-| --- | --- |
+| English                                                                                                                                                                 | Español                                                                                                                                                                         |
+|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | API Connector lets you model REST APIs visually inside Odoo, orchestrate endpoints, transform payloads, trigger automations, and keep a full audit trail of every call. | API Connector te permite modelar APIs REST dentro de Odoo, orquestar endpoints, transformar cargas, disparar automatizaciones y mantener un historial completo de cada llamada. |
 
 ## Key Features
@@ -20,8 +20,8 @@
 
 ## Requirements
 
-- Odoo 18.0 (Community or Enterprise)
-- Python `requests` (bundled with Odoo 18 runtime)
+- Odoo 19.0 (Community or Enterprise)
+- Python `requests` (bundled with Odoo 19 runtime)
 - Optional: `social_media` app (already in depends list)
 
 ## Installation
@@ -86,5 +86,5 @@ zip -r solt_api_connector_18.0.1.0.1.zip solt_api_connector \
 
 ---
 
-© 2024 Soltein SA de CV · Licensed under LGPL-3
+© 2025 Soltein SA de CV · Licensed under LGPL-3
 

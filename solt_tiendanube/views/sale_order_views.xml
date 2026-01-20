@@ -1,5 +1,4 @@
 <odoo>
-    <data>
         <!-- Inherit Form View to Modify it -->
         <record id="nube_sale_order_form_inherit" model="ir.ui.view">
             <field name="name">nube.sale.order.form.inherit</field>
@@ -19,5 +18,4 @@
                 </field>
             </field>
         </record>
-    </data>
 </odoo>

@@ -4,12 +4,13 @@
 {
     'name': 'Mexican Partner Address',
     'countries': ['mx'],
-    'version': '17.0.1.0.2',
+    'version': '19.0.1.0.2',
     'category': 'Soltein SA de CV/Hidden',
     'license': 'LGPL-3',
     'author': 'Soltein SA de CV',
-    'website': 'https://soltein.mx',
-    'depends': ['base_setup', 'base_address_extended', 'l10n_mx_hr'],
+    'website': 'https://soltein.mx/',
+    #'depends': ['base_setup', 'base_address_extended', 'l10n_mx_hr'],
+    'depends': ['base_setup', 'base_address_extended', 'hr'],
     'data': [
         'security/ir.model.access.csv',
         'views/hr_employee.xml',
@@ -22,7 +23,6 @@
         'data/res_country.xml',
     ],
     'installable': True,
-    'auto_install': True,
     'post_init_hook': 'post_init_hook',
     'summary': 'Solt L10n Mx Partner Address for Odoo',
     'description': '''

@@ -6,7 +6,6 @@ import csv
 _logger = logging.getLogger(__name__)
 
 def post_init_hook(env):
-    """Load Mexican cities and districts data after module installation."""
     mx_country = env["res.country"].search([("code", "=", "MX")])
     # Load cities
     res_city_vals_list = []
@@ -56,7 +55,7 @@ def post_init_hook(env):
         if localities:
             env.cr.execute('''
                INSERT INTO ir_model_data (name, res_id, module, model, noupdate)
-                   SELECT
+                   SELECT 
                         'res_locality_mx_' || lower(res_country_state.code) || '_' || res_locality.code,
                         res_locality.id,
                         'solt_l10n_mx_partner_address',
@@ -73,20 +72,17 @@ def post_init_hook(env):
         district_vals_list = []
         with tools.file_open("solt_l10n_mx_partner_address/data/res.city.district.csv") as csv_file:
             for row in csv.DictReader(csv_file):
-                city_id = env.ref(row['city_id'], raise_if_not_found=False)
-                if not city_id:
-                    continue
                 district_vals_list.append({
                     'name': row['name'],
                     'zip_code': row['zipcode'],
-                    'city_id': city_id.id,
+                    'city_id': env.ref(row['city_id'], raise_if_not_found=False).id,
                 })
 
         districties = district_obj.create(district_vals_list)
         if districties:
             env.cr.execute('''
 INSERT INTO ir_model_data (name, res_id, module, model, noupdate)
-   SELECT
+   SELECT 
         'colony_' || lower(replace(res_city_district.name, ' ', '_')) || '_' || res_city_district.zip_code || '_' || res_city_district.id,
          res_city_district.id,
         'solt_l10n_mx_partner_address',

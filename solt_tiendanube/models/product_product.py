@@ -146,3 +146,11 @@ class ProductProduct(models.Model):
             self[0].company_id.with_context(product_id=product_tmpl_ids.ids)._sync_variants_cost(0, 50)
         else:
             _logger.info((_("No products selected to update the cost.")))
+
+    def action_migrate_images(self):
+        """Delegate image migration to the product template."""
+        templates = self.mapped('product_tmpl_id')
+        if templates:
+            return templates.action_migrate_images()
+        return False
+

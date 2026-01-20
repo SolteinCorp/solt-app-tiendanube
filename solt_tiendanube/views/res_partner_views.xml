@@ -1,5 +1,4 @@
 <odoo>
-    <data>
         <!-- Inherit Form View to Modify it -->
         <record id="nube_res_partner_form_inherit" model="ir.ui.view">
             <field name="name">nube.res.partner.form.inherit</field>
@@ -38,5 +37,4 @@
             <field name="res_model">solt.region</field>
             <field name="view_mode">list</field>
         </record>
-    </data>
 </odoo>

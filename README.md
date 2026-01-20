@@ -1,10 +1,10 @@
 # solt-tiendanube
 
-Odoo ↔ Tiendanube Connector for Odoo 18.0
+Odoo ↔ Tiendanube Connector for Odoo 19.0
 
 ## Description
 
-This repository contains the **Soltein Tiendanube Connector** - a bi-directional integration between Odoo 18.0 and Tiendanube that synchronizes catalogs, orders, fulfillment and webhooks.
+This repository contains the **Soltein Tiendanube Connector** - a bi-directional integration between Odoo 19.0 and Tiendanube that synchronizes catalogs, orders, fulfillment and webhooks.
 
 The connector centralizes product data, pricing, stock availability and shipment statuses for multi-warehouse sellers, eliminating manual tasks and simplifying omnichannel operations.
 
@@ -44,7 +44,7 @@ solt-tiendanube/
 
 ## Requirements
 
-- Odoo 18.0 Community or Enterprise
+- Odoo 19.0 Community or Enterprise
 - Valid Tiendanube API credentials per company
 - Python requirements inherited from base Odoo installation
 

@@ -1,5 +1,4 @@
 <odoo>
-    <data>
       <!-- Inherit Form View to Modify it -->
       <record id="nube_product_category_form_inherit" model="ir.ui.view">
           <field name="name">nube.product.category.form.inherit</field>
@@ -25,5 +24,4 @@
               </xpath>
           </field>
       </record>
-    </data>
 </odoo>

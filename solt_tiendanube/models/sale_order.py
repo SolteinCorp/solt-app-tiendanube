@@ -460,7 +460,7 @@ class SaleOrder(models.Model):
         fulfillment_sync = []
         picking_to_valiate = self.env['stock.picking']
         for order_line in self.order_line.filtered(
-                lambda l: l.product_id.type != 'service' and not l.display_type
+                lambda l: l.product_id.is_storable and not l.display_type
         ):
             order_data = order_response_dict[self.x_external_id]
             shipping_status = order_data.get('shipping_status')
@@ -528,7 +528,7 @@ class SaleOrder(models.Model):
         StockQuant = self.env['stock.quant'].sudo()
         quant_ids = self.env['stock.quant'].sudo()
         for order_line in self.order_line.filtered(
-                lambda l: l.product_id.type != 'service' and not l.display_type
+                lambda l: l.product_id.is_storable and not l.display_type
         ):
             order_data = order_response_dict[self.x_external_id]
             fulfillments_data = order_data.get("fulfillments")

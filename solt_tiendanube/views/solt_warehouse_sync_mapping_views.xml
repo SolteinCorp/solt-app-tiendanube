@@ -1,5 +1,4 @@
 <odoo>
-    <data>
         <record id="solt_warehouse_sync_mapping_view_list" model="ir.ui.view">
             <field name="name">solt.warehouse.sync.mapping.view.list</field>
             <field name="model">solt.warehouse.sync.mapping</field>
@@ -31,5 +30,4 @@
             <field name="res_model">solt.warehouse.sync.mapping</field>
             <field name="view_mode">list</field>
         </record>
-    </data>
 </odoo>

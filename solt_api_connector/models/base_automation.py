@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Copyright 2024 Soltein SA. de CV.
 # License LGPL-3 or later (http://www.gnu.org/licenses/lgpl.html)
-from odoo import models, fields, api
+from odoo import api, fields, models
 
 
 class BaseAutomation(models.Model):
@@ -9,10 +9,7 @@ class BaseAutomation(models.Model):
 
     connector_id = fields.Many2one('solt.api.connector', string='Connector')
     endpoint_id = fields.Many2one('solt.api.endpoint', string='Endpoint')
-    sync_direction = fields.Selection([
-        ('to_store', 'To external store'),
-        ('from_store', 'From external store'),
-    ], string='Sync direction', default='to_store')
+    sync_direction = fields.Selection([('to_store', 'To external store'), ('from_store', 'From external store'), ], string='Sync direction', default='to_store')
     is_api_sync = fields.Boolean(string='Is API Sync', compute='_compute_is_api_sync', store=True, prefetch=False)
     sequence = fields.Integer(string="Sequence", default=10)
 
@@ -40,17 +37,17 @@ class BaseAutomation(models.Model):
         self_sudo = self.sudo()
         _fields = []
         modified_fields = []
-        ignore_computed = self._context.get('ignore_computed_fields', False)
+        ignore_computed = self.env.context.get('ignore_computed_fields', False)
         if not self_sudo.trigger_field_ids:
             # Every field is an implicit trigger
             fields_list = list(record._fields.keys())
         else:
             fields_list = self_sudo.trigger_field_ids.mapped('name')
 
-        if self._context.get('old_values', None) is None:
+        if self.env.context.get('old_values', None) is None:
             return modified_fields
         # note: old_vals are in the record format
-        old_vals = self._context['old_values'].get(record.id, {})
+        old_vals = self.env.context['old_values'].get(record.id, {})
 
         def differ(name):
             return name in old_vals and record[name] != old_vals[name]

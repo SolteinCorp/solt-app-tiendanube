@@ -13,12 +13,11 @@ from odoo.tools import image
 from odoo.tools.mimetypes import guess_mimetype
 from odoo.tools.image import is_image_size_above
 
-from odoo.addons.base_import.models.base_import import (
-    DEFAULT_IMAGE_CHUNK_SIZE,
-    DEFAULT_IMAGE_MAXBYTES,
-    DEFAULT_IMAGE_REGEX,
-    DEFAULT_IMAGE_TIMEOUT,
-)
+# Constants for image import (previously from base_import, now defined locally for Odoo 19 compatibility)
+DEFAULT_IMAGE_CHUNK_SIZE = 32768  # Same as DEFAULT_CHUNK_SIZE in base_import
+DEFAULT_IMAGE_MAXBYTES = 10485760  # 10 MB - default value from config
+DEFAULT_IMAGE_TIMEOUT = 3  # seconds - default value from config
+DEFAULT_IMAGE_REGEX = r'^(?:http|https)://'  # URL pattern for images
 
 _logger = logging.getLogger(__name__)
 

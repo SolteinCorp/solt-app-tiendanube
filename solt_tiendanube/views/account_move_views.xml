@@ -1,5 +1,4 @@
 <odoo>
-    <data>
         <record id="nube_account_move_form_inherit" model="ir.ui.view">
             <field name="name">nube.account.move.form.inherit</field>
             <field name="model">account.move</field>
@@ -15,5 +14,4 @@
                 </notebook>
             </field>
         </record>
-    </data>
 </odoo>

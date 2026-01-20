@@ -1922,7 +1922,7 @@ msgstr "Requisitos de Odoo"
 #. module: solt_tiendanube
 #: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
 msgid "Odoo 18.0 (Community or Enterprise)"
-msgstr "Odoo 18.0 (Community o Enterprise)"
+msgstr "Odoo 19.0 (Community o Enterprise)"
 
 #. module: solt_tiendanube
 #: model_terms:ir.ui.view,arch_db:solt_tiendanube.index

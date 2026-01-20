@@ -86,7 +86,7 @@ class HrEmployeePrivate(models.Model):
     def _onchange_private_city_id(self):
         if self.private_city_id and self.country_enforce_districts and (not self.private_district_id or self.private_city_id != self.private_district_id.city_id):
             districts = self.env['res.city.district'].search([
-                ('city_id', '=', self.private_city_id.id),
+                ('city_id', '=', self.private_state_id.id),
             ])
             self.private_district_id = districts and districts[0].id or False
             self.private_colony = districts and districts[0].name or ''

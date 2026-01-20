@@ -49,7 +49,7 @@
         <field name="name">solt.api.call.log.list</field>
         <field name="model">solt.api.call.log</field>
         <field name="arch" type="xml">
-            <tree decoration-success="success" decoration-danger="not success">
+            <list decoration-success="success" decoration-danger="not success">
                 <field name="create_date"/>
                 <field name="name"/>
                 <field name="connector_id"/>
@@ -58,7 +58,7 @@
                 <field name="response_code"/>
                 <field name="duration" string="Duration (s)"/>
                 <field name="success" invisible="1"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -106,7 +106,7 @@
                         domain="[('create_date', '&gt;=', ((context_today()) - datetime.timedelta(days=1)).strftime('%Y-%m-%d')), ('create_date', '&lt;', (context_today()).strftime('%Y-%m-%d'))]"/>
                 <filter string="This week" name="this_week"
                         domain="[('create_date', '&gt;=', ((context_today()) - datetime.timedelta(days=(context_today().weekday()))).strftime('%Y-%m-%d'))]"/>
-                <group expand="0" string="Group By">
+                <group>
                     <filter string="Connector" name="group_by_connector" context="{'group_by':'connector_id'}"/>
                     <filter string="Endpoint" name="group_by_endpoint" context="{'group_by':'endpoint_id'}"/>
                     <filter string="Method" name="group_by_method" context="{'group_by':'request_method'}"/>
