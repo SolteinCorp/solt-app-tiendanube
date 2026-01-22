@@ -42,7 +42,7 @@ class ResPartner(models.Model):
         return values
 
     def _get_complete_name(self):
-        if self._context.get("show_full_name", ''):
+        if self.env.context.get("show_full_name", ''):
             return self.name
         return super()._get_complete_name()
 
