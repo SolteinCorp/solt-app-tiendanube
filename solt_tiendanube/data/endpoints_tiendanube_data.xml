@@ -52,7 +52,7 @@
         <field name="connector_id" ref="tn_connector_api"/>
         <field name="response_mapping"><![CDATA[
 {
-"name": "data.get('name').get(data.get('main_language'))",
+"name": "data.get('name')",
 "email": "data.get('email', '').strip()",
 "phone": "data.get('phone')",
 "country_id": "env['res.country'].sudo().search([('code', '=', data.get('country'))],limit=1).id",
