@@ -154,3 +154,11 @@ class ProductProduct(models.Model):
             return templates.action_migrate_images()
         return False
 
+
+    def action_migrate_images(self):
+        """Delegate image migration to the product template."""
+        templates = self.mapped('product_tmpl_id')
+        if templates:
+            return templates.action_migrate_images()
+        return False
+
