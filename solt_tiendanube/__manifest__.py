@@ -2,15 +2,11 @@
 {
     'name': "Odoo ↔ Tiendanube Connector",
     'summary': "Bi-directional integration between Odoo and Tiendanube",
-    'description': """
-        Sync Tiendanube catalogs, orders, fulfillment and webhooks with Odoo 18.0.
-        The connector centralizes product data, pricing, stock availability and shipment statuses for multi-warehouse sellers.
-    """,
     'author': 'Soltein SA de CV',
     'website': 'https://www.soltein.mx',
     'support': 'soporte@soltein.mx',
     'maintainers': ['soltein'],
-    'version': '17.0.1.1.1',
+    'version': '17.0.1.1.2',
     'license': 'LGPL-3',
     'category': 'Sales/Multichannel',
     'application': True,
