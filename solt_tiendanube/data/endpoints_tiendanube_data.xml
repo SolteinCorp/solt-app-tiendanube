@@ -910,7 +910,7 @@
 "requires_shipping": {"field": "nube_requires_shipping"},
 "free_shipping": {"field": "nube_free_shipping"},
 "published": {"field": "is_published"},
-"video_url": {"field": "nube_video_url"},
+"video_url": {"expression": "record.nube_video_url or ''"},
 "brand": {"field": "product_brand_id.name"},
 "seo_title": {"field": "website_seo_metatitle", "transform": "method('convert_translated_field_to_api_format', value)"},
 "seo_description": {"field": "website_seo_description", "transform": "method('convert_translated_field_to_api_format', value)"},

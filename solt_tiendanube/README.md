@@ -41,7 +41,7 @@ The **Soltein Tiendanube Connector** keeps Odoo 18.0 synchronized with Tiendanub
 
 ## Requirements
 
-- Odoo 18.0 Community or Enterprise
+- Odoo 17.0 Community or Enterprise
 - Dependencies listed in `__manifest__.py`
 - Valid Tiendanube API credentials per company
 - Python requirements inherited from base Odoo installation
@@ -73,7 +73,7 @@ The **Soltein Tiendanube Connector** keeps Odoo 18.0 synchronized with Tiendanub
 3. Package the module:
    ```bash
    cd ..
-   zip -r solt_tiendanube_18.0.1.0.7.zip solt_tiendanube -x "*/__pycache__/*" "*.pyc"
+   zip -r solt_tiendanube_17.0.1.0.7.zip solt_tiendanube -x "*/__pycache__/*" "*.pyc"
    ```
 4. Submit on Odoo Apps with updated screenshots and manifest category `Sales/Multichannel`.
 
