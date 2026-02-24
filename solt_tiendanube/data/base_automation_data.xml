@@ -2411,7 +2411,7 @@ for record in records:
         <field name="model_id" ref="product.model_product_template"/>
         <field name="connector_id" ref="tn_connector_api"/>
         <field name="filter_domain"><![CDATA[
-["&", "&", "&", "&", ("x_exclud_from_sync", "=", False), ("x_external_id", "in", [False, ""]), ("product_variant_ids.product_tmpl_id", "!=", False), ("product_variant_ids.standard_price", ">=", 1), "|", ("sale_ok", "=", True), ("purchase_ok", "=", True)]
+["&", "&", ("x_exclud_from_sync", "=", False), ("x_external_id", "in", [False, ""]), ("product_variant_ids.product_tmpl_id", "!=", False), "|", ("sale_ok", "=", True), ("purchase_ok", "=", True), "|", "&", ("product_variant_ids", "!=", False), ("product_variant_ids.product_template_attribute_value_ids", "!=", False), ("product_variant_ids.standard_price", ">=", 1)]
 ]]></field>
 
     </record>
