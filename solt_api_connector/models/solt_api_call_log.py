@@ -32,13 +32,16 @@ class SoltApiCallLog(models.Model):
 
     name = fields.Char('Name', compute='_compute_name', store=True, readonly=True,
                         help="Auto-generated name combining date, method and endpoint.")
-    automation_id = fields.Many2one('base.automation', string='Automation', ondelete='set null', readonly=True)
-    company_id = fields.Many2one('res.company', string='Company', readonly=True)
+    automation_id = fields.Many2one('base.automation', string='Automation', ondelete='set null', readonly=True,
+                                    help="Related automation if this call was triggered by one.")
+    company_id = fields.Many2one('res.company', string='Company', readonly=True,
+                                 help="Related company if this call was triggered by one.")
     direction = fields.Selection(
         [('outgoing', 'Outgoing'), ('incoming', 'Incoming')],
         string='Direction',
         default='outgoing',
         readonly=True,
+        help="Direction of the API call: 'Outgoing' if initiated by Odoo to an external API, 'Incoming' if received from an external source (e.g. webhook)."
     )
 
     @api.depends('create_date', 'endpoint_id', 'automation_id', 'request_method', 'direction')
