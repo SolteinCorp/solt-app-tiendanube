@@ -4,64 +4,9 @@
     <!--  Base automation  -->
     <!--  Webhooks  -->
     <!--  Store  -->
-    <record id="tn_automation_register_store" model="base.automation">
-        <field name="name">REGISTRO DE TIENDA</field>
-        <field name="active" eval="False"/>
-        <field name="trigger">on_webhook</field>
-        <field name="model_id" ref="base.model_res_company"/>
-        <field name="connector_id" ref="tn_connector_api"/>
-        <field name="record_getter"><![CDATA[
-model.env.company
-]]></field>
-        <field name="log_webhook_calls" eval="False"/>
-    </record>
-
-    <record id="tn_ir_actions_server_register_store" model="ir.actions.server">
-        <field name="name">Ejecutar código: WH Registrar Tienda</field>
-        <field name="state">code</field>
-        <field name="model_id" ref="base.model_res_company"/>
-        <field name="code"><![CDATA[
-_logger.info(f"Webhook registrar tienda.")
-try:
-    res1 = base_automation.connector_id.execute_endpoint('TOKEN',record=record,data=payload)
-    _logger.info(res1)
-    if 200 <= res1.get('status_code') < 300:
-        res = base_automation.connector_id.execute_endpoint('STORE',record=record,data=res1['values'])
-        if 200 <= res.get('status_code') < 300:
-            res['values']['connector_id'] = base_automation.connector_id.id
-            res['values']['external_id'] = res1['values']['external_id']
-            res['values']['bearer_token'] = res1['values']['bearer_token']
-            _logger.info(res)
-
-            values = res['values']
-            ResCompany = env['res.company'].sudo()
-
-            # check if company exists
-            company_id = ResCompany.search(['|', ('name', '=ilike', values.get('name')), ('email', '=ilike', values.get('email'))], limit=1)
-            if not company_id:
-                _logger.info('Empresa no encontrada. Crear')
-                company_id = ResCompany.with_context(exclud_contact_from_sync=True, not_execute_warehouse_base_automation=True).create(values)
-            else:
-                _logger.info(f'Empresa {company_id.name} encontrada. Actualizar')
-                company_id.partner_id.write({'x_exclud_from_sync': True})
-                company_id.sudo().write(values)
-            if company_id:
-                company_id.message_post(body="Empresa sincronizada con tienda en Tiendanube!")
-
-            _logger.info(f"Tienda de TN {company_id.name} sincronizada!")
-        else:
-            _logger.error(f"Error Endpoint STORE: {res.get('error_message', '')}")
-    else:
-        _logger.error(f"Error Endpoint TOKEN: {res1.get('error_message', '')}")
-except Exception as e:
-    _logger.error(f"Error al ejecutar Webhook registrar tienda.: {str(e)}")
-        ]]></field>
-        <field name="base_automation_id" ref="tn_automation_register_store"/>
-    </record>
-
     <record id="tn_automation_update_store" model="base.automation">
         <field name="name">ACTUALIZAR TIENDA</field>
-        <field name="active" eval="False"/>
+        <field name="active" eval="True"/>
         <field name="trigger">on_webhook</field>
         <field name="model_id" ref="base.model_res_company"/>
         <field name="connector_id" ref="tn_connector_api"/>
@@ -83,6 +28,61 @@ try:
         _logger.info("Endpoint con código STORE no configurado, para actualizar y asociar empresa de odoo con una tienda de Tiendanube.")
         raise UserError("Endpoint con código STORE no configurado, para actualizar y asociar empresa de odoo con una tienda de Tiendanube.")
 
+    # ===== VALIDAR Y ACTIVAR IDIOMA Y MONEDA PRINCIPAL ANTES DE PROCESAR =====
+    main_lang = payload.get('main_language')
+    main_currency_code = payload.get('main_currency')
+    country_code = payload.get("country")
+
+    # Validar y activar el idioma principal
+    if main_lang and country_code:
+        lang_code = f"{main_lang}_{country_code}"
+        res_lang_id = env['res.lang'].with_context(active_test=False).sudo().search([('code', '=', lang_code)], limit=1)
+        if res_lang_id:
+            if not res_lang_id.active:
+                res_lang_id.write({'active': True})
+                _logger.info(f"Idioma principal {lang_code} activado en Odoo.")
+            else:
+                _logger.info(f"Idioma principal {lang_code} ya está activo.")
+        else:
+            _logger.warning(f"Idioma principal {lang_code} no encontrado en res.lang. Debe cargarse en Odoo.")
+
+    # Validar y activar la moneda principal
+    if main_currency_code:
+        main_currency = env['res.currency'].with_context(active_test=False).sudo().search([('name', '=', main_currency_code)], limit=1)
+        if main_currency:
+            if not main_currency.active:
+                main_currency.write({'active': True})
+                _logger.info(f"Moneda principal {main_currency_code} activada en Odoo.")
+            else:
+                _logger.info(f"Moneda principal {main_currency_code} ya está activa.")
+        else:
+            _logger.warning(f"Moneda principal {main_currency_code} no encontrada en res.currency. Debe cargarse en Odoo.")
+
+    # Validar y activar idiomas y monedas secundarios
+    langs = payload.get('languages', {})
+    for lang_code, lang_data in langs.items():
+        if lang_data.get('active') and country_code:
+            full_lang_code = f"{lang_code}_{country_code}"
+            res_lang_id = env['res.lang'].with_context(active_test=False).sudo().search([('code', '=', full_lang_code)], limit=1)
+            if res_lang_id:
+                if not res_lang_id.active:
+                    res_lang_id.write({'active': True})
+                    _logger.info(f"Idioma {full_lang_code} activado en Odoo.")
+            else:
+                _logger.warning(f"Idioma {lang_code} no está cargado en res.lang. Cargar manualmente si se necesita.")
+
+            # Activar moneda asociada al idioma
+            currency_code = lang_data.get('currency')
+            if currency_code:
+                currency = env['res.currency'].with_context(active_test=False).sudo().search([('name', '=', currency_code)], limit=1)
+                if currency:
+                    if not currency.active:
+                        currency.write({'active': True})
+                        _logger.info(f"Moneda {currency_code} activada por idioma {lang_code}.")
+                else:
+                    _logger.warning(f"Moneda {currency_code} no encontrada en res.currency.")
+
+    # ===== PROCESAR MAPPING Y CREAR/ACTUALIZAR EMPRESA =====
     mapping_config = json.loads(endpoint.response_mapping)
     values = endpoint._process_simple_mapping_to_odoo(mapping_config, payload, record)
     values['connector_id'] = base_automation.connector_id.id
@@ -100,32 +100,13 @@ try:
         company_id.sudo().write(values)
         company_id.message_post(body="Empresa sincronizada con tienda en Tiendanube!")
 
-    # idiomas
-    main_lang = payload.get('main_language')
-    country_code = payload.get("country") or company_id.country_id.code
+    # Asignar idioma principal al partner de la empresa
     if main_lang and country_code:
         lang_code = f"{main_lang}_{country_code}"
-        res_lang_id = env['res.lang'].with_context(active_test=False).sudo().search([('code', '=', lang_code)], limit=1)
+        res_lang_id = env['res.lang'].sudo().search([('code', '=', lang_code), ('active', '=', True)], limit=1)
         if res_lang_id:
             company_id.partner_id.write({'lang': res_lang_id.code})
             _logger.info(f"Asignado idioma principal {res_lang_id.code} al partner {company_id.partner_id.name}")
-        else:
-            _logger.warning(f"Idioma {main_lang} no encontrado en res.lang. Debe cargarse en Odoo.")
-
-    langs = payload.get('languages')
-    for lang_code, lang_data in langs.items():
-        if lang_data.get('active'):
-            full_lang_code = f"{lang_code}_{country_code}"
-            res_lang_id = env['res.lang'].with_context(active_test=False).sudo().search([('code', '=', full_lang_code)], limit=1)
-            if not res_lang_id:
-                _logger.warning(f"Idioma {lang_code} no está cargado en res.lang. Cargar manualmente si se necesita.")
-
-            currency_code = lang_data.get('currency')
-            if currency_code:
-                currency = env['res.currency'].with_context(active_test=False).sudo().search([('name', '=', currency_code)], limit=1)
-                if currency and not currency.active:
-                    currency.write({'active': True})
-                    _logger.info(f"Moneda {currency_code} activada por idioma {lang_code}.")
 
     _logger.info(f"Tienda de TN {company_id.name} sincronizada!")
 except Exception as e:
@@ -2681,34 +2662,61 @@ for record in records:
         <field name="model_id" ref="product.model_product_template"/>
         <field name="code"><![CDATA[
 _logger.info(f"RA Actualizando Producto.")
+
+# Campos que representan precio en product.template
+PRICE_FIELDS = {'list_price'}
+
 for record in records:
     if env.company.external_id and env.company.bearer_token and record.company_id == env.company:
         name = record.name
         _logger.info(f"Actualizando Producto: {name}")
+
         if env.context.get('not_execute_product_base_automation', False):
             _logger.info('not_execute_product_base_automation esta en el contexto. No ejecutar RA.')
             continue
+
         try:
-            # obtener los campos que se modificaron
-            modified_fields = base_automation.with_context(ignore_computed_fields=True)._get_trigger_fields(record)
+            modified_fields = base_automation.with_context(
+                ignore_computed_fields=True
+            )._get_trigger_fields(record)
             _logger.info(f"Campos a actualizar {modified_fields}, Company {env.company.name}")
             modified_fields = [field for field in modified_fields if field != 'attribute_line_ids']
-            if modified_fields:
+
+            if not modified_fields:
+                continue
+
+            # ── Separar campos de precio vs campos de producto ─────────────
+            price_fields_modified = [f for f in modified_fields if f in PRICE_FIELDS]
+            product_fields_modified = [f for f in modified_fields if f not in PRICE_FIELDS]
+            # ──────────────────────────────────────────────────────────────
+
+            # Verificar si podemos sincronizar
+            if not record.can_sync_to_store():
+                _logger.info(
+                    f"Producto con ID {record.id} ya está siendo sincronizado desde la tienda, saltando."
+                )
+                continue
+
+            # Marcar como sincronizando desde Odoo
+            record.mark_as_syncing('odoo')
+
+            # ── 1. Actualizar campos generales del producto (PUT /products/{id}) ──
+            if product_fields_modified:
                 code = 'PRODUCT_UPDATE'
-                endpoint = env['solt.api.endpoint'].search([('code', '=', code), ('connector_id', '=', base_automation.connector_id.id)], limit=1)
+                endpoint = env['solt.api.endpoint'].search(
+                    [('code', '=', code), ('connector_id', '=', base_automation.connector_id.id)],
+                    limit=1
+                )
                 if not endpoint:
-                    msg = f"Endpoint con código {code} no configurado, para actualizar categorías de producto."
-                    _logger.info(msg)
+                    msg = f"Endpoint con código {code} no configurado."
+                    _logger.error(msg)
                     raise UserError(msg)
-                # Verificar si podemos sincronizar
-                if not record.can_sync_to_store():
-                    _logger.info(
-                        f"Producto con ID {record.id} ya está siendo sincronizado desde la tienda, saltando sincronización.")
-                    continue
-                # Marcar como sincronizando desde Odoo
-                record.mark_as_syncing('odoo')
-                response = endpoint.with_context(modified_fields=modified_fields).execute_request(record=record)
-                _logger.info(response)
+
+                response = endpoint.with_context(
+                    modified_fields=product_fields_modified
+                ).execute_request(record=record)
+                _logger.info(f"Response {code}: {response}")
+
                 if 200 <= response.get('status_code') < 300:
                     record.write(response['values'])
 
@@ -2718,31 +2726,67 @@ for record in records:
                             "x_date_last_sync": datetime.datetime.now(),
                             "x_exclud_from_sync": False,
                             "x_store_external_id": env.company.external_id,
-                            "company_id": env.company.id
+                            "company_id": env.company.id,
                         })
 
-                    #sincronizar variantes
-                    record.create_product_variants_from_json(response['raw_response'], update_from_store=False)
+                    record.create_product_variants_from_json(
+                        response['raw_response'], update_from_store=False
+                    )
 
-                # Suspension of API access due to lack of payment
-                # se debe suspender todo los endpoints y webhoks
                 elif response.get('status_code') == 402:
-                        record.write({
-                            'x_date_last_sync': datetime.datetime.now(),
-                            'x_state_sync': 'error'
-                        })
-                        _logger.error(f"Error ejecutando endpoint {code}: {response.get('error_message', '')}")
-                elif response.get('status_code') == 422 or response.get('status_code') != 404:
-                    _logger.error(f"Error ejecutando endpoint {code}: {response.get('error_message', '')}")
-                    #raise UserError(f"Error ejecutando endpoint {code}: {response.get('error_message', '')}")
+                    record.write({
+                        'x_date_last_sync': datetime.datetime.now(),
+                        'x_state_sync': 'error'
+                    })
+                    _logger.error(f"Error 402 en {code}: {response.get('error_message', '')}")
+
+                elif response.get('status_code') in (422, 404):
+                    _logger.error(f"Error {response.get('status_code')} en {code}: {response.get('error_message', '')}")
+
                 else:
                     record.write({
                         'x_date_last_sync': datetime.datetime.now(),
                         'x_state_sync': 'error'
                     })
-                    _logger.error(f"Error ejecutando endpoint {code}: {response.get('error_message', '')}")
-                _logger.info(f"Ejecución del endpoint {code} finalizada.")
-                _logger.info(f"Producto {record.name} sincronizado!.")
+                    _logger.error(f"Error en {code}: {response.get('error_message', '')}")
+
+                _logger.info(f"Endpoint {code} finalizado para {record.name}.")
+
+            # ── 2. Actualizar precio de variantes (PATCH /products/stock-price) ──
+            if price_fields_modified:
+                _logger.info(
+                    f"Campos de precio modificados {price_fields_modified}. "
+                    f"Sincronizando precios de variantes con TN..."
+                )
+
+                code_price = 'PRODUCT_VARIANT_PRICE_PATCH'
+                endpoint_price = env['solt.api.endpoint'].search(
+                    [('code', '=', code_price), ('connector_id', '=', base_automation.connector_id.id)],
+                    limit=1
+                )
+
+                if not endpoint_price:
+                    _logger.warning(
+                        f"Endpoint {code_price} no configurado. "
+                        f"No se actualizará el precio en TN."
+                    )
+                else:
+                    price_response = endpoint_price.execute_request(record=record)
+                    _logger.info(f"Response {code_price}: {price_response}")
+
+                    if 200 <= price_response.get('status_code') < 300:
+                        _logger.info(f"Precios sincronizados en TN para {record.name}.")
+                    else:
+                        _logger.error(
+                            f"Error en {code_price}: {price_response.get('error_message', '')}"
+                        )
+                        record.write({
+                            'x_date_last_sync': datetime.datetime.now(),
+                            'x_state_sync': 'error'
+                        })
+
+            _logger.info(f"Producto {record.name} sincronizado!.")
+
         except Exception as e:
             _logger.error(f"Error al actualizar Producto: {str(e)}")
             record.write({
@@ -2750,8 +2794,11 @@ for record in records:
                 'x_state_sync': 'error'
             })
             raise UserError(f"Error: {str(e)}")
+
     else:
-        _logger.info(f"RA Actualizar productos. Empresa {env.company.name} no esta asociada a una tienda en TN.")
+        _logger.info(
+            f"RA Actualizar productos. Empresa {env.company.name} no está asociada a una tienda en TN."
+        )
         ]]></field>
         <field name="base_automation_id" ref="tn_ba_automation_product_template_update"/>
     </record>
@@ -4207,45 +4254,106 @@ else:
         <field name="code"><![CDATA[
 if not env.company.external_id or not env.company.bearer_token:
     raise UserError(f"La empresa {env.company.name} no está sincronizada con una tienda.")
+
 action_id = env['ir.actions.server'].search([('use_for_initial_export', '=', True)], limit=1)
 _logger.info(env.context.get('default_connector_id', False))
+
 if action_id and action_id.connector_id:
-    res = action_id.connector_id.execute_endpoint('PRODUCT_ALL_GET',record=record)
-    to_create_values = []
-    to_write_values = []
+    connector = action_id.connector_id
+    res = connector.execute_endpoint('PRODUCT_ALL_GET', record=record)
+
     product_ids = env['product.template'].sudo()
+
     if isinstance(res['values'], list):
-        # verificar si existe el producto template
         for val in res['values']:
-            product_id = env['product.template'].search([('x_external_id', '=', val['x_external_id'])], limit=1)
+            product_id = env['product.template'].search(
+                [('x_external_id', '=', val['x_external_id'])], limit=1
+            )
             if product_id:
                 product_ids |= product_id
                 _logger.info(f"Producto con ID Externo {val['x_external_id']} encontrado sincronizado!")
             _logger.info(val)
 
+    _logger.info(f"Productos encontrados: {len(res['values'])}")
 
-    _logger.info(f"Productos encontrados {len(res['values'])}")
-
-    # sync images of products
+    # ── Exportación masiva de imágenes: Odoo → TN ──────────────────────────
     if product_ids:
-        raw_response = []
-        if isinstance(res['raw_response'], dict) and 'items' in res['raw_response']:  # paginado
-            raw_response = res['raw_response'].get('items')
-        elif isinstance(res['raw_response'], list):
-            raw_response = res['raw_response']
+        for product in product_ids:
+            _logger.info(f"Sincronizando imágenes del producto ID: {product.id} - {product.name}")
 
-        product_ids.with_context(not_execute_product_base_automation=True)._sync_product_images_from_json(raw_response)
-        _logger.info("Imagenes sincronizadas")
-    # crear los webhooks y publicarlos
-    _logger.info(f"Crear los webhooks")
-    for wh_event in ["product/created", "product/updated", "product/deleted"]:
-        # verificar si fue creado
-        wh_event_id = env['solt.register.webhook'].with_context(active_test=False).search([('event', '=', wh_event), ('company_id', '=', env.company.id)])
-        if wh_event_id and wh_event_id.x_state_sync == 'yes':
-            continue
-        wh_event_id._register_webhook(action_id.connector_id)
+            # Solo productos sincronizados con TN
+            if product.x_state_sync != 'yes':
+                _logger.info(f"Producto {product.id} no está en estado sync 'yes', saltando.")
+                continue
+
+            try:
+                for product_image in product.product_image_ids:
+                    # Solo imágenes que tengan external_id del producto pero NO tengan el propio
+                    if (
+                        product_image.product_tmpl_id
+                        and product_image.product_tmpl_id.x_external_id
+                        and not product_image.x_external_id
+                    ):
+                        _logger.info(f"Creando imagen '{product_image.name}' en TN...")
+                        image_response = connector.execute_endpoint(
+                            'PRODUCT_IMAGE_CREATE', record=product_image
+                        )
+                        _logger.info(f"Response PRODUCT_IMAGE_CREATE: {image_response}")
+
+                        if 200 <= image_response.get('status_code', 0) < 300:
+                            product_image.write(image_response['values'])
+                            _logger.info(f"Imagen '{product_image.name}' sincronizada correctamente.")
+
+                            # Si la imagen tiene variantes, actualizarlas
+                            if product_image.product_variant_ids:
+                                variant_response = connector.execute_endpoint(
+                                    'PRODUCT_IMAGE_VARIANT_PATCH', record=product_image
+                                )
+                                _logger.info(f"Response PRODUCT_IMAGE_VARIANT_PATCH: {variant_response}")
+
+                                if 200 <= variant_response.get('status_code', 0) < 300:
+                                    if not isinstance(variant_response['values'], list):
+                                        product_image.product_variant_ids.write(variant_response['values'])
+                                    else:
+                                        for variant, vals in zip(
+                                            product_image.product_variant_ids,
+                                            variant_response['values']
+                                        ):
+                                            variant.write(vals)
+                                else:
+                                    product_image.product_variant_ids.write({
+                                        'x_date_last_sync': datetime.datetime.now(),
+                                        'x_state_sync': 'error'
+                                    })
+                                    _logger.error(
+                                        f"Error PRODUCT_IMAGE_VARIANT_PATCH: "
+                                        f"{variant_response.get('error_message', '')}"
+                                    )
+                        else:
+                            product_image.write({
+                                'x_date_last_sync': datetime.datetime.now(),
+                                'x_state_sync': 'error'
+                            })
+                            _logger.error(
+                                f"Error PRODUCT_IMAGE_CREATE: "
+                                f"{image_response.get('error_message', '')}"
+                            )
+
+            except Exception as e:
+                _logger.error(f"Error al sincronizar imágenes del producto {product.id}: {str(e)}")
+                product.write({
+                    'x_date_last_sync': datetime.datetime.now(),
+                    'x_state_sync': 'error'
+                })
+                # Continúa con el siguiente producto en lugar de frenar todo el proceso
+                continue
+
+        _logger.info("Exportación masiva de imágenes finalizada.")
+    # ────────────────────────────────────────────────────────────────────────
+
 else:
     _logger.error("Conector no configurado")
+
         ]]></field>
     </record>
 

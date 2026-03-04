@@ -19,5 +19,26 @@
                 </field>
             </field>
         </record>
+
+        <!--
+            Acción de servidor: Sincronizar estado de orden desde TiendaNube
+            Lógica aplicada (replica webhooks de TN, sin crear órdenes nuevas):
+              · open/no pagada   → confirma si draft, sincroniza picking
+              · paid             → genera facturas si invoice_status != invoiced
+              · fulfilled/full   → bloquea la orden
+              · cancelled        → cancela en Odoo + excluye de sync futura
+            El estado se obtiene siempre en tiempo real desde la API de TN
+        -->
+        <record id="action_server_tn_sync_order_state" model="ir.actions.server">
+            <field name="name">Sincronizar orden desde TiendaNube</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="binding_model_id" ref="sale.model_sale_order"/>
+            <field name="binding_view_types">list,form</field>
+            <field name="state">code</field>
+            <field name="code">
+                if records:
+                    action = records.action_tn_sync_state_from_tn()
+            </field>
+        </record>
     </data>
 </odoo>

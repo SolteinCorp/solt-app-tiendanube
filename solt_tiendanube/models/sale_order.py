@@ -657,6 +657,326 @@ class SaleOrder(models.Model):
 
         return generated_invoices
 
+    # Acción de servidor: Sincronizar estado desde TiendaNube
+    def action_tn_sync_state_from_tn(self):
+        """
+        Acción de servidor ejecutada sobre órdenes ya existentes en Odoo.
+        Para cada orden seleccionada obtiene el estado actual desde TN y aplica
+        la lógica equivalente a los webhooks que pudo haber perdido:
+
+          order/created   → confirma si draft, picking, campos personalizados
+          order/paid      → genera facturas si payment_status == paid
+          order/fulfilled → picking + bloqueo si delivery_status == full
+          order/cancelled → cancela + excluye de sync futura
+          order/edited    → si shipping_status == unpacked y orden confirmada,
+                            cancela la actual y crea nueva versión con datos TN
+          fulfillment/updated → sync picking (incluyendo fulfillments parciales:
+                            partially_fulfilled + DISPATCHED)
+
+        Nunca crea órdenes nuevas desde cero; solo aplica transiciones de estado
+        o crea una nueva versión (order/edited) a partir de una existente.
+        """
+        orders_to_sync = self.filtered(lambda o: o.x_external_id)
+
+        if not orders_to_sync:
+            raise UserError(_(
+                "Ninguna de las órdenes seleccionadas tiene un ID externo de TiendaNube. "
+                "Solo se pueden sincronizar órdenes que fueron importadas desde TN."
+            ))
+
+        total = len(orders_to_sync)
+        updated = 0
+        skipped = 0
+        errors = 0
+
+        for order in orders_to_sync:
+            try:
+                ok = order._tn_sync_single_order_state()
+                if ok is True:
+                    updated += 1
+                elif ok is False:
+                    skipped += 1
+                else:
+                    errors += 1
+            except Exception as e:
+                _logger.error(
+                    f"TN Sync State: Error inesperado en orden {order.name}: {str(e)}"
+                )
+                errors += 1
+
+        # Notificación en pantalla
+        if errors == 0 and skipped == 0:
+            msg_type = 'success'
+            msg = _(f"✓ {updated} de {total} órdenes sincronizadas correctamente desde TiendaNube.")
+        elif errors > 0:
+            msg_type = 'warning'
+            msg = _(
+                f"Sincronización completada con errores: "
+                f"{updated} actualizadas | {skipped} sin cambios | {errors} con error. "
+                f"Revisar logs del servidor para más detalle."
+            )
+        else:
+            msg_type = 'info'
+            msg = _(f"{updated} actualizadas | {skipped} sin cambios (ya estaban al día).")
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _("Sincronización TiendaNube"),
+                'message': msg,
+                'type': msg_type,
+                'sticky': errors > 0,
+            }
+        }
+
+    # LÓGICA DE SINCRONIZACIÓN DE ESTADO PARA UNA ORDEN
+
+    def _tn_sync_single_order_state(self):
+        """
+        Obtiene el estado actual de la orden desde TN y aplica las transiciones
+        de estado correspondientes en Odoo, replicando la lógica de los webhooks.
+
+        Cubre los siguientes eventos de webhook:
+          order/created   → confirma + picking + campos personalizados
+          order/paid      → factura si payment_status == paid y no la tiene
+          order/fulfilled → picking + bloqueo si delivery_status == full
+          order/cancelled → cancela y excluye de sync futura
+          order/edited    → si shipping_status == unpacked y estado == sale,
+                            crea nueva versión via action_new_version()
+          fulfillment/updated → cubierto por tiendanube_sync_picking_from_order:
+                            detecta shipping_status == partially_fulfilled y
+                            fulfillment_status == DISPATCHED para validar
+                            los pickings de fulfillments parciales
+
+        Returns:
+            True  – estado actualizado / nueva versión creada
+            False – sin cambios necesarios (orden ya al día)
+            None  – error al consultar TN o no se pudo aplicar el cambio
+        """
+        self.ensure_one()
+
+        connector = self.company_id.connector_id
+        if not connector:
+            _logger.warning(
+                f"TN Sync State [{self.name}]: No se encontró conector TN "
+                f"para la empresa '{self.company_id.name}'. Saltando."
+            )
+            return None
+
+        # ── 1. Obtener estado actual desde TN ─────────────────────────────────
+        # Path de GET_SINGLE: /{env.company.external_id}/orders/{data.get('id')}
+        # → 'data' lleva x_external_id para interpolar el path
+        # → el company_id en context resuelve env.company correctamente
+        endpoint = self.env['solt.api.endpoint'].sudo().search(
+            [('code', '=', 'SALE_ORDER_GET_SINGLE')], limit=1
+        )
+        if not endpoint:
+            _logger.error("TN Sync State: Endpoint 'SALE_ORDER_GET_SINGLE' no encontrado.")
+            return None
+
+        try:
+            response = endpoint.with_context(
+                company_id=self.company_id.id
+            ).execute_request(
+                record=self,
+                data={'id': self.x_external_id},
+            )
+        except Exception as e:
+            _logger.error(f"TN Sync State [{self.name}]: Error al consultar TN: {str(e)}")
+            return None
+
+        status_code = response.get('status_code', 0)
+
+        if status_code == 404:
+            _logger.warning(
+                f"TN Sync State [{self.name}]: Orden {self.x_external_id} "
+                f"no encontrada en TN (404). Puede haber sido eliminada."
+            )
+            return False
+
+        if not (200 <= status_code < 300):
+            _logger.error(
+                f"TN Sync State [{self.name}]: Error HTTP {status_code}: "
+                f"{response.get('error_message', '')}"
+            )
+            return None
+
+        raw            = response.get('raw_response', {})
+        mapped_values  = response.get('values', {})
+        order_status    = raw.get('status')           # open / closed / cancelled
+        payment_status  = raw.get('payment_status')   # pending / paid / refunded / voided
+        shipping_status = raw.get('shipping_status')  # unpacked / shipped / delivered /
+                                                       # partially_packed / partially_fulfilled
+
+        _logger.info(
+            f"TN Sync State [{self.name}]: TN responde → "
+            f"status={order_status} | payment={payment_status} | "
+            f"shipping={shipping_status}"
+        )
+
+        order_response_dict = {str(self.x_external_id): raw}
+        changed = False
+
+        # order/edited
+        # ──────────────────────────────────────────────────────────────────────
+        # En TN, una orden solo puede editarse mientras esté en estado UNPACKED
+        # (no se ha preparado ningún envío). El webhook order/edited cancela la
+        # orden existente en Odoo y crea una nueva versión con los datos actuales.
+        # Condición: shipping_status == 'unpacked' Y orden ya confirmada en Odoo.
+        # ──────────────────────────────────────────────────────────────────────
+        if shipping_status == 'unpacked' and self.state == 'sale':
+            _logger.info(
+                f"TN Sync State [{self.name}]: shipping_status=unpacked + estado=sale "
+                f"→ aplicando lógica order/edited (nueva versión)."
+            )
+            try:
+                new_order = self.action_new_version(mapped_values)
+                if not new_order:
+                    _logger.error(
+                        f"TN Sync State [{self.name}]: action_new_version no devolvió orden."
+                    )
+                    return None
+
+                # Confirmar la nueva versión si quedó en draft
+                if new_order.state == 'draft':
+                    new_order.action_confirm()
+                    _logger.info(
+                        f"TN Sync State [{self.name}]: Nueva versión {new_order.name} confirmada."
+                    )
+
+                # Sync picking de la nueva versión
+                new_order_response_dict = {str(new_order.x_external_id): raw}
+                new_order.tiendanube_sync_picking_from_order(new_order_response_dict)
+
+                # Campos personalizados de la nueva versión
+                self._tn_apply_custom_fields(self.company_id, connector, new_order)
+
+                new_order.write({
+                    'x_state_sync': 'yes',
+                    'x_date_last_sync': datetime.datetime.now(),
+                })
+
+                _logger.info(
+                    f"TN Sync State [{self.name}]: Orden/edited completada. "
+                    f"Nueva versión: {new_order.name} | Anterior cancelada: {self.name}."
+                )
+                return True
+
+            except Exception as e:
+                _logger.error(
+                    f"TN Sync State [{self.name}]: Error en lógica order/edited: {str(e)}"
+                )
+                return None
+
+        # order/cancelled
+        # ──────────────────────────────────────────────────────────────────────
+        if order_status == 'cancelled' and self.state not in ('cancel',):
+            self._action_cancel()
+            self.write({
+                'x_state_sync': 'yes',
+                'x_date_last_sync': datetime.datetime.now(),
+                'x_exclud_from_sync': True,
+            })
+            self.message_post(body=_(
+                "Pedido cancelado por sincronización manual desde TiendaNube."
+            ))
+            _logger.info(f"TN Sync State [{self.name}]: Cancelada.")
+            return True
+
+        # ──────────────────────────────────────────────────────────────────────
+        # order/created / order/paid / order/fulfilled / fulfillment/updated
+        # ──────────────────────────────────────────────────────────────────────
+
+        # Confirmar si todavía está en borrador
+        if self.state == 'draft' and order_status != 'cancelled':
+            self.action_confirm()
+            _logger.info(f"TN Sync State [{self.name}]: Confirmada.")
+            changed = True
+
+        # Sincronizar picking (cubre order/fulfilled y fulfillment/updated)
+        # Esto replica tanto order/fulfilled como fulfillment/updated.
+        if order_status != 'cancelled':
+            self.tiendanube_sync_picking_from_order(order_response_dict)
+            _logger.info(
+                f"TN Sync State [{self.name}]: Picking sincronizado "
+                f"(shipping_status={shipping_status})."
+            )
+            changed = True
+
+        # Generar facturas si está pagada y no las tiene (order/paid)
+        if (
+            payment_status == 'paid'
+            and self.state in ('sale')
+            and self.invoice_status != 'invoiced'
+        ):
+            generated = self._generate_delivered_invoices()
+            _logger.info(
+                f"TN Sync State [{self.name}]: {len(generated)} factura(s) generada(s)."
+            )
+            changed = True
+
+        # Bloquear si la entrega fue completada (order/fulfilled)
+        if self.delivery_status == 'full' and self.state == 'sale':
+            self.action_lock()
+            self.message_post(body=_(
+                "Pedido bloqueado por sincronización manual desde TiendaNube. "
+                "Entrega completa confirmada."
+            ))
+            _logger.info(f"TN Sync State [{self.name}]: Bloqueada (entrega completa).")
+            changed = True
+
+        # Actualizar marca de sync
+        if changed:
+            self.write({
+                'x_state_sync': 'yes',
+                'x_date_last_sync': datetime.now(),
+            })
+
+        return True if changed else False
+
+    # Helpers
+    def _tn_apply_custom_fields(self, company, connector, order):
+        """
+        Obtiene y aplica los campos personalizados de TN a la orden de Odoo.
+        Replica la lógica de order/created. Los errores son no-fatales.
+        """
+        try:
+            cf_response = connector.execute_endpoint(
+                'CUSTOM_FIELD_ORDERS_GET_VALUES',
+                record=order
+            )
+            if 200 <= cf_response.get('status_code', 0) < 300:
+                for response_data, val in zip(
+                    cf_response.get('raw_response', []),
+                    cf_response.get('values', [])
+                ):
+                    field_odoo_id = self.env['ir.model.fields'].sudo().search([
+                        '|',
+                        ('x_external_id', '=', response_data.get('id')),
+                        ('x_key', '=', response_data.get('key')),
+                    ])
+                    if field_odoo_id:
+                        field_name = field_odoo_id.name
+                        val.update({field_name: response_data.get('value')})
+                        order.write(val)
+                _logger.info(
+                    f"TN Sync State [{company.name}]: Campos personalizados "
+                    f"aplicados a {order.name}."
+                )
+            else:
+                _logger.warning(
+                    f"TN Sync State [{company.name}]: No se pudieron obtener "
+                    f"campos personalizados para {order.name}: "
+                    f"{cf_response.get('error_message', '')}"
+                )
+        except Exception as e:
+            _logger.warning(
+                f"TN Sync State [{company.name}]: Error en campos personalizados "
+                f"para {order.name}: {str(e)}"
+            )
+
+
 
 
 
