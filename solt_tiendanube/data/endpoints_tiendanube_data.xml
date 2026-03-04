@@ -4,7 +4,7 @@
     <!--  Conector API  -->
     <record id="tn_connector_api" model="solt.api.connector">
         <field name="name">Tienda Nube</field>
-        <field name="active" eval="False"/>
+        <field name="active" eval="True"/>
         <field name="auth_type">none</field>
         <field name="base_url">https://api.tiendanube.com/v1</field>
         <field name="headers"><![CDATA[

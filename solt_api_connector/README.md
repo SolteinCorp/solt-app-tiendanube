@@ -87,4 +87,3 @@ zip -r solt_api_connector_18.0.1.0.1.zip solt_api_connector \
 ---
 
 © 2024 Soltein SA de CV · Licensed under LGPL-3
-

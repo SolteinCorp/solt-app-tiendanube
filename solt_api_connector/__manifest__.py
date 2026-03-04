@@ -3,20 +3,13 @@
 # License LGPL-3 or later (http://www.gnu.org/licenses/lgpl.html)
 {
     'name': "API Connector",
-    'summary': "Configurable API orchestration framework for Odoo 18",
-    'description': """API Connector
-===================
-
-Model, execute, and monitor integrations with any REST API directly from Odoo. Define multiple
-connections, map payloads visually, orchestrate automations, and log every call with retry and
-webhook support.
-""",
+    'summary': "Configurable API orchestration framework for Odoo 17",
     'author': 'Soltein SA de CV',
     'maintainers': ['soltein'],
     'website': 'https://www.soltein.mx',
     'support': 'soporte@soltein.mx',
     'category': 'Tools/Connectivity',
-    'version': '17.0.1.0.1',
+    'version': '17.0.1.0.2',
     'license': 'LGPL-3',
     'depends': ['base', 'base_automation', 'social_media'],
     'application': True,

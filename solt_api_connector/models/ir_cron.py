@@ -1,4 +1,4 @@
-from odoo import models, fields, _
+from odoo import fields, models
 
 
 class IrCron(models.Model):
@@ -8,6 +8,7 @@ class IrCron(models.Model):
         'ir.actions.server',
         string='Server action for import',
         readonly=True,
+        help="Server action used to run the initial import.",
     )
     server_action_to_export_id = fields.Many2one(
         'ir.actions.server',

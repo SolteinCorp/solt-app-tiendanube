@@ -2,8 +2,7 @@
 
 from lxml import etree
 from lxml.etree import XML, tostring
-
-from odoo import api, fields, models, _, Command
+from odoo import Command, _, api, fields, models
 from odoo.exceptions import UserError
 
 group_template = """<group></group>"""
@@ -38,11 +37,12 @@ class SoltApiMetaFields(models.Model):
     _name = 'solt.api.meta.fields'
     _description = 'API Meta Fields'
 
-    connector_id = fields.Many2one('solt.api.connector', string='Conector API', required=True, ondelete='cascade')
-    name = fields.Char("Nombre")
-    model_id = fields.Many2one('ir.model', string='Modelo Odoo')
+    connector_id = fields.Many2one('solt.api.connector', string='Conector API', required=True, ondelete='cascade',
+                                   help="API connector that owns this meta field configuration.")
+    name = fields.Char("Nombre", help="Name of this meta field configuration.")
+    model_id = fields.Many2one('ir.model', string='Modelo Odoo', help="Odoo model to add dynamic fields to.")
     model = fields.Char('Model', related="model_id.model")
-    active = fields.Boolean(default=True, string="Activar")
+    active = fields.Boolean(default=True, string="Activar", help="Whether this meta field configuration is active.")
 
     form_view_id = fields.Many2one('ir.ui.view', 'Vista de formulario', help="Vista de formulario del modelo")
     extended_form_view_id = fields.Many2one('ir.ui.view', 'Vista de formulario extendida', readonly=True,
@@ -51,8 +51,10 @@ class SoltApiMetaFields(models.Model):
     extended_search_view_id = fields.Many2one('ir.ui.view', 'Vista de búsqueda extendida', readonly=True,
                                               help="The search view of the model that want to extend",
                                               copy=False)
-    ir_meta_field_ids = fields.One2many('ir.model.fields', 'api_meta_field_id', string="Campos meta")
-    meta_tab_label = fields.Char(string='Etiqueta de la pestaña Integración', default='Sincronización')
+    ir_meta_field_ids = fields.One2many('ir.model.fields', 'api_meta_field_id', string="Campos meta",
+                                        help="Dynamic fields created for this meta field configuration.")
+    meta_tab_label = fields.Char(string='Etiqueta de la pestaña Integración', default='Sincronización',
+                                 help="Label for the integration tab added to the form view.")
     create_dinamic_view = fields.Boolean("Crear vistas dinámicas", default=False,
                                          help="Crea las vistas dinámicas para el modelo Odoo configurado")
     list_view_id = fields.Many2one('ir.ui.view', 'Viste árbol',
@@ -62,12 +64,14 @@ class SoltApiMetaFields(models.Model):
                                             copy=False)
 
     def get_field_types(self):
+        """Returns the available field types for dynamic meta field creation."""
         vals = [('boolean', 'Boolean'), ('char', 'Char'), ('date', 'Date'), ('datetime', 'Datetime'), ('float', 'Float'), ('html', 'Html'), ('integer', 'Integer'), ('text', 'Text'),
                 ('selection', 'Selection')]
         return vals
 
     @api.onchange('model_id')
     def onchange_model_id(self):
+        """Auto-fills name and view references when the model is changed."""
         if self.model_id:
             if not self.name:
                 self.name = self.model_id.name
@@ -85,6 +89,7 @@ class SoltApiMetaFields(models.Model):
             self.update(values)
 
     def action_create_meta_fields(self):
+        """Creates the dynamic fields and optionally the extended views."""
         self.make_fields()
         if self.create_dinamic_view:
             self.make_views()
@@ -159,6 +164,7 @@ class SoltApiMetaFields(models.Model):
             raise UserError(_('Please set the form view'))
 
     def make_fields(self):
+        """Creates or updates the default dynamic meta fields for the configured model."""
         self.ensure_one()
         ir_meta_field_ids = self._get_default_meta_field_mapping()
         fd_ids = self.create_or_update_field(ir_meta_field_ids)
@@ -167,6 +173,7 @@ class SoltApiMetaFields(models.Model):
         return True
 
     def make_form_meta_fields(self, arch):
+        """Builds the form view XML nodes for the integration tab with meta fields."""
         fields_attrs = []
         node_group = []
         for mf in self.ir_meta_field_ids:
@@ -201,6 +208,7 @@ class SoltApiMetaFields(models.Model):
         return arch
 
     def make_form_view(self):
+        """Creates or updates the extended form view with meta field nodes."""
         view_obj = self.env['ir.ui.view'].sudo()
         data = XML('<data/>')
         arch = XML(container_template)
@@ -223,6 +231,7 @@ class SoltApiMetaFields(models.Model):
             view.write(view_data)
 
     def make_search_view(self):
+        """Creates or updates the extended search view with sync status filter."""
         if self.search_view_id:
             state_field = False
             if self.ir_meta_field_ids:
@@ -255,6 +264,7 @@ class SoltApiMetaFields(models.Model):
                     view.write(view_data)
 
     def make_views(self):
+        """Creates or updates all extended views (form, search, list)."""
         self.ensure_one()
         if self.form_view_id:
             self.make_form_view()
@@ -265,6 +275,7 @@ class SoltApiMetaFields(models.Model):
         return True
 
     def create_or_update_field(self, ir_meta_field_ids):
+        """Creates or updates ir.model.fields records from the meta field mapping."""
         self.ensure_one()
         field_obj = self.env['ir.model.fields'].sudo()
         fd_obj = self.env['ir.model.fields'].sudo()
@@ -298,6 +309,7 @@ class SoltApiMetaFields(models.Model):
         return fd_obj
 
     def make_tree_view(self):
+        """Creates or updates the extended list view with sync fields."""
         if self.list_view_id:
             view_obj = self.env['ir.ui.view'].sudo()
             data = XML('<data/>')
@@ -329,6 +341,7 @@ class SoltApiMetaFields(models.Model):
                 view.write(view_data)
 
     def add_dynamic_fields_to_extended_view(self, model, new_field_names):
+        """Adds new dynamic fields to the existing extended form view."""
         # Buscar la vista extendida
         self.ensure_one()
         meta_fields = self

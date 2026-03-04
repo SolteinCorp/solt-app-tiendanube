@@ -6,7 +6,7 @@
     'website': 'https://www.soltein.mx',
     'support': 'soporte@soltein.mx',
     'maintainers': ['soltein'],
-    'version': '17.0.1.1.2',
+    'version': '17.0.1.1.3',
     'license': 'LGPL-3',
     'category': 'Sales/Multichannel',
     'application': True,

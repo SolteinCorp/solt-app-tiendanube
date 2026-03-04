@@ -3,7 +3,7 @@
 import logging
 from datetime import timedelta
 
-from odoo import models, fields, api
+from odoo import api, fields, models
 
 _logger = logging.getLogger(__name__)
 
@@ -16,21 +16,29 @@ class ConnectorSyncMixin(models.AbstractModel):
     _name = 'connector.sync.mixin'
     _description = 'Connector Sync Mixin'
 
-    is_being_synced = fields.Boolean('In synchronization', default=False, copy=False, prefetch=False)
+    is_being_synced = fields.Boolean('In synchronization', default=False, copy=False, prefetch=False,
+                                     help="Flag indicating the record is currently being synchronized.")
     sync_source = fields.Selection([
         ('odoo', 'From Odoo'),
         ('store', 'From Store')
-    ], string='Synchronization source', copy=False, prefetch=False)
-    sync_timestamp = fields.Datetime('Synchronization time', copy=False, prefetch=False)
-    x_external_id = fields.Char('External ID', readonly=True)
-    x_store_external_id = fields.Char('Store external ID', readonly=True)
+    ], string='Synchronization source', copy=False, prefetch=False,
+        help="Origin of the current synchronization process.")
+    sync_timestamp = fields.Datetime('Synchronization time', copy=False, prefetch=False,
+                                     help="Timestamp when the current sync operation started.")
+    x_external_id = fields.Char('External ID', readonly=True,
+                                help="ID of the record in the external system.")
+    x_store_external_id = fields.Char('Store external ID', readonly=True,
+                                      help="External store identifier for this record.")
     x_state_sync = fields.Selection([
         ('yes', 'In sync'),
         ('no', 'Pending sync'),
         ('error', 'Error'),
-    ], string='Sync status', default='no', readonly=True)
-    x_exclud_from_sync = fields.Boolean('Exclude from sync', default=False)
-    x_date_last_sync = fields.Datetime('Last synchronization', readonly=True)
+    ], string='Sync status', default='no', readonly=True,
+        help="Indicates whether the record is synchronized with the external system.")
+    x_exclud_from_sync = fields.Boolean('Exclude from sync', default=False,
+                                        help="When enabled, the record will not be exported to external systems.")
+    x_date_last_sync = fields.Datetime('Last synchronization', readonly=True,
+                                       help="Timestamp of the last successful synchronization.")
 
     def mark_as_syncing(self, source):
         """Marks the record as being synchronized"""

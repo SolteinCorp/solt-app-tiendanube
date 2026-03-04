@@ -2,26 +2,30 @@
 # Copyright 2024 Soltein SA. de CV.
 # License LGPL-3 or later (http://www.gnu.org/licenses/lgpl.html)
 
-from odoo import api, fields, models, tools, _, Command, SUPERUSER_ID
+from odoo import SUPERUSER_ID, Command, api, fields, models
 
 
 class ResCompany(models.Model):
     _inherit = 'res.company'
 
-    external_id = fields.Char("External ID")
-    bearer_token = fields.Char("Bearer token")
-    connector_id = fields.Many2one('solt.api.connector', string='API connector')
+    external_id = fields.Char("External ID", help="ID of this company in the external system.")
+    bearer_token = fields.Char("Bearer token", help="Authentication token for API calls on behalf of this company.")
+    connector_id = fields.Many2one('solt.api.connector', string='API connector',
+                                   help="API connector associated with this company.")
     state_initial_load = fields.Selection([
         ('not_executed', 'Not executed'),
         ('completed', 'Completed'),
-    ], string="Initial load status", default="not_executed")
+    ], string="Initial load status", default="not_executed",
+        help="Tracks whether the initial data import has been executed for this company.")
 
     # social media
-    social_pinterest = fields.Char('Pinterest account', prefetch=False)
-    social_blog = fields.Char('Blog', prefetch=False)
+    social_pinterest = fields.Char('Pinterest account', prefetch=False,
+                                   help="Pinterest account URL for this company.")
+    social_blog = fields.Char('Blog', prefetch=False, help="Blog URL for this company.")
 
     @api.model_create_multi
     def create(self, vals_list):
+        """Override to exclude synced contacts from partner creation when applicable."""
 
         if self.env.context.get('exclud_contact_from_sync', False):
             # create missing partners
@@ -47,7 +51,7 @@ class ResCompany(models.Model):
                 ])
                 # compute stored fields, for example address dependent fields
                 partners.flush_model()
-                for vals, partner in zip(no_partner_vals_list, partners):
+                for vals, partner in zip(no_partner_vals_list, partners, strict=True):
                     vals['partner_id'] = partner.id
 
             for vals in vals_list:
