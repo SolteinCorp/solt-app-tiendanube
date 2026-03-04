@@ -25,6 +25,7 @@ class BaseAutomation(models.Model):
 
     @api.depends('trigger', 'trigger_field_ids', 'trg_selection_field_id', 'trg_field_ref')
     def _compute_filter_domain(self):
+        """Override to clear filter domain for connector-based automations that don't have trigger fields, as they would be ignored anyway."""
         non_connector_records = self.env['base.automation']
         for record in self:
             if record.connector_id and record.trigger not in ['on_state_set', 'on_priority_set', 'on_user_set', 'on_archive', 'on_unarchive']:
@@ -38,10 +39,12 @@ class BaseAutomation(models.Model):
 
     @api.depends('connector_id')
     def _compute_is_api_sync(self):
+        """Compute the 'is_api_sync' field based on whether a connector is linked to this automation."""
         for record in self:
             record.is_api_sync = bool(record.connector_id)
 
     def toggle_active(self):
+        """Override to disable ir.logging for webhook automations with connectors, as calls are logged in solt.api.call.log."""
         result = super(BaseAutomation, self).toggle_active()
         for record in self:
             if record.connector_id and record.trigger == 'on_webhook':
