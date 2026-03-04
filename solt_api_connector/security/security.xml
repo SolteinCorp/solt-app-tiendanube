@@ -16,4 +16,30 @@
         <field name="user_ids" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
         <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
     </record>
+
+    <!-- API Call Log: row-level security by company -->
+    <!-- Regular users only see logs belonging to their own companies.
+         Logs without a company (e.g. legacy records) remain visible to everyone. -->
+    <record id="rule_solt_api_call_log_user" model="ir.rule">
+        <field name="name">API Call Log: own companies only</field>
+        <field name="model_id" ref="model_solt_api_call_log"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- API Integration Administrators can see all logs regardless of company. -->
+    <record id="rule_solt_api_call_log_manager" model="ir.rule">
+        <field name="name">API Call Log: manager sees all</field>
+        <field name="model_id" ref="model_solt_api_call_log"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_api_integration_manager'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
 </odoo>

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 # Copyright 2024 Soltein SA. de CV.
 # License LGPL-3 or later (http://www.gnu.org/licenses/lgpl.html)
+import json
+import traceback
 from odoo import api, fields, models
 
 
@@ -29,7 +31,46 @@ class BaseAutomation(models.Model):
             record.is_api_sync = bool(record.connector_id)
 
     def toggle_active(self):
-        return super(BaseAutomation, self).toggle_active()
+        result = super(BaseAutomation, self).toggle_active()
+        for record in self:
+            if record.connector_id and record.trigger == 'on_webhook':
+                # Webhook calls with a connector are logged in solt.api.call.log,
+                # so ir.logging is not needed.
+                record.log_webhook_calls = False
+        return result
+
+    def _get_webhook_log_vals(self, payload):
+        """Hook for sub-modules to inject extra values into the webhook log.
+
+        Override this method in connector-specific modules to add fields such as
+        company_id derived from the incoming payload.
+        """
+        return {}
+
+    def _execute_webhook(self, payload):
+        """Override to redirect webhook logs to solt.api.call.log when a connector is set."""
+        if not self.connector_id:
+            return super()._execute_webhook(payload)
+
+        call_log_vals = {
+            'connector_id': self.connector_id.id,
+            'automation_id': self.id,
+            'request_url': self.url,
+            'request_method': 'POST',
+            'request_body': json.dumps(payload, default=str),
+            'direction': 'incoming',
+            'success': True,
+        }
+        call_log_vals.update(self._get_webhook_log_vals(payload))
+        try:
+            result = super()._execute_webhook(payload)
+            return result
+        except Exception:
+            call_log_vals['success'] = False
+            call_log_vals['response_body'] = traceback.format_exc()
+            raise
+        finally:
+            self.env['solt.api.call.log'].sudo().create(call_log_vals)
 
     def _get_trigger_fields(self, record):
         """Return the trigger fields that have been modified on ``record``.

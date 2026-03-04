@@ -55,8 +55,10 @@ class SoltRegisterWebhook(models.Model):
 
     @api.ondelete(at_uninstall=False)
     def _unlink_except_automation_id(self):
-        if any(connector.automation_id for connector in self):
-            raise UserError(_('No puedes eliminar el Registro con un webhook configurado.'))
+        for connector in self:
+            if connector.automation_id and connector.active:
+                raise UserError(
+                    _('No puedes eliminar el Registro con un webhook configurado y activo. Desactívalo primero.'))
 
     def toggle_active(self):
         res = super().toggle_active()
