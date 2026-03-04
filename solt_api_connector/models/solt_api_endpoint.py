@@ -558,7 +558,7 @@ Expressions can access:
         connector = self.connector_id
         url = connector._prepare_api_url(self._prepare_endpoint_path(record, data))
         headers = self._get_auth_headers(data, record)
-        log_vals = {'connector_id': connector.id, 'endpoint_id': self.id, 'request_url': url, 'request_method': self.method, 'request_headers': json.dumps(headers), 'request_params': json.dumps(request_params),
+        log_vals = {'connector_id': connector.id, 'endpoint_id': self.id, 'company_id': self.env.company.id, 'request_url': url, 'request_method': self.method, 'request_headers': json.dumps(headers), 'request_params': json.dumps(request_params),
                 'request_body':     json.dumps(request_data) if request_data else False, }
         try:
             _logger.info(f"Request: {request_data}")
@@ -624,7 +624,7 @@ Expressions can access:
             request_params[self.pagination_size_param] = self.pagination_size
 
         while has_more_pages:
-            log_vals = {'connector_id': connector.id, 'endpoint_id': self.id, 'request_url': url, 'request_method': self.method, 'request_headers': json.dumps(headers), 'request_params': json.dumps(request_params),
+            log_vals = {'connector_id': connector.id, 'endpoint_id': self.id, 'company_id': self.env.company.id, 'request_url': url, 'request_method': self.method, 'request_headers': json.dumps(headers), 'request_params': json.dumps(request_params),
                     'request_body':     json.dumps(request_data) if request_data else False, }
 
             try:

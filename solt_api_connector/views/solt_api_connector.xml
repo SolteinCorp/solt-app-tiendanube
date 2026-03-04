@@ -75,6 +75,7 @@
                                     />
                                     <button name="toggle_active" icon="fa-archive fa-2x" type="object"
                                             title="Deactivate Webhook/Automations"
+                                            invisible="not active or not parent.active"
                                             confirm="This action will deactivate the rule and prevent execution. Continue?"
                                     />
                                 </list>

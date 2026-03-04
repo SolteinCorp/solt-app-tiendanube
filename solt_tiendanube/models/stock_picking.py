@@ -12,6 +12,62 @@ class StockPicking(models.Model):
     _name = 'stock.picking'
     _inherit = ['stock.picking', 'solt.integration.model.mixin', 'connector.sync.mixin']
 
+    def _is_tiendanube_sale_picking(self):
+        """Verifica si el picking está asociado a una venta de TiendaNube.
+
+        Se utiliza para determinar si se debe evitar la sincronización de stock
+        hacia TiendaNube cuando se valida la entrega, ya que TN ya descontó
+        el inventario cuando se creó la orden.
+
+        :return: True si el picking es de una venta TiendaNube, False en caso contrario
+        :rtype: bool
+        """
+        self.ensure_one()
+        return (
+            self.sale_id
+            and self.sale_id.order_number  # Número de referencia de la orden en TN
+            and self.location_dest_id.usage == 'customer'
+        )
+
+    def button_validate(self):
+        """Override para evitar sincronización de stock hacia TN solo en ventas de TiendaNube.
+
+        Solo las ventas que provienen de TiendaNube no deben sincronizar el stock,
+        ya que TN ya descontó el inventario al crear la orden.
+
+        Todas las demás operaciones si deben sincronizar hacia TN:
+        - Ventas de Odoo (no TN): si sincronizar
+        - Recepciones de compra: si sincronizar
+        - Transferencias internas: si sincronizar
+        - Ajustes de inventario: si sincronizar
+        - Fabricaciones: si sincronizar
+
+        Se utiliza el contexto 'not_execute_quants_base_automation' que ya es
+        reconocido por la acción automatizada 'tn_ba_automation_inventory_stock_update'.
+        """
+        # Separar pickings de ventas TN de todos los demás
+        tn_sale_pickings = self.filtered(lambda p: p._is_tiendanube_sale_picking())
+        other_pickings = self - tn_sale_pickings
+
+        result = None
+        # Validar pickings de ventas TN con contexto especial para evitar sync de stock a TN
+        if tn_sale_pickings:
+            _logger.info(
+                "Validando entregas de TiendaNube sin sincronizar stock a TN: %s",
+                ', '.join(tn_sale_pickings.mapped('name'))
+            )
+            result = super(StockPicking, tn_sale_pickings.with_context(
+                not_execute_quants_base_automation=True
+            )).button_validate()
+
+        # Validar todos los demás pickings normalmente
+        # Estos si deben sincronizar stock hacia TN
+        if other_pickings:
+            other_result = super(StockPicking, other_pickings).button_validate()
+            result = other_result if result is None else result
+
+        return result
+
     def _check_carrier_details_compliance(self):
         """ Check that a picking has a `carrier_tracking_ref`.
         This allows to block a picking to be validated as done if the `carrier_tracking_ref` is
