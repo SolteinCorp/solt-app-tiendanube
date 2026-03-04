@@ -2,7 +2,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import logging
-from odoo import models, fields, _
+
+from odoo import _, fields, models
 from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
@@ -29,27 +30,33 @@ class ServerAction(models.Model):
                                    help="API Connector linked to this server action")
     use_for_initial_import = fields.Boolean(default=False, string="Use for initial import",
                                             help="Mark when this server action is part of the initial import flow")
-    last_import_date = fields.Datetime('Last import', readonly=True)
+    last_import_date = fields.Datetime('Last import', readonly=True,
+                                      help="Timestamp of the last successful import execution.")
     importing_state = fields.Selection([
         ('idle', 'Idle'),
         ('scheduled', 'Scheduled'),
         ('running', 'Running'),
         ('done', 'Completed'),
         ('error', 'Error')
-    ], string='Import status', default='idle', readonly=True)
-    import_result = fields.Text('Import result', readonly=True)
+    ], string='Import status', default='idle', readonly=True,
+        help="Current state of the import process.")
+    import_result = fields.Text('Import result', readonly=True,
+                                help="Result message from the last import execution.")
     # Campos para exportación inicial
     use_for_initial_export = fields.Boolean(default=False, string="Use for initial export",
                                             help="Mark when this server action is part of the initial export flow")
-    last_export_date = fields.Datetime('Last export', readonly=True)
+    last_export_date = fields.Datetime('Last export', readonly=True,
+                                       help="Timestamp of the last successful export execution.")
     exporting_state = fields.Selection([
         ('idle', 'Idle'),
         ('scheduled', 'Scheduled'),
         ('running', 'Running'),
         ('done', 'Completed'),
         ('error', 'Error')
-    ], string='Export status', default='idle', readonly=True)
-    export_result = fields.Text('Export result', readonly=True)
+    ], string='Export status', default='idle', readonly=True,
+        help="Current state of the export process.")
+    export_result = fields.Text('Export result', readonly=True,
+                                help="Result message from the last export execution.")
     code = fields.Text(string='Python Code', groups='base.group_system,solt_api_connector.group_api_integration_manager',
                        default=DEFAULT_PYTHON_CODE,
                        help="Write Python code that the action will execute. Some variables are "
@@ -221,4 +228,3 @@ class ServerAction(models.Model):
                 'export_result': result
             })
         return result
-

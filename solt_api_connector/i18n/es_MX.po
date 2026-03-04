@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 18.0-20251203\n"
+"Project-Id-Version: Odoo Server 18.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-04 05:57+0000\n"
-"PO-Revision-Date: 2025-12-04 05:57+0000\n"
+"POT-Creation-Date: 2026-03-04 04:32+0000\n"
+"PO-Revision-Date: 2026-03-04 04:32+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -19,6 +19,31 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:solt_api_connector.view_solt_api_endpoint_form
 msgid "/route/{id}/resource"
 msgstr "/ruta/{id}/recurso"
+
+#. module: solt_api_connector
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.view_solt_api_endpoint_form
+msgid ""
+"<code>\n"
+"                                            {\n"
+"                                            \"array_source\": \"product_variant_ids\", // Odoo One2many or Many2many field\n"
+"                                            \"item_mapping\": {\n"
+"                                            \"id\": {\"field\": \"external_id\", \"type\": \"integer\"},\n"
+"                                            \"values\": {\"expression\": \"[{'en': av.name} for av in item.attribute_value_ids]\"},\n"
+"                                            \"price\": {\"field\": \"list_price\", \"transform\": \"f'{float(value):.2f}'\"}\n"
+"                                            }\n"
+"                                            }\n"
+"                                        </code>"
+msgstr ""
+"<code>\n"
+"                                        {\n"
+"                                            \"array_source\": \"product_variant_ids\", // Campo One2many o Many2many de Odoo\n"
+"                                            \"item_mapping\": {\n"
+"                                                \"id\": {\"field\": \"external_id\", \"type\": \"integer\"},\n"
+"                                                \"values\": {\"expression\": \"[{'en': av.name} for av in item.attribute_value_ids]\"},\n"
+"                                                \"price\": {\"field\": \"list_price\", \"transform\": \"f'{float(value):.2f}'\"}\n"
+"                                            }\n"
+"                                        }\n"
+"                                        </code>"
 
 #. module: solt_api_connector
 #: model_terms:ir.ui.view,arch_db:solt_api_connector.view_solt_api_endpoint_form
@@ -72,30 +97,28 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:solt_api_connector.view_solt_api_endpoint_form
 msgid ""
 "<code>\n"
-"                                        {\n"
-"                                            \"array_source\": \"product_variant_ids\", // Odoo One2many or Many2many field\n"
-"                                            \"item_mapping\": {\n"
-"                                                \"id\": {\"field\": \"external_id\", \"type\": \"integer\"},\n"
-"                                                \"values\": {\"expression\": \"[{'en': av.name} for av in item.attribute_value_ids]\"},\n"
-"                                                \"price\": {\"field\": \"list_price\", \"transform\": \"f'{float(value):.2f}'\"}\n"
+"                                            {\n"
+"                                            \"id\": {\"field\": \"external_id\", \"type\": \"integer\"},\n"
+"                                            \"variants\": {\n"
+"                                            \"source\": \"product_variant_ids\",\n"
+"                                            \"items\": [\n"
+"                                            {\n"
+"                                            \"id\": {\"field\": \"external_id\", \"type\": \"integer\"},\n"
+"                                            \"price\": {\"field\": \"list_price\", \"type\": \"float\"},\n"
+"                                            \"inventory_levels\": {\n"
+"                                            \"source\": \"stock_quant_ids\",\n"
+"                                            \"items\": [\n"
+"                                            {\n"
+"                                            \"stock\": {\"field\": \"quantity\", \"type\": \"integer\"}\n"
 "                                            }\n"
-"                                        }\n"
+"                                            ]\n"
+"                                            }\n"
+"                                            }\n"
+"                                            ]\n"
+"                                            }\n"
+"                                            }\n"
 "                                        </code>"
 msgstr ""
-"<code>\n"
-"                                        {\n"
-"                                            \"array_source\": \"product_variant_ids\", // Campo One2many o Many2many de Odoo\n"
-"                                            \"item_mapping\": {\n"
-"                                                \"id\": {\"field\": \"external_id\", \"type\": \"integer\"},\n"
-"                                                \"values\": {\"expression\": \"[{'en': av.name} for av in item.attribute_value_ids]\"},\n"
-"                                                \"price\": {\"field\": \"list_price\", \"transform\": \"f'{float(value):.2f}'\"}\n"
-"                                            }\n"
-"                                        }\n"
-"                                        </code>"
-
-#. module: solt_api_connector
-#: model_terms:ir.ui.view,arch_db:solt_api_connector.view_solt_api_endpoint_form
-msgid ""
 "<code>\n"
 "                                        {\n"
 "                                            \"id\": {\"field\": \"external_id\", \"type\": \"integer\"},\n"
@@ -118,38 +141,37 @@ msgid ""
 "                                            }\n"
 "                                        }\n"
 "                                        </code>"
-msgstr ""
 
 #. module: solt_api_connector
 #: model_terms:ir.ui.view,arch_db:solt_api_connector.view_solt_api_endpoint_form
 msgid ""
 "<code>\n"
-"                                        {\n"
-"                                        \"name\": \"data['name']\", // Direct access to a field\n"
-"                                        \"reference\": \"data.get('ref', '')\", // With default value\n"
-"                                        \"date_order\": \"fields.Date.to_date(data['date'])\", // Type conversion\n"
-"                                        \"amount_total\": \"float(data['amount']) * 1.16\", // Mathematical operation\n"
-"                                        \"state\": \"'paid' if float(data['amount']) &gt; 0 else 'draft'\", // Conditional\n"
+"                                            {\n"
+"                                            \"name\": \"data['name']\", // Direct access to a field\n"
+"                                            \"reference\": \"data.get('ref', '')\", // With default value\n"
+"                                            \"date_order\": \"fields.Date.to_date(data['date'])\", // Type conversion\n"
+"                                            \"amount_total\": \"float(data['amount']) * 1.16\", // Mathematical operation\n"
+"                                            \"state\": \"'paid' if float(data['amount']) &gt; 0 else 'draft'\", // Conditional\n"
 "\n"
-"                                        // Relational field (many2one)\n"
-"                                        \"partner_id\": \"env['res.partner'].search([('ref', '=', data['customer_id'])],\n"
-"                                        limit=1).id\",\n"
+"                                            // Relational field (many2one)\n"
+"                                            \"partner_id\": \"env['res.partner'].search([('ref', '=', data['customer_id'])],\n"
+"                                            limit=1).id\",\n"
 "\n"
-"                                        // Create record if it doesn't exist\n"
-"                                        \"partner_id\": \"env['res.partner'].search([('ref', '=', data['customer_id'])],\n"
-"                                        limit=1).id or env['res.partner'].create({'ref': data['customer_id'], 'name':\n"
-"                                        data['customer_name']}).id\",\n"
+"                                            // Create record if it doesn't exist\n"
+"                                            \"partner_id\": \"env['res.partner'].search([('ref', '=', data['customer_id'])],\n"
+"                                            limit=1).id or env['res.partner'].create({'ref': data['customer_id'], 'name':\n"
+"                                            data['customer_name']}).id\",\n"
 "\n"
-"                                        // one2many lines using list comprehension\n"
-"                                        \"line_ids\": \"[Command.create({'product_id':\n"
-"                                        env['product.product'].search([('default_code', '=', item['code'])], limit=1).id,\n"
-"                                        'quantity': float(item['qty']), 'price_unit': float(item['price'])}) for item in\n"
-"                                        data.get('items', [])]\"\n"
+"                                            // one2many lines using list comprehension\n"
+"                                            \"line_ids\": \"[Command.create({'product_id':\n"
+"                                            env['product.product'].search([('default_code', '=', item['code'])], limit=1).id,\n"
+"                                            'quantity': float(item['qty']), 'price_unit': float(item['price'])}) for item in\n"
+"                                            data.get('items', [])]\"\n"
 "\n"
-"                                        // Execute functions by passing their name and parameters\n"
+"                                            // Execute functions by passing their name and parameters\n"
 "                                            \"name\": \"method('func_name', data.get('name'))\"\n"
-"                                        }\n"
-"                                    </code>"
+"                                            }\n"
+"                                        </code>"
 msgstr ""
 "<code>\n"
 "                                        {\n"
@@ -496,6 +518,12 @@ msgid "Authentication type"
 msgstr "Tipo de autenticación"
 
 #. module: solt_api_connector
+#: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_call_log__automation_id
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.view_solt_api_call_log_search
+msgid "Automation"
+msgstr "Webhook/Automatización"
+
+#. module: solt_api_connector
 #: model:ir.model,name:solt_api_connector.model_base_automation
 msgid "Automation Rule"
 msgstr "Regla de automatización"
@@ -579,6 +607,12 @@ msgstr "Empresas con conector"
 #: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_connector__company_sync_count
 msgid "Companies with external config"
 msgstr "Empresas con configuración externa"
+
+#. module: solt_api_connector
+#: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_call_log__company_id
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.view_solt_api_call_log_search
+msgid "Company"
+msgstr "Empresa"
 
 #. module: solt_api_connector
 #: model:ir.model.fields.selection,name:solt_api_connector.selection__ir_actions_server__exporting_state__done
@@ -787,6 +821,12 @@ msgstr ""
 "}\n"
 
 #. module: solt_api_connector
+#: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_call_log__direction
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.view_solt_api_call_log_search
+msgid "Direction"
+msgstr "Dirección"
+
+#. module: solt_api_connector
 #: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_call_log__display_name
 #: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_connector__display_name
 #: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_endpoint__display_name
@@ -871,24 +911,6 @@ msgstr ""
 
 #. module: solt_api_connector
 #. odoo-python
-#: code:addons/solt_api_connector/models/solt_api_endpoint.py:0
-msgid "Error al preparar datos de array: %s"
-msgstr ""
-
-#. module: solt_api_connector
-#. odoo-python
-#: code:addons/solt_api_connector/models/solt_api_endpoint.py:0
-msgid "Error de conexión en página %s: %s"
-msgstr ""
-
-#. module: solt_api_connector
-#. odoo-python
-#: code:addons/solt_api_connector/models/solt_api_endpoint.py:0
-msgid "Error de conexión: %s"
-msgstr ""
-
-#. module: solt_api_connector
-#. odoo-python
 #: code:addons/solt_api_connector/models/ir_actions_server.py:0
 msgid "Error during export: %s"
 msgstr "Error durante la exportación: %s"
@@ -898,24 +920,6 @@ msgstr "Error durante la exportación: %s"
 #: code:addons/solt_api_connector/models/ir_actions_server.py:0
 msgid "Error during import: %s"
 msgstr "Error durante la importación: %s"
-
-#. module: solt_api_connector
-#. odoo-python
-#: code:addons/solt_api_connector/models/solt_api_endpoint.py:0
-msgid "Error en la llamada a la API (página %s): Código %s - %s"
-msgstr ""
-
-#. module: solt_api_connector
-#. odoo-python
-#: code:addons/solt_api_connector/models/solt_api_endpoint.py:0
-msgid "Error evaluating custom headers: %s"
-msgstr "Error al evaluar encabezados personalizados: %s"
-
-#. module: solt_api_connector
-#. odoo-python
-#: code:addons/solt_api_connector/models/solt_api_endpoint.py:0
-msgid "Error evaluating endpoint path: %s"
-msgstr "Error al evaluar la ruta del endpoint: %s"
 
 #. module: solt_api_connector
 #. odoo-python
@@ -930,10 +934,19 @@ msgid "Error in import action '%s': %s"
 msgstr "Error en la acción de importación '%s': %s"
 
 #. module: solt_api_connector
-#. odoo-python
-#: code:addons/solt_api_connector/models/solt_api_endpoint.py:0
-msgid "Error preparing request data: %s"
-msgstr "Error al preparar los datos de la solicitud: %s"
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.delivery_carrier_1322_api_connector_search_view
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.payment_method_671_api_connector_search_view
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.product_category_501_api_connector_search_view
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.product_product_479_api_connector_search_view
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.product_template_478_api_connector_search_view
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.res_partner_128_api_connector_search_view
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.sale_order_1271_api_connector_search_view
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.sale_order_line_1300_api_connector_search_view
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.solt_register_webhook_1433_api_connector_search_view
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.stock_picking_1028_api_connector_search_view
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.stock_warehouse_1004_api_connector_search_view
+msgid "Estado de sincronización"
+msgstr ""
 
 #. module: solt_api_connector
 #: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_meta_fields__meta_tab_label
@@ -1051,12 +1064,6 @@ msgid "From external store"
 msgstr "Desde tienda externa"
 
 #. module: solt_api_connector
-#. odoo-python
-#: code:addons/solt_api_connector/models/solt_api_endpoint.py:0
-msgid "Function '%s' not found in evaluation context."
-msgstr "Función '%s' no encontrada en el contexto de evaluación."
-
-#. module: solt_api_connector
 #: model:ir.model.fields.selection,name:solt_api_connector.selection__solt_api_endpoint__method__get
 msgid "GET"
 msgstr ""
@@ -1162,6 +1169,12 @@ msgstr "En sincronización"
 #: model_terms:ir.ui.view,arch_db:solt_api_connector.view_solt_api_connector_search
 msgid "Inactive"
 msgstr "Inactivo"
+
+#. module: solt_api_connector
+#: model:ir.model.fields.selection,name:solt_api_connector.selection__solt_api_call_log__direction__incoming
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.view_solt_api_call_log_search
+msgid "Incoming"
+msgstr "Entrante"
 
 #. module: solt_api_connector
 #. odoo-python
@@ -1318,12 +1331,6 @@ msgid "Month"
 msgstr "Mes"
 
 #. module: solt_api_connector
-#. odoo-python
-#: code:addons/solt_api_connector/models/solt_api_endpoint.py:0
-msgid "Método HTTP no soportado."
-msgstr ""
-
-#. module: solt_api_connector
 #: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_call_log__name
 #: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_connector__name
 #: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_endpoint__name
@@ -1365,6 +1372,12 @@ msgstr "No ejecutado"
 #: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_endpoint__model_id
 msgid "Odoo model"
 msgstr "Modelo de Odoo"
+
+#. module: solt_api_connector
+#: model:ir.model.fields.selection,name:solt_api_connector.selection__solt_api_call_log__direction__outgoing
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.view_solt_api_call_log_search
+msgid "Outgoing"
+msgstr "Saliente"
 
 #. module: solt_api_connector
 #: model:ir.model.fields.selection,name:solt_api_connector.selection__solt_api_endpoint__method__patch
@@ -1573,6 +1586,25 @@ msgstr "Acciones del servidor utilizadas para exportaciones por primera vez"
 #: model_terms:ir.ui.view,arch_db:solt_api_connector.view_solt_api_endpoint_form
 msgid "Simple array"
 msgstr "Arreglo simple"
+
+#. module: solt_api_connector
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.solt_api_connector10_ir_model_fields_form_view
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.solt_api_connector11_sale_order_form_view
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.solt_api_connector12_sale_order_line_form_view
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.solt_api_connector13_stock_picking_form_view
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.solt_api_connector14_delivery_carrier_form_view
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.solt_api_connector15_payment_method_form_view
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.solt_api_connector1_product_category_form_view
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.solt_api_connector2_product_template_form_view
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.solt_api_connector3_solt_register_webhook_form_view
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.solt_api_connector4_res_partner_form_view
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.solt_api_connector5_product_attribute_form_view
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.solt_api_connector6_product_product_form_view
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.solt_api_connector7_solt_product_brand_form_view
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.solt_api_connector8_solt_product_image_form_view
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.solt_api_connector9_stock_warehouse_form_view
+msgid "Sincronización"
+msgstr ""
 
 #. module: solt_api_connector
 #: model:ir.model.fields,field_description:solt_api_connector.field_connector_sync_mixin__x_store_external_id

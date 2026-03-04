@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 # Copyright 2024 Soltein SA. de CV.
 # License LGPL-3 or later (http://www.gnu.org/licenses/lgpl.html)
-import json
-
 import base64
+import json
 import logging
-import requests
 
-from odoo import models, fields, _, api
-from odoo.exceptions import ValidationError, UserError
+import requests
+from odoo import _, api, fields, models
+from odoo.exceptions import UserError, ValidationError
 
 _logger = logging.getLogger(__name__)
 
@@ -25,27 +24,35 @@ class SoltApiConnector(models.Model):
         ('basic', 'Basic authentication'),
         ('bearer', 'Bearer token'),
         ('api_key', 'API key'),
-    ], string='Authentication type', default='none', required=True)
+    ], string='Authentication type', default='none', required=True,
+        help="Method used to authenticate API requests.")
     username = fields.Char('Username', help="Used for Basic authentication")
     password = fields.Char('Password', help="Used for Basic authentication")
     token = fields.Char('Token', help="Used for Bearer or API key auth")
     api_key_name = fields.Char('API key name', help="Parameter name for the API key")
-    api_key_in = fields.Selection([('header', 'Header'), ('query', 'Query parameter')], string='API key location', default='header')
-    timeout = fields.Integer('Timeout (seconds)', default=30)
+    api_key_in = fields.Selection([('header', 'Header'), ('query', 'Query parameter')], string='API key location', default='header',
+                                  help="Where to include the API key: in the header or as a query parameter.")
+    timeout = fields.Integer('Timeout (seconds)', default=30, help="Maximum time in seconds to wait for API responses.")
     headers = fields.Json('Extra headers', help="JSON structure with extra headers")
-    endpoint_ids = fields.One2many('solt.api.endpoint', 'connector_id', string='Endpoints')
+    endpoint_ids = fields.One2many('solt.api.endpoint', 'connector_id', string='Endpoints',
+                                   help="API endpoints configured for this connector.")
     automation_ids = fields.One2many('base.automation', 'connector_id', string='Automations',
                                      domain=['|', ('active', '=', True), ('active', '=', False)],
                                      context={'active_test': False},
                                      help="Automation rules associated with this connector")
     company_ids = fields.One2many('res.company', 'connector_id', string='Companies', help="Companies linked to this connector")
-    call_log_count = fields.Integer(string='Call logs', compute='_compute_call_log_count')
-    meta_field_ids = fields.One2many('solt.api.meta.fields', 'connector_id', string="Meta fields")
+    call_log_count = fields.Integer(string='Call logs', compute='_compute_call_log_count',
+                                    help="Number of API call logs for this connector.")
+    meta_field_ids = fields.One2many('solt.api.meta.fields', 'connector_id', string="Meta fields",
+                                     help="Dynamic meta field configurations for integration models.")
     ini_import_acion_server_ids = fields.One2many('ir.actions.server', 'connector_id',
                                                   domain=[('use_for_initial_import', '=', True)],
-                                                  string='Initial import actions')
-    company_count = fields.Integer(compute="_compute_company_count", string="Companies with connector")
-    company_sync_count = fields.Integer(compute="_compute_company_count", string="Companies with external config")
+                                                  string='Initial import actions',
+                                                  help="Server actions used for first-time imports.")
+    company_count = fields.Integer(compute="_compute_company_count", string="Companies with connector",
+                                   help="Number of companies linked to this connector.")
+    company_sync_count = fields.Integer(compute="_compute_company_count", string="Companies with external config",
+                                        help="Number of companies with external ID and token configured.")
     ini_export_action_server_ids = fields.One2many('ir.actions.server', 'connector_id',
                                                    string='Initial export actions',
                                                    domain=[('use_for_initial_export', '=', True)],
@@ -161,11 +168,13 @@ class SoltApiConnector(models.Model):
             }
 
     def action_all_active(self):
+        """Activates all automation rules linked to this connector."""
         for connector in self.with_context(active_test=False):
             connector.automation_ids.filtered(lambda a: not a.active).toggle_active()
         return True
 
     def action_all_inactive(self):
+        """Deactivates all automation rules linked to this connector."""
         for connector in self.with_context(active_test=False):
             connector.automation_ids.filtered(lambda a: a.active).toggle_active()
         return True
@@ -176,6 +185,7 @@ class SoltApiConnector(models.Model):
             raise UserError(_('You cannot delete an active API connector.'))
 
     def toggle_active(self):
+        """Toggles active state and propagates it to child automation rules."""
         res = super().toggle_active()
         # Propagate active state to children
         for connector in self.with_context(active_test=False):
@@ -193,12 +203,14 @@ class SoltApiConnector(models.Model):
         return arch, view
 
     def action_create_all_meta_fields(self):
+        """Creates all dynamic meta fields for each configured meta field group."""
         self.ensure_one()
         if self.meta_field_ids:
             for meta_field_id in self.meta_field_ids:
                 meta_field_id.action_create_meta_fields()
 
     def unlink(self):
+        """Deletes the connector and all its related records."""
         for connector in self:
             # delete ini_import_acion_server_ids
             ini_import_acion_server_ids = self.env['ir.actions.server'].with_context(active_test=False).search([

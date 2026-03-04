@@ -1,15 +1,13 @@
+import base64
 import json
 import logging
 import re
-import requests
-import base64
-import re
 
-from odoo import models, fields, _, tools, api
+import requests
+from odoo import _, api, fields, models, tools
 from odoo.exceptions import UserError, ValidationError
-from odoo.tools.safe_eval import safe_eval
 from odoo.tools.float_utils import float_compare
-from odoo.tools.image import base64_to_image
+from odoo.tools.safe_eval import safe_eval
 
 _logger = logging.getLogger(__name__)
 
@@ -18,12 +16,14 @@ class SoltApiEndpoint(models.Model):
     _name = 'solt.api.endpoint'
     _description = 'API Endpoint'
 
-    name = fields.Char('Name', required=True)
-    code = fields.Char('Code', required=True)
-    connector_id = fields.Many2one('solt.api.connector', string='API Connector', required=True, ondelete='cascade')
+    name = fields.Char('Name', required=True, help="Display name of the endpoint.")
+    code = fields.Char('Code', required=True, help="Unique code used to reference this endpoint programmatically.")
+    connector_id = fields.Many2one('solt.api.connector', string='API Connector', required=True, ondelete='cascade',
+                                   help="API connector that owns this endpoint.")
     endpoint_path = fields.Char('Endpoint path', required=True, help="Endpoint path. You can use variables such as {{variable}}")
-    method = fields.Selection([('GET', 'GET'), ('POST', 'POST'), ('PUT', 'PUT'), ('PATCH', 'PATCH'), ('DELETE', 'DELETE')], string='HTTP method', default='GET', required=True)
-    model_id = fields.Many2one('ir.model', string='Odoo model')
+    method = fields.Selection([('GET', 'GET'), ('POST', 'POST'), ('PUT', 'PUT'), ('PATCH', 'PATCH'), ('DELETE', 'DELETE')], string='HTTP method', default='GET', required=True,
+                              help="HTTP method used for this endpoint.")
+    model_id = fields.Many2one('ir.model', string='Odoo model', help="Odoo model related to this endpoint.")
     request_mapping = fields.Json(
         'Request mapping',
         help="""Defines how Odoo data is transformed into the external API payload.
@@ -71,13 +71,19 @@ Expressions can access:
     request_param = fields.Json('Request parameters',
                                      help="JSON definition for additional request parameters",
                                      default="{}")
-    headers = fields.Json('Extra headers', help="Additional headers in JSON format")
-    pagination_enabled = fields.Boolean('Enable pagination', default=False)
-    pagination_param = fields.Char('Page parameter', default='page')
-    pagination_size_param = fields.Char('Page size parameter', default='limit')
-    pagination_size = fields.Integer('Page size', default=100)
-    sequence = fields.Integer(string="Sequence", default=10)
-    check_required_request_field = fields.Boolean("Validate required fields")
+    headers = fields.Json('Extra headers', help="Additional headers in JSON format for this specific endpoint.")
+    pagination_enabled = fields.Boolean('Enable pagination', default=False,
+                                       help="Enable automatic pagination for GET requests.")
+    pagination_param = fields.Char('Page parameter', default='page',
+                                   help="Query parameter name for the page number.")
+    pagination_size_param = fields.Char('Page size parameter', default='limit',
+                                        help="Query parameter name for the page size.")
+    pagination_size = fields.Integer('Page size', default=100,
+                                     help="Number of records per page.")
+    sequence = fields.Integer(string="Sequence", default=10,
+                              help="Order in which endpoints are displayed.")
+    check_required_request_field = fields.Boolean("Validate required fields",
+                                                  help="When enabled, validates that required fields are present in the request mapping.")
     required_request_field = fields.Json("Required fields", help="API fields that must be sent in the request. Comma-separated char field with API field names")
     request_as_array = fields.Boolean('Send request as array', default=False,
         help="When enabled, the request will be sent as a raw array based on the mapping configuration"
@@ -118,7 +124,7 @@ Expressions can access:
                           f"pero no se encuentra una configuración en el Mapeo de la Solicitud."))
                 mapping_config = json.loads(endpoint.request_mapping)
                 is_request_as_array = False
-                for field_key, field_config in mapping_config.items():
+                for _field_key, field_config in mapping_config.items():
                     if isinstance(field_config, dict) and 'source' in field_config:
                         is_request_as_array = True
                         break
@@ -280,7 +286,7 @@ Expressions can access:
                                 # Campo del record principal o del item según contexto
                                 try:
                                     item_value = self._get_field_value(record, item_config['field'])
-                                except:
+                                except Exception:
                                     item_value = self._get_field_value(item_record, item_config['field'])
                             if item_value is not None and 'type' in item_config:
                                 item_value = self._convert_field_value(item_value, item_config['type'])
@@ -524,6 +530,7 @@ Expressions can access:
         model = self.env[model_name] if model_name else None
 
         def execute_function(func_name, *args, **kwargs):
+            """Dynamically call a named function from record, endpoint or model."""
             if record and hasattr(record, func_name):
                 func = getattr(record, func_name)
                 return func(*args, **kwargs)
@@ -614,6 +621,7 @@ Expressions can access:
             'request_headers': json.dumps(headers),
             'request_params': json.dumps(request_params),
             'request_body': json.dumps(request_data) if request_data else False,
+            'company_id': self.env.company.id
         }
         try:
             _logger.info(f"Request: {request_data}")
@@ -703,6 +711,7 @@ Expressions can access:
                 'request_headers': json.dumps(headers),
                 'request_params': json.dumps(request_params),
                 'request_body': json.dumps(request_data) if request_data else False,
+                'company_id': self.env.company.id
             }
 
             try:
