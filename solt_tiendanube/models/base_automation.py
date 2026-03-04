@@ -14,3 +14,19 @@ class BaseAutomation(models.Model):
             'automation_id': self.id,
             'company_id': company.id,
         }
+
+    def _get_webhook_log_vals(self, payload):
+        """Resolve company_id from the TiendaNube store_id present in the payload.
+
+        TiendaNube sends: {'store_id': 6024254, 'id': ..., 'event': '...'}
+        store_id matches res.company.external_id set during store installation.
+        """
+        vals = super()._get_webhook_log_vals(payload)
+        store_id = payload.get('store_id')
+        if store_id:
+            company = self.env['res.company'].sudo().search(
+                [('external_id', '=', str(store_id))], limit=1
+            )
+            if company:
+                vals['company_id'] = company.id
+        return vals

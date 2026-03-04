@@ -29,14 +29,32 @@ class SoltApiCallLog(models.Model):
     success = fields.Boolean('Successful', default=False, readonly=True)
 
     name = fields.Char('Name', compute='_compute_name', store=True, readonly=True)
+    automation_id = fields.Many2one('base.automation', string='Automation', ondelete='set null', readonly=True,
+                                    help="Related automation if this call was triggered by one.")
+    company_id = fields.Many2one('res.company', string='Company', readonly=True,
+                                 help="Related company if this call was triggered by one.")
+    direction = fields.Selection(
+        [('outgoing', 'Outgoing'), ('incoming', 'Incoming')],
+        string='Direction',
+        default='outgoing',
+        readonly=True,
+        help="Direction of the API call: 'Outgoing' if initiated by Odoo to an external API, 'Incoming' if received from an external source (e.g. webhook)."
+    )
 
-    @api.depends('create_date', 'endpoint_id', 'request_method')
+    @api.depends('create_date', 'endpoint_id', 'automation_id', 'request_method', 'direction')
     def _compute_name(self):
+        """Compute a human-readable name for the API call log entry based on its creation date,
+        associated endpoint or automation, HTTP method, and direction."""
         for record in self:
             if record.create_date:
                 date_str = fields.Datetime.to_string(record.create_date)
-                endpoint_name = record.endpoint_id.name if record.endpoint_id else _('Unknown endpoint')
-                http_method = record.request_method or 'GET'
-                record.name = "%s - %s %s" % (date_str, http_method, endpoint_name)
+                if record.endpoint_id:
+                    label = record.endpoint_id.name
+                elif record.automation_id:
+                    label = record.automation_id.name
+                else:
+                    label = _('Unknown endpoint')
+                http_method = record.request_method or ('POST' if record.direction == 'incoming' else 'GET')
+                record.name = f"{date_str} - {http_method} {label}"
             else:
                 record.name = _('New API call')
