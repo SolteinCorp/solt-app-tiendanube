@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-04 04:32+0000\n"
-"PO-Revision-Date: 2026-03-04 04:32+0000\n"
+"POT-Creation-Date: 2026-03-07 00:58+0000\n"
+"PO-Revision-Date: 2026-03-07 00:58+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -377,6 +377,11 @@ msgid "API Connector: Initial export processing"
 msgstr "Conector API: Procesamiento de exportación inicial"
 
 #. module: solt_api_connector
+#: model:ir.actions.server,name:solt_api_connector.ir_cron_process_pending_retries_ir_actions_server
+msgid "API Connector: Process pending retries"
+msgstr "Conector API: Procesar reintentos pendientes"
+
+#. module: solt_api_connector
 #: model:ir.actions.act_window,name:solt_api_connector.action_solt_api_connector
 #: model:ir.ui.menu,name:solt_api_connector.menu_solt_api_connector_root
 msgid "API Connectors"
@@ -415,9 +420,19 @@ msgid "API connector"
 msgstr "Conector API"
 
 #. module: solt_api_connector
+#: model:ir.model.fields,help:solt_api_connector.field_base_automation__connector_id
+msgid "API connector linked to this automation rule."
+msgstr "Conector API vinculado a esta regla de automatización."
+
+#. module: solt_api_connector
 #: model_terms:ir.actions.act_window,help:solt_api_connector.action_solt_api_connector
 msgid "API connectors allow Odoo to connect with external services."
 msgstr "Los conectores API permiten a Odoo conectarse con servicios externos."
+
+#. module: solt_api_connector
+#: model:ir.model.fields,help:solt_api_connector.field_base_automation__endpoint_id
+msgid "API endpoint executed by this automation rule."
+msgstr "Endpoint API ejecutado por esta regla de automatización."
 
 #. module: solt_api_connector
 #: model_terms:ir.actions.act_window,help:solt_api_connector.action_solt_api_endpoint
@@ -483,6 +498,12 @@ msgid "Activate Webhooks/Automations"
 msgstr "Activar Webhooks/Automatizaciones"
 
 #. module: solt_api_connector
+#: model:ir.model.fields,help:solt_api_connector.field_solt_api_connector__retry_enabled
+msgid ""
+"Activate automatic retries for failed outgoing calls on this connector."
+msgstr "Activar reintentos automáticos para llamadas salientes fallidas en este conector."
+
+#. module: solt_api_connector
 #: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_connector__active
 msgid "Active"
 msgstr "Activo"
@@ -506,6 +527,11 @@ msgstr "Administrador"
 #: model_terms:ir.ui.view,arch_db:solt_api_connector.view_solt_api_connector_search
 msgid "All"
 msgstr "Todos"
+
+#. module: solt_api_connector
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.view_solt_api_call_log_form
+msgid "Attempted at"
+msgstr "Intentado en"
 
 #. module: solt_api_connector
 #: model_terms:ir.ui.view,arch_db:solt_api_connector.view_solt_api_connector_search
@@ -551,6 +577,20 @@ msgid "Base URL"
 msgstr "URL base"
 
 #. module: solt_api_connector
+#: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_connector__retry_delay_minutes
+msgid "Base delay (min)"
+msgstr "Retraso base (min)"
+
+#. module: solt_api_connector
+#: model:ir.model.fields,help:solt_api_connector.field_solt_api_connector__retry_delay_minutes
+msgid ""
+"Base delay in minutes between retries. With exponential backoff: delay = "
+"base_delay × 2^attempt_number."
+msgstr ""
+"Retraso base en minutos entre reintentos. Con retroceso exponencial: retraso = "
+"retraso_base × 2^número_de_intento."
+
+#. module: solt_api_connector
 #: model:ir.model.fields.selection,name:solt_api_connector.selection__solt_api_connector__auth_type__basic
 msgid "Basic authentication"
 msgstr "Autenticación básica"
@@ -580,6 +620,11 @@ msgstr "Registros de llamadas"
 #: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_meta_fields__ir_meta_field_ids
 msgid "Campos meta"
 msgstr ""
+
+#. module: solt_api_connector
+#: model:ir.model.fields,help:solt_api_connector.field_solt_api_call_log__child_log_ids
+msgid "Child logs created by each retry attempt."
+msgstr "Registros secundarios creados por cada intento de reintento."
 
 #. module: solt_api_connector
 #: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_endpoint__code
@@ -633,6 +678,7 @@ msgstr "Configurar campos dinámicos"
 
 #. module: solt_api_connector
 #: model:ir.ui.menu,name:solt_api_connector.menu_solt_config
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.view_solt_api_connector_form
 msgid "Configuration"
 msgstr "Configuración"
 
@@ -710,6 +756,11 @@ msgstr "Creado por"
 #: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_meta_fields__create_date
 msgid "Created on"
 msgstr "Creado el"
+
+#. module: solt_api_connector
+#: model:ir.model.fields,help:solt_api_connector.field_solt_api_call_log__retry_state
+msgid "Current state of the automatic retry process for this log."
+msgstr "Estado actual del proceso de reintento automático para este registro."
 
 #. module: solt_api_connector
 #: model:ir.model.fields.selection,name:solt_api_connector.selection__solt_api_endpoint__method__delete
@@ -827,6 +878,20 @@ msgid "Direction"
 msgstr "Dirección"
 
 #. module: solt_api_connector
+#: model:ir.model.fields,help:solt_api_connector.field_base_automation__sync_direction
+msgid ""
+"Direction of data synchronization: push to or pull from external store."
+msgstr "Dirección de la sincronización de datos: enviar a o recibir de la tienda externa."
+
+#. module: solt_api_connector
+#: model:ir.model.fields,help:solt_api_connector.field_solt_api_call_log__direction
+msgid ""
+"Direction of the API call: 'Outgoing' if initiated by Odoo to an external "
+"API, 'Incoming' if received from an external source (e.g. webhook)."
+msgstr ""
+"Dirección de la llamada API: 'Saliente' si es iniciada por Odoo hacia una API externa, 'Entrante' si es recibida desde una fuente externa (por ejemplo, webhook)."
+
+#. module: solt_api_connector
 #: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_call_log__display_name
 #: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_connector__display_name
 #: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_endpoint__display_name
@@ -836,6 +901,7 @@ msgstr "Nombre para mostrar"
 
 #. module: solt_api_connector
 #: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_call_log__duration
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.view_solt_api_call_log_form
 #: model_terms:ir.ui.view,arch_db:solt_api_connector.view_solt_api_call_log_list
 msgid "Duration (s)"
 msgstr "Duración (s)"
@@ -856,6 +922,11 @@ msgstr "Habilite 'Usar para importación inicial'."
 #: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_endpoint__pagination_enabled
 msgid "Enable pagination"
 msgstr "Habilitar paginación"
+
+#. module: solt_api_connector
+#: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_connector__retry_enabled
+msgid "Enable retries"
+msgstr "Habilitar reintentos"
 
 #. module: solt_api_connector
 #: model:ir.model.fields,field_description:solt_api_connector.field_base_automation__endpoint_id
@@ -959,6 +1030,16 @@ msgid "Exclude from sync"
 msgstr "Excluir de la sincronización"
 
 #. module: solt_api_connector
+#: model:ir.model.fields.selection,name:solt_api_connector.selection__solt_api_call_log__retry_state__exhausted
+msgid "Exhausted"
+msgstr "Agotado"
+
+#. module: solt_api_connector
+#: model:ir.model.fields.selection,name:solt_api_connector.selection__solt_api_connector__retry_strategy__exponential
+msgid "Exponential backoff"
+msgstr "Retroceso exponencial"
+
+#. module: solt_api_connector
 #: model_terms:ir.ui.view,arch_db:solt_api_connector.view_solt_api_connector_form
 msgid "Export"
 msgstr "Exportar"
@@ -1039,6 +1120,11 @@ msgid "Fields"
 msgstr "Campos"
 
 #. module: solt_api_connector
+#: model:ir.model.fields.selection,name:solt_api_connector.selection__solt_api_connector__retry_strategy__fixed
+msgid "Fixed delay"
+msgstr "Retraso fijo"
+
+#. module: solt_api_connector
 #: model:ir.model.fields.selection,name:solt_api_connector.selection__connector_sync_mixin__sync_source__odoo
 #: model:ir.model.fields.selection,name:solt_api_connector.selection__product_category__sync_source__odoo
 #: model:ir.model.fields.selection,name:solt_api_connector.selection__product_template__sync_source__odoo
@@ -1081,6 +1167,14 @@ msgid "HTTP method"
 msgstr "Método HTTP"
 
 #. module: solt_api_connector
+#: model:ir.model.fields,help:solt_api_connector.field_solt_api_call_log__response_headers
+msgid ""
+"HTTP response headers stored as JSON. Used by the retry system to read rate-"
+"limit hints (e.g. x-rate-limit-reset)."
+msgstr ""
+"Encabezados de respuesta HTTP almacenados como JSON. Usados por el sistema de reintentos para leer sugerencias de límite de tasa (por ejemplo, x-rate-limit-reset)."
+
+#. module: solt_api_connector
 #: model:ir.model.fields.selection,name:solt_api_connector.selection__solt_api_connector__api_key_in__header
 msgid "Header"
 msgstr "Encabezado"
@@ -1097,6 +1191,11 @@ msgstr "Encabezados"
 #: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_meta_fields__id
 msgid "ID"
 msgstr ""
+
+#. module: solt_api_connector
+#: model:ir.model.fields,help:solt_api_connector.field_solt_api_call_log__res_id
+msgid "ID of the Odoo record that originated this API call."
+msgstr "ID del registro de Odoo que originó esta llamada API."
 
 #. module: solt_api_connector
 #. odoo-python
@@ -1189,6 +1288,11 @@ msgid "Indicates whether the record is synchronized."
 msgstr "Indica si el registro está sincronizado."
 
 #. module: solt_api_connector
+#: model:ir.model.fields,help:solt_api_connector.field_base_automation__is_api_sync
+msgid "Indicates whether this automation is linked to an API connector."
+msgstr "Indica si esta automatización está vinculada a un conector API."
+
+#. module: solt_api_connector
 #: model_terms:ir.ui.view,arch_db:solt_api_connector.view_solt_api_connector_form
 msgid "Initial Export Actions"
 msgstr "Acciones de exportación inicial"
@@ -1232,6 +1336,16 @@ msgstr "Acciones de integración"
 #: model:ir.model.fields,field_description:solt_api_connector.field_base_automation__is_api_sync
 msgid "Is API Sync"
 msgstr "Es sincronización API"
+
+#. module: solt_api_connector
+#: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_call_log__is_retry
+msgid "Is a retry"
+msgstr "Es un reintento"
+
+#. module: solt_api_connector
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.view_solt_api_call_log_search
+msgid "Is retry attempt"
+msgstr "Es intento de reintento"
 
 #. module: solt_api_connector
 #: model:ir.model.fields,help:solt_api_connector.field_solt_api_endpoint__request_param
@@ -1298,6 +1412,22 @@ msgstr ""
 "inicial"
 
 #. module: solt_api_connector
+#: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_call_log__max_retries
+#: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_connector__max_retry_count
+msgid "Max retries"
+msgstr "Máximo de reintentos"
+
+#. module: solt_api_connector
+#: model:ir.model.fields,help:solt_api_connector.field_solt_api_connector__max_retry_count
+msgid "Maximum number of retry attempts before marking the call as exhausted."
+msgstr "Número máximo de intentos de reintento antes de marcar la llamada como agotada."
+
+#. module: solt_api_connector
+#: model:ir.model.fields,help:solt_api_connector.field_solt_api_call_log__max_retries
+msgid "Maximum retries allowed, copied from the connector at log creation."
+msgstr "Máximo de reintentos permitidos, copiado del conector al crear el registro."
+
+#. module: solt_api_connector
 #: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_connector__meta_field_ids
 #: model_terms:ir.ui.view,arch_db:solt_api_connector.view_solt_api_connector_form
 msgid "Meta fields"
@@ -1349,6 +1479,11 @@ msgid "New API call"
 msgstr "Nueva llamada API"
 
 #. module: solt_api_connector
+#: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_call_log__next_retry_at
+msgid "Next retry at"
+msgstr "Próximo reintento en"
+
+#. module: solt_api_connector
 #: model_terms:ir.actions.act_window,help:solt_api_connector.action_solt_api_call_log
 msgid "No API call logs yet"
 msgstr "Aún no hay registros de llamadas API"
@@ -1357,6 +1492,11 @@ msgstr "Aún no hay registros de llamadas API"
 #: model:ir.model.fields.selection,name:solt_api_connector.selection__solt_api_connector__auth_type__none
 msgid "No authentication"
 msgstr "Sin autenticación"
+
+#. module: solt_api_connector
+#: model_terms:ir.actions.act_window,help:solt_api_connector.action_solt_api_call_log_retries
+msgid "No pending or exhausted retries"
+msgstr "No hay reintentos pendientes ni agotados"
 
 #. module: solt_api_connector
 #: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_meta_fields__name
@@ -1369,9 +1509,29 @@ msgid "Not executed"
 msgstr "No ejecutado"
 
 #. module: solt_api_connector
+#: model:ir.model.fields,help:solt_api_connector.field_solt_api_call_log__retry_count
+msgid "Number of retry attempts executed so far."
+msgstr "Cantidad de intentos de reintento ejecutados hasta ahora."
+
+#. module: solt_api_connector
 #: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_endpoint__model_id
 msgid "Odoo model"
 msgstr "Modelo de Odoo"
+
+#. module: solt_api_connector
+#: model:ir.model.fields,help:solt_api_connector.field_solt_api_call_log__res_model_id
+msgid "Odoo model of the record that originated this API call."
+msgstr "Modelo de Odoo del registro que originó esta llamada API."
+
+#. module: solt_api_connector
+#: model:ir.model.fields,help:solt_api_connector.field_base_automation__sequence
+msgid "Order in which automations are executed."
+msgstr "Orden en el que se ejecutan las automatizaciones."
+
+#. module: solt_api_connector
+#: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_call_log__original_log_id
+msgid "Original log"
+msgstr "Registro del log original"
 
 #. module: solt_api_connector
 #: model:ir.model.fields.selection,name:solt_api_connector.selection__solt_api_call_log__direction__outgoing
@@ -1430,6 +1590,21 @@ msgid "Password"
 msgstr "Contraseña"
 
 #. module: solt_api_connector
+#: model:ir.model.fields.selection,name:solt_api_connector.selection__solt_api_call_log__retry_state__pending
+msgid "Pending"
+msgstr "Pendiente"
+
+#. module: solt_api_connector
+#: model:ir.actions.act_window,name:solt_api_connector.action_solt_api_call_log_retries
+msgid "Pending / Exhausted Retries"
+msgstr "Reintentos pendientes / agotados"
+
+#. module: solt_api_connector
+#: model:ir.ui.menu,name:solt_api_connector.menu_solt_api_call_log_retries
+msgid "Pending Retries"
+msgstr "Reintentos pendientes"
+
+#. module: solt_api_connector
 #: model:ir.model.fields.selection,name:solt_api_connector.selection__connector_sync_mixin__x_state_sync__no
 #: model:ir.model.fields.selection,name:solt_api_connector.selection__product_category__x_state_sync__no
 #: model:ir.model.fields.selection,name:solt_api_connector.selection__product_template__x_state_sync__no
@@ -1460,6 +1635,26 @@ msgstr "Código Python"
 #: model:ir.model.fields.selection,name:solt_api_connector.selection__solt_api_connector__api_key_in__query
 msgid "Query parameter"
 msgstr "Parámetro de consulta"
+
+#. module: solt_api_connector
+#: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_call_log__res_id
+msgid "Record ID"
+msgstr "ID de registro"
+
+#. module: solt_api_connector
+#: model:ir.model.fields,help:solt_api_connector.field_solt_api_call_log__automation_id
+msgid "Related automation if this call was triggered by one."
+msgstr "Automatización relacionada si esta llamada fue activada por una."
+
+#. module: solt_api_connector
+#: model:ir.model.fields,help:solt_api_connector.field_solt_api_call_log__company_id
+msgid "Related company if this call was triggered by one."
+msgstr "Empresa relacionada si esta llamada fue activada por una."
+
+#. module: solt_api_connector
+#: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_call_log__res_model_id
+msgid "Related model"
+msgstr "Modelo relacionado"
 
 #. module: solt_api_connector
 #: model_terms:ir.ui.view,arch_db:solt_api_connector.view_solt_api_call_log_form
@@ -1504,6 +1699,11 @@ msgid "Required fields"
 msgstr "Campos requeridos"
 
 #. module: solt_api_connector
+#: model:ir.model.fields.selection,name:solt_api_connector.selection__solt_api_call_log__retry_state__resolved
+msgid "Resolved"
+msgstr "Resuelto"
+
+#. module: solt_api_connector
 #: model_terms:ir.ui.view,arch_db:solt_api_connector.view_solt_api_call_log_form
 msgid "Response"
 msgstr "Respuesta"
@@ -1519,6 +1719,11 @@ msgid "Response code"
 msgstr "Código de respuesta"
 
 #. module: solt_api_connector
+#: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_call_log__response_headers
+msgid "Response headers"
+msgstr "Encabezados de respuesta"
+
+#. module: solt_api_connector
 #: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_endpoint__response_mapping
 msgid "Response mapping"
 msgstr "Mapeo de respuesta"
@@ -1527,6 +1732,58 @@ msgstr "Mapeo de respuesta"
 #: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_call_log__response_body
 msgid "Response payload"
 msgstr "Carga útil de respuesta"
+
+#. module: solt_api_connector
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.view_solt_api_call_log_search
+msgid "Retries active"
+msgstr "Reintentos activos"
+
+#. module: solt_api_connector
+#: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_call_log__retry_count
+msgid "Retries done"
+msgstr "Reintentos realizados"
+
+#. module: solt_api_connector
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.view_solt_api_connector_form
+msgid "Retry System"
+msgstr "Sistema de reintentos"
+
+#. module: solt_api_connector
+#: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_call_log__child_log_ids
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.view_solt_api_call_log_form
+msgid "Retry attempts"
+msgstr "Intentos de reintento"
+
+#. module: solt_api_connector
+#: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_call_log__retry_state
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.view_solt_api_call_log_search
+msgid "Retry state"
+msgstr "Estado de reintento"
+
+#. module: solt_api_connector
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.view_solt_api_call_log_form
+msgid "Retry status"
+msgstr "Estado de reintento"
+
+#. module: solt_api_connector
+#: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_connector__retry_strategy
+msgid "Retry strategy"
+msgstr "Estrategia de reintento"
+
+#. module: solt_api_connector
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.view_solt_api_call_log_search
+msgid "Retry: Exhausted"
+msgstr "Reintento: Agotado"
+
+#. module: solt_api_connector
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.view_solt_api_call_log_search
+msgid "Retry: Pending"
+msgstr "Reintento: Pendiente"
+
+#. module: solt_api_connector
+#: model:ir.model.fields.selection,name:solt_api_connector.selection__solt_api_call_log__retry_state__retrying
+msgid "Retrying"
+msgstr "Reintentando"
 
 #. module: solt_api_connector
 #: model:ir.model.fields.selection,name:solt_api_connector.selection__ir_actions_server__exporting_state__running
@@ -1544,6 +1801,11 @@ msgstr "Programado"
 #: model:ir.model,name:solt_api_connector.model_ir_cron
 msgid "Scheduled Actions"
 msgstr "Acciones planificadas"
+
+#. module: solt_api_connector
+#: model:ir.model.fields,help:solt_api_connector.field_solt_api_call_log__next_retry_at
+msgid "Scheduled datetime for the next retry attempt."
+msgstr "Fecha y hora programada para el próximo intento de reintento."
 
 #. module: solt_api_connector
 #: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_endpoint__request_as_array
@@ -1683,6 +1945,11 @@ msgstr ""
 " trabajo"
 
 #. module: solt_api_connector
+#: model:ir.model.fields,help:solt_api_connector.field_solt_api_call_log__original_log_id
+msgid "The original failed log that triggered the retry chain."
+msgstr "El registro de log original fallido que desencadenó la cadena de reintentos."
+
+#. module: solt_api_connector
 #: model:ir.model.fields,help:solt_api_connector.field_solt_api_meta_fields__extended_search_view_id
 msgid "The search view of the model that want to extend"
 msgstr "La vista de búsqueda del modelo que desea extender"
@@ -1750,6 +2017,15 @@ msgstr ""
 " los modelos de Odoo configurados."
 
 #. module: solt_api_connector
+#: model_terms:ir.actions.act_window,help:solt_api_connector.action_solt_api_call_log_retries
+msgid ""
+"This view shows outgoing calls that failed and are waiting for\n"
+"                a retry or have exhausted all attempts."
+msgstr ""
+"Esta vista muestra las llamadas salientes que fallaron y están esperando\n"
+"                un reintento o han agotado todos los intentos."
+
+#. module: solt_api_connector
 #: model_terms:ir.ui.view,arch_db:solt_api_connector.view_solt_api_call_log_search
 msgid "This week"
 msgstr "Esta semana"
@@ -1779,6 +2055,11 @@ msgstr ""
 #: code:addons/solt_api_connector/models/solt_api_connector.py:0
 msgid "Token is required for Bearer authentication."
 msgstr "El token es requerido para autenticación Bearer."
+
+#. module: solt_api_connector
+#: model:ir.model.fields,help:solt_api_connector.field_solt_api_call_log__is_retry
+msgid "True when this log was created by the retry cron (child log)."
+msgstr "Verdadero cuando este registro fue creado por el cron de reintentos (registro hijo)."
 
 #. module: solt_api_connector
 #. odoo-python
@@ -1937,6 +2218,15 @@ msgstr "Debe establecer el conector antes de ejecutar la exportación."
 #: code:addons/solt_api_connector/models/ir_actions_server.py:0
 msgid "You must set the connector before running the import."
 msgstr "Debe establecer el conector antes de ejecutar la importación."
+
+#. module: solt_api_connector
+#: model:ir.model.fields,help:solt_api_connector.field_solt_api_connector__retry_strategy
+msgid ""
+"fixed: constant delay between retries.\n"
+"exponential: delay doubles with each attempt (base × 2^attempt)."
+msgstr ""
+"fijo: retraso constante entre reintentos.\n"
+"exponencial: el retraso se duplica con cada intento (base × 2^intento)."
 
 #. module: solt_api_connector
 #: model_terms:ir.ui.view,arch_db:solt_api_connector.view_solt_api_endpoint_form

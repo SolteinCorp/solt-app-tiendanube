@@ -95,6 +95,18 @@
                         <page string="Additional Headers" name="headers">
                             <field name="headers" widget="ace"/>
                         </page>
+                        <page string="Retry System" name="retry_config">
+                            <group string="Configuration">
+                                <group>
+                                    <field name="retry_enabled"/>
+                                    <field name="max_retry_count" invisible="not retry_enabled"/>
+                                </group>
+                                <group>
+                                    <field name="retry_strategy" invisible="not retry_enabled"/>
+                                    <field name="retry_delay_minutes" invisible="not retry_enabled"/>
+                                </group>
+                            </group>
+                        </page>
                         <page name="meta_fields" string="Default field configuration" invisible="not id">
                             <p colspan="2" class="mb-4">This section lists all default dynamic fields to add to configured Odoo models.</p>
                             <button name="action_create_all_meta_fields"

@@ -38,6 +38,30 @@ class SoltApiConnector(models.Model):
     company_sync_count = fields.Integer(compute="_compute_company_count", string="Companies with external config")
     ini_export_action_server_ids = fields.One2many('ir.actions.server', 'connector_id', string='Initial export actions', domain=[('use_for_initial_export', '=', True)], help="Server actions used for first-time exports")
 
+    # ------------------------------------------------------------------
+    # Retry system configuration
+    # ------------------------------------------------------------------
+    retry_enabled = fields.Boolean(
+        'Enable retries', default=False,
+        help="Activate automatic retries for failed outgoing calls on this connector."
+    )
+    max_retry_count = fields.Integer(
+        'Max retries', default=3,
+        help="Maximum number of retry attempts before marking the call as exhausted."
+    )
+    retry_strategy = fields.Selection([
+        ('fixed', 'Fixed delay'),
+        ('exponential', 'Exponential backoff'),
+    ], string='Retry strategy', default='exponential',
+        help="fixed: constant delay between retries.\n"
+             "exponential: delay doubles with each attempt (base × 2^attempt)."
+    )
+    retry_delay_minutes = fields.Integer(
+        'Base delay (min)', default=5,
+        help="Base delay in minutes between retries. "
+             "With exponential backoff: delay = base_delay × 2^attempt_number."
+    )
+
     @api.depends()
     def _compute_call_log_count(self):
         """Calculates the number of call logs for this connector"""

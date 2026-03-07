@@ -27,8 +27,29 @@
                             <field name="response_code"/>
                             <field name="duration" widget="float_time"/>
                             <field name="success"/>
+                            <field name="res_model_id" invisible="not res_model_id"/>
+                            <field name="res_id" invisible="not res_id"/>
                         </group>
                     </group>
+
+                    <!-- Retry status banner (only shown when retry system is active) -->
+                    <group string="Retry status" invisible="not retry_state">
+                        <group>
+                            <field name="retry_state" widget="badge"
+                                   decoration-warning="retry_state == 'pending'"
+                                   decoration-info="retry_state == 'retrying'"
+                                   decoration-success="retry_state == 'resolved'"
+                                   decoration-danger="retry_state == 'exhausted'"/>
+                            <field name="retry_count"/>
+                            <field name="max_retries"/>
+                        </group>
+                        <group>
+                            <field name="next_retry_at" invisible="retry_state not in ('pending', 'retrying')"/>
+                            <field name="is_retry"/>
+                            <field name="original_log_id" invisible="not original_log_id"/>
+                        </group>
+                    </group>
+
                     <notebook>
                         <page string="Request" name="request">
                             <group>
@@ -39,8 +60,21 @@
                         </page>
                         <page string="Response" name="response">
                             <group>
+                                <field name="response_headers" widget="ace" readonly="1"/>
                                 <field name="response_body" widget="ace" readonly="1"/>
                             </group>
+                        </page>
+                        <page string="Retry attempts" name="retries"
+                              invisible="not retry_state or is_retry">
+                            <field name="child_log_ids" readonly="1">
+                                <list decoration-success="success" decoration-danger="not success">
+                                    <field name="create_date" string="Attempted at"/>
+                                    <field name="response_code"/>
+                                    <field name="response_body" optional="hide"/>
+                                    <field name="duration" string="Duration (s)"/>
+                                    <field name="success" invisible="1"/>
+                                </list>
+                            </field>
                         </page>
                     </notebook>
                 </sheet>
@@ -63,6 +97,12 @@
                 <field name="request_method"/>
                 <field name="response_code"/>
                 <field name="duration" string="Duration (s)"/>
+                <field name="retry_state" optional="show" widget="badge"
+                       decoration-warning="retry_state == 'pending'"
+                       decoration-info="retry_state == 'retrying'"
+                       decoration-success="retry_state == 'resolved'"
+                       decoration-danger="retry_state == 'exhausted'"/>
+                <field name="retry_count" optional="hide"/>
                 <field name="success" invisible="1"/>
             </list>
         </field>
@@ -112,6 +152,15 @@
                 <filter string="Outgoing" name="outgoing" domain="[('direction', '=', 'outgoing')]"/>
                 <filter string="Incoming" name="incoming" domain="[('direction', '=', 'incoming')]"/>
                 <separator/>
+                <filter string="Retry: Pending" name="retry_pending"
+                        domain="[('retry_state', '=', 'pending')]"/>
+                <filter string="Retry: Exhausted" name="retry_exhausted"
+                        domain="[('retry_state', '=', 'exhausted')]"/>
+                <filter string="Retries active" name="retry_active"
+                        domain="[('retry_state', 'in', ('pending', 'retrying', 'exhausted'))]"/>
+                <filter string="Is retry attempt" name="is_retry"
+                        domain="[('is_retry', '=', True)]"/>
+                <separator/>
                 <filter string="Today" name="today"
                         domain="[('create_date', '&gt;=', (context_today()).strftime('%Y-%m-%d'))]"/>
                 <filter string="Yesterday" name="yesterday"
@@ -126,6 +175,7 @@
                     <filter string="Endpoint" name="group_by_endpoint" context="{'group_by':'endpoint_id'}"/>
                     <filter string="Method" name="group_by_method" context="{'group_by':'request_method'}"/>
                     <filter string="Response Code" name="group_by_code" context="{'group_by':'response_code'}"/>
+                    <filter string="Retry state" name="group_by_retry_state" context="{'group_by':'retry_state'}"/>
                     <filter string="Date" name="group_by_date" context="{'group_by':'create_date:day'}"/>
                     <filter string="Month" name="group_by_month" context="{'group_by':'create_date:month'}"/>
                 </group>
@@ -133,6 +183,7 @@
         </field>
     </record>
 
+    <!-- Main action: all logs -->
     <record id="action_solt_api_call_log" model="ir.actions.act_window">
         <field name="name">API Call Logs</field>
         <field name="res_model">solt.api.call.log</field>
@@ -144,6 +195,24 @@
             </p>
             <p>
                 API call logs record every interaction with external services.
+            </p>
+        </field>
+    </record>
+
+    <!-- Filtered action: pending and exhausted retries -->
+    <record id="action_solt_api_call_log_retries" model="ir.actions.act_window">
+        <field name="name">Pending / Exhausted Retries</field>
+        <field name="res_model">solt.api.call.log</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('retry_state', 'in', ('pending', 'retrying', 'exhausted')), ('is_retry', '=', False)]</field>
+        <field name="context">{'search_default_group_by_retry_state': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No pending or exhausted retries
+            </p>
+            <p>
+                This view shows outgoing calls that failed and are waiting for
+                a retry or have exhausted all attempts.
             </p>
         </field>
     </record>
