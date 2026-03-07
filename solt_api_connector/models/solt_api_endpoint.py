@@ -560,13 +560,19 @@ Expressions can access:
         headers = self._get_auth_headers(data, record)
         log_vals = {'connector_id': connector.id, 'endpoint_id': self.id, 'company_id': self.env.company.id, 'request_url': url, 'request_method': self.method, 'request_headers': json.dumps(headers), 'request_params': json.dumps(request_params),
                 'request_body':     json.dumps(request_data) if request_data else False, }
+        # Store reference to the Odoo record that triggered this call
+        # so the retry system can later create activities on it.
+        if record and self.model_id:
+            log_vals['res_model_id'] = self.model_id.id
+            log_vals['res_id'] = record.id
         try:
             _logger.info(f"Request: {request_data}")
             response = self._send_request(url, request_params, request_data, headers, connector.timeout)
             end_time = fields.Datetime.now()
             status_code = response.status_code
-            log_vals.update({'response_code': status_code, 'response_body': response.text, 'success': 200 <= status_code < 300, 'duration': (end_time - start_time).total_seconds(), })
-            self.env['solt.api.call.log'].create(log_vals)
+            log_vals.update({'response_code': status_code, 'response_headers': json.dumps(dict(response.headers)), 'response_body': response.text, 'success': 200 <= status_code < 300, 'duration': (end_time - start_time).total_seconds(), })
+            created_log = self.env['solt.api.call.log'].create(log_vals)
+            created_log._init_retry_if_needed()
             try:
                 response_data = response.json() if response.text else {}
             except ValueError:
@@ -580,7 +586,8 @@ Expressions can access:
         except requests.exceptions.RequestException as e:
             end_time = fields.Datetime.now()
             log_vals.update({'response_code': 0, 'response_body': str(e), 'success': False, 'duration': (end_time - start_time).total_seconds(), })
-            self.env['solt.api.call.log'].create(log_vals)
+            created_log = self.env['solt.api.call.log'].create(log_vals)
+            created_log._init_retry_if_needed()
             raise UserError(_("Error de conexión: %s") % str(e))
 
     def _send_request(self, url, params, data, headers, timeout):
@@ -623,17 +630,33 @@ Expressions can access:
         if self.pagination_size_param and self.pagination_size:
             request_params[self.pagination_size_param] = self.pagination_size
 
+        # Base log values shared across all page requests
+        base_log_vals = {
+            'connector_id': connector.id,
+            'endpoint_id': self.id,
+            'company_id': self.env.company.id,
+            'request_method': self.method,
+            'request_headers': json.dumps(headers),
+            'request_body': json.dumps(request_data) if request_data else False,
+        }
+        if record and self.model_id:
+            base_log_vals['res_model_id'] = self.model_id.id
+            base_log_vals['res_id'] = record.id
+
         while has_more_pages:
-            log_vals = {'connector_id': connector.id, 'endpoint_id': self.id, 'company_id': self.env.company.id, 'request_url': url, 'request_method': self.method, 'request_headers': json.dumps(headers), 'request_params': json.dumps(request_params),
-                    'request_body':     json.dumps(request_data) if request_data else False, }
+            log_vals = dict(base_log_vals, **{
+                'request_url': url,
+                'request_params': json.dumps(request_params),
+            })
 
             try:
                 page_start_time = fields.Datetime.now()
                 response = self._send_request(url, request_params, request_data, headers, connector.timeout)
                 page_end_time = fields.Datetime.now()
 
-                log_vals.update({'response_code': response.status_code, 'response_body': response.text, 'success': 200 <= response.status_code < 300, 'duration': (page_end_time - page_start_time).total_seconds(), })
-                self.env['solt.api.call.log'].create(log_vals)
+                log_vals.update({'response_code': response.status_code, 'response_headers': json.dumps(dict(response.headers)), 'response_body': response.text, 'success': 200 <= response.status_code < 300, 'duration': (page_end_time - page_start_time).total_seconds(), })
+                created_log = self.env['solt.api.call.log'].create(log_vals)
+                created_log._init_retry_if_needed()
 
                 if 200 <= response.status_code < 300:
                     response_data = response.json() if response.text else {}
@@ -663,7 +686,8 @@ Expressions can access:
             except requests.exceptions.RequestException as e:
                 page_end_time = fields.Datetime.now()
                 log_vals.update({'response_code': 0, 'response_body': str(e), 'success': False, 'duration': (page_end_time - page_start_time).total_seconds(), })
-                self.env['solt.api.call.log'].create(log_vals)
+                created_log = self.env['solt.api.call.log'].create(log_vals)
+                created_log._init_retry_if_needed()
                 raise UserError(_("Error de conexión en página %s: %s") % (current_page, str(e)))
 
         # Combinar todos los resultados en la estructura de respuesta original
