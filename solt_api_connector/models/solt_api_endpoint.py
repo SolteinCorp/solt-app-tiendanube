@@ -623,6 +623,11 @@ Expressions can access:
             'request_body': json.dumps(request_data) if request_data else False,
             'company_id': self.env.company.id
         }
+        # Store reference to the Odoo record that triggered this call
+        # so the retry system can later create activities on it.
+        if record and self.model_id:
+            log_vals['res_model_id'] = self.model_id.id
+            log_vals['res_id'] = record.id
         try:
             _logger.info(f"Request: {request_data}")
             response = self._send_request(url, request_params, request_data, headers, connector.timeout)
