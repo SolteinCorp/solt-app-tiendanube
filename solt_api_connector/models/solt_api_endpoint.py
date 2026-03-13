@@ -633,8 +633,10 @@ Expressions can access:
                 'response_body': response.text,
                 'success': 200 <= status_code < 300,
                 'duration': (end_time - start_time).total_seconds(),
+                'response_headers': json.dumps(dict(response.headers))
             })
-            self.env['solt.api.call.log'].create(log_vals)
+            created_log = self.env['solt.api.call.log'].create(log_vals)
+            created_log._init_retry_if_needed()
             try:
                 response_data = response.json() if response.text else {}
             except ValueError:
@@ -659,7 +661,8 @@ Expressions can access:
                 'success': False,
                 'duration': (end_time - start_time).total_seconds(),
             })
-            self.env['solt.api.call.log'].create(log_vals)
+            created_log = self.env['solt.api.call.log'].create(log_vals)
+            created_log._init_retry_if_needed()
             raise UserError(_("Error de conexión: %s") % str(e))
 
     def _send_request(self, url, params, data, headers, timeout):
@@ -702,17 +705,24 @@ Expressions can access:
         if self.pagination_size_param and self.pagination_size:
             request_params[self.pagination_size_param] = self.pagination_size
 
+        # Base log values shared across all page requests
+        base_log_vals = {
+            'connector_id': connector.id,
+            'endpoint_id': self.id,
+            'company_id': self.env.company.id,
+            'request_method': self.method,
+            'request_headers': json.dumps(headers),
+            'request_body': json.dumps(request_data) if request_data else False,
+        }
+        if record and self.model_id:
+            base_log_vals['res_model_id'] = self.model_id.id
+            base_log_vals['res_id'] = record.id
+
         while has_more_pages:
-            log_vals = {
-                'connector_id': connector.id,
-                'endpoint_id': self.id,
+            log_vals = dict(base_log_vals, **{
                 'request_url': url,
-                'request_method': self.method,
-                'request_headers': json.dumps(headers),
                 'request_params': json.dumps(request_params),
-                'request_body': json.dumps(request_data) if request_data else False,
-                'company_id': self.env.company.id
-            }
+            })
 
             try:
                 page_start_time = fields.Datetime.now()
@@ -724,8 +734,10 @@ Expressions can access:
                     'response_body': response.text,
                     'success': 200 <= response.status_code < 300,
                     'duration': (page_end_time - page_start_time).total_seconds(),
+                    'response_headers': json.dumps(dict(response.headers))
                 })
-                self.env['solt.api.call.log'].create(log_vals)
+                created_log = self.env['solt.api.call.log'].create(log_vals)
+                created_log._init_retry_if_needed()
 
                 if 200 <= response.status_code < 300:
                     response_data = response.json() if response.text else {}
@@ -762,7 +774,8 @@ Expressions can access:
                     'success': False,
                     'duration': (page_end_time - page_start_time).total_seconds(),
                 })
-                self.env['solt.api.call.log'].create(log_vals)
+                created_log = self.env['solt.api.call.log'].create(log_vals)
+                created_log._init_retry_if_needed()
                 raise UserError(_("Error de conexión en página %s: %s") % (current_page, str(e)))
 
         # Combinar todos los resultados en la estructura de respuesta original

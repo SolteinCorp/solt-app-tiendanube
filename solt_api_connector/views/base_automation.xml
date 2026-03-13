@@ -5,7 +5,7 @@
         <field name="name">Webhooks</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">base.automation</field>
-        <field name="view_mode">kanban,list,form</field>
+        <field name="view_mode">kanban,tree,form</field>
         <field name="view_id" ref="base_automation.view_base_automation_kanban"/>
         <field name="context">{'active_test': False}</field>
         <field name="domain">[('trigger', '=', 'on_webhook')]</field>
@@ -14,7 +14,7 @@
     <record id="config_base_automation_action" model="ir.actions.act_window">
         <field name="name">Automations</field>
         <field name="res_model">base.automation</field>
-        <field name="view_mode">kanban,list,form</field>
+        <field name="view_mode">kanban,tree,form</field>
         <field name="view_id" ref="base_automation.view_base_automation_kanban"/>
         <field name="context">{'active_test': False}</field>
         <field name="domain">[('trigger', '!=', 'on_webhook')]</field>
