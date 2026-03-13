@@ -15,6 +15,11 @@
               action="action_solt_api_call_log"
               sequence="30"/>
 
+    <menuitem id="menu_solt_api_call_log_retries" name="Pending Retries"
+                  parent="menu_solt_api_connector_root"
+                  action="action_solt_api_call_log_retries"
+                  sequence="35"/>
+
     <menuitem id="menu_solt_config" name="Configuration"
               parent="menu_solt_api_connector_root"
               sequence="100"/>

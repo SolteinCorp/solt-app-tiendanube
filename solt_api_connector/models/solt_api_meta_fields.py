@@ -57,9 +57,9 @@ class SoltApiMetaFields(models.Model):
                                  help="Label for the integration tab added to the form view.")
     create_dinamic_view = fields.Boolean("Crear vistas dinámicas", default=False,
                                          help="Crea las vistas dinámicas para el modelo Odoo configurado")
-    list_view_id = fields.Many2one('ir.ui.view', 'Viste árbol',
+    tree_view_id = fields.Many2one('ir.ui.view', 'Viste árbol',
                                    help="The list view of the model that want to extend Workflow state on it")
-    extended_list_view_id = fields.Many2one('ir.ui.view', 'Vista árbol extendida', readonly=True,
+    extended_tree_view_id = fields.Many2one('ir.ui.view', 'Vista árbol extendida', readonly=True,
                                             help="The list view of the model that want to extend",
                                             copy=False)
 
@@ -270,7 +270,7 @@ class SoltApiMetaFields(models.Model):
             self.make_form_view()
         if self.search_view_id:
             self.make_search_view()
-        if self.list_view_id:
+        if self.tree_view_id:
             self.make_tree_view()
         return True
 
@@ -310,7 +310,7 @@ class SoltApiMetaFields(models.Model):
 
     def make_tree_view(self):
         """Creates or updates the extended list view with sync fields."""
-        if self.list_view_id:
+        if self.tree_view_id:
             view_obj = self.env['ir.ui.view'].sudo()
             data = XML('<data/>')
             arch = XML("""<xpath expr="//list" position="inside"></xpath>""")
@@ -320,15 +320,15 @@ class SoltApiMetaFields(models.Model):
             arch.append(XML(tree_field_template % {'tree_field': 'x_state_sync'}))
             arch.append(XML("""<field name="%(tree_field)s" readonly="True" optional="hide"/>""" % {'tree_field': 'x_external_id'}))
             arch.append(XML("""<field name="%(tree_field)s" readonly="False" optional="hide"/>""" % {'tree_field': 'x_exclud_from_sync'}))
-            view_data = {'name': f"{self.model}.{self.list_view_id.id}.api.connector.list.view", 'type': 'list',
-                         'model': self.model, 'inherit_id': self.list_view_id.id, 'mode': 'extension',
+            view_data = {'name': f"{self.model}.{self.tree_view_id.id}.api.connector.list.view", 'type': 'list',
+                         'model': self.model, 'inherit_id': self.tree_view_id.id, 'mode': 'extension',
                          'arch': tostring(data, pretty_print=True)}
             # update or create view
-            xml_id = f"solt_api_connector.{self.model.replace('.', '_')}_{self.list_view_id.id}_api_connector_list_view"
+            xml_id = f"solt_api_connector.{self.model.replace('.', '_')}_{self.tree_view_id.id}_api_connector_list_view"
             view = self.env.ref(xml_id, raise_if_not_found=False)
-            if view and self.extended_list_view_id != view:
-                self.extended_list_view_id = view.id
-            view = self.extended_list_view_id.sudo()
+            if view and self.extended_tree_view_id != view:
+                self.extended_tree_view_id = view.id
+            view = self.extended_tree_view_id.sudo()
             if not view:
                 view = view_obj.create(view_data)
                 self.env['ir.model.data']._update_xmlids([{
@@ -336,7 +336,7 @@ class SoltApiMetaFields(models.Model):
                     'record': view,
                     'noupdate': True,
                 }])
-                self.write({'extended_list_view_id': view.id})
+                self.write({'extended_tree_view_id': view.id})
             else:
                 view.write(view_data)
 
