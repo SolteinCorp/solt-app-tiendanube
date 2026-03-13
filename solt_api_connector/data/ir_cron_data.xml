@@ -33,5 +33,16 @@
             <field name="interval_type">hours</field>
             <field name="active" eval="False"/>
         </record>
+
+        <!-- Retry system cron -->
+        <record id="ir_cron_process_pending_retries" model="ir.cron">
+            <field name="name">API Connector: Process pending retries</field>
+            <field name="model_id" ref="model_solt_api_call_log"/>
+            <field name="state">code</field>
+            <field name="code">model.cron_process_pending_retries()</field>
+            <field name="interval_number">15</field>
+            <field name="interval_type">minutes</field>
+            <field name="active" eval="True"/>
+        </record>
     </data>
 </odoo>
