@@ -1,6 +1,5 @@
 <odoo>
-    <data>
-        <!--   solt.product.brand views and actions   -->
+    <!--   solt.product.brand views and actions   -->
         <record id="action_open_related_brand_products" model="ir.actions.act_window">
             <field name="name">Products</field>
             <field name="res_model">product.template</field>
@@ -27,7 +26,7 @@
             <field name="name">solt.product.brand.list</field>
             <field name="model">solt.product.brand</field>
             <field name="arch" type="xml">
-                <tree string="Product Brand">
+                <tree>
                     <field name="name"/>
                     <field name="description" optional="hide"/>
                     <field name="company_id" groups="base.group_multi_company" optional="hide" readonly="1"/>
@@ -75,7 +74,10 @@
                         </group>
                         <field name="description" string="Description"/>
                     </sheet>
-                    <chatter/>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
                 </form>
             </field>
         </record>
@@ -203,6 +205,4 @@
             </field>
         </record>
 
-    </data>
 </odoo>
-
