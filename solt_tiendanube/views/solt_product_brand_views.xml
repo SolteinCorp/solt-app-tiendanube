@@ -91,10 +91,11 @@
                     <templates>
                         <t t-name="card">
                             <aside>
-                                <img
-                                        t-att-src="kanban_image('solt.product.brand', 'image_128', record.id.raw_value)"
-                                        alt="Marca" class="o_image_64_contain"
-                                />
+                                <field name="image_128"
+                                        widget="image"
+                                        alt="Marca"
+                                        options="{'size': [64, 64], 'img_class': 'o_image_64_contain'}"/>
+
                             </aside>
                             <main>
                                 <h4>
