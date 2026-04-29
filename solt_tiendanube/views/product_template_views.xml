@@ -51,9 +51,15 @@
                             </group>
                         </group>
                         <group name="product_image_ids" string="Extra Images" col="4" invisible="is_product_variant or not id">
-                            <field name="product_image_ids" colspan="2" mode="kanban"
-                                   class="o_website_sale_image_list" context="{'default_name': name}"
-                                   options="{'create_text':'Add image'}" nolabel="1"/>
+                            <field
+                                name="product_image_ids"
+                                colspan="2"
+                                class="o_website_sale_image_list"
+                                context="{'default_name': name}"
+                                mode="kanban"
+                                add-label="Add image"
+                                nolabel="1"
+                                widget="x2_many_media_viewer"/>
                         </group>
 
                     </page>
