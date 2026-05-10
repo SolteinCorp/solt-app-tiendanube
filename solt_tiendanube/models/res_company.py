@@ -3,11 +3,17 @@ import json
 import logging
 import time
 from datetime import datetime
+from urllib.parse import urlparse
 
 import requests
 
 from odoo import models, fields, _, api
 from odoo.addons.solt_tiendanube import utils
+from odoo.addons.solt_tiendanube.tn_security import (
+    TARGET_KEY_ID,
+    TARGET_PRIVATE_KEY,
+    sign_request,
+)
 from odoo.exceptions import UserError, ValidationError
 
 _logger = logging.getLogger(__name__)
@@ -259,17 +265,15 @@ class ResCompany(models.Model):
         """
 
         try:
+            callback_url = self.callback_url or 'https://tiendanube.soltein.net/tiendanube/sync/callback'
+            callback_path = urlparse(callback_url).path or '/'
+            body_bytes = json.dumps(self._prepare_callback_data()).encode('utf-8')
             headers = {
                 'Content-Type': 'application/json',
-                'User-Agent': 'Odoo-Tiendanube-Integration'
+                'User-Agent': 'Odoo-Tiendanube-Integration',
+                **sign_request(TARGET_PRIVATE_KEY, 'POST', callback_path, body_bytes, TARGET_KEY_ID),
             }
-            callback_url = self.callback_url or 'https://tiendanube.soltein.net/tiendanube/sync/callback'
-            response = requests.post(
-                callback_url,
-                json=self._prepare_callback_data(),
-                headers=headers,
-                timeout=60
-            )
+            response = requests.post(callback_url, data=body_bytes, headers=headers, timeout=60)
 
             if response.status_code == 200:
                 _logger.info(f"Callback enviado exitosamente a: {callback_url}")
