@@ -16,3 +16,4 @@ access_solt_warehouse_sync_mapping_manager,solt.warehouse.sync.mapping manager,m
 access_product_brand_product_manager,product.brand.manager,model_solt_product_brand,stock.group_stock_manager,1,1,1,1
 access_product_brand_user,product.brand.user,model_solt_product_brand,base.group_user,1,0,0,0
 
+access_solt_tiendanube_sync_nonce_admin,solt.tiendanube.sync.nonce admin,model_solt_tiendanube_sync_nonce,base.group_system,1,1,1,1

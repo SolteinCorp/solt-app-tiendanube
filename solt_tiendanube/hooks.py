@@ -1,11 +1,11 @@
 # coding: utf-8
 import logging
-from odoo import tools
 
 _logger = logging.getLogger(__name__)
 
+
 def post_init_hook(env):
-    """Apply custom LATAM address format after installation."""
+    """Apply LATAM address format defaults."""
     try:
         custom_view = env.ref("solt_l10n_mx_partner_address.mx_partner_address_form")
     except ValueError:

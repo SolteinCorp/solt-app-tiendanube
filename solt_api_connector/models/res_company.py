@@ -72,9 +72,9 @@ class ResCompany(models.Model):
             # Make sure that the selected currencies are enabled
             companies.currency_id.sudo().filtered(lambda c: not c.active).active = True
 
-            companies_needs_l10n = companies.filtered('country_id')
-            if companies_needs_l10n:
-                companies_needs_l10n.install_l10n_modules()
+            # companies_needs_l10n = companies.filtered('country_id')
+            # if companies_needs_l10n:
+            #     companies_needs_l10n.install_l10n_modules()
 
             return companies
         else:
