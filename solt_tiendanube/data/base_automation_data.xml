@@ -75,14 +75,27 @@ try:
     values = endpoint._process_simple_mapping_to_odoo(mapping_config, payload, record)
     values['connector_id'] = base_automation.connector_id.id
     ResCompany = env['res.company'].sudo()
-    company_id = ResCompany.search(['|', ('name', '=ilike', values.get('name')), ('email', '=ilike', values.get('email'))], limit=1)
-    if not company_id:
-        _logger.info('Empresa no encontrada con nombre {} o email {}. Crear'.format(values.get('name'), values.get('email')))
-        company_id = ResCompany.with_context(exclud_contact_from_sync=True, not_execute_warehouse_base_automation=True).create(values)
+
+    # Si la multicompañia no esta activa (solo existe una compañia en la base),
+    # actualizamos directamente la compañia actual. Si esta activa, buscamos por
+    # nombre o email para localizar la compañia correspondiente a la tienda.
+    multi_company_active = ResCompany.search_count([]) > 1
+
+    if multi_company_active:
+        company_id = ResCompany.search(['|', ('name', '=ilike', values.get('name')), ('email', '=ilike', values.get('email'))], limit=1)
+        if not company_id:
+            _logger.info('Multicompañia activa: empresa no encontrada con nombre {} o email {}. Crear'.format(values.get('name'), values.get('email')))
+            company_id = ResCompany.with_context(exclud_contact_from_sync=True, not_execute_warehouse_base_automation=True).create(values)
+        else:
+            _logger.info('Multicompañia activa: empresa {} encontrada. Actualizar'.format(company_id.name))
+            company_id.partner_id.write({'x_exclud_from_sync': True})
+            company_id.sudo().write(values)
+            company_id.message_post(body='Empresa sincronizada con tienda en Tiendanube!')
     else:
-        _logger.info('Empresa {} encontrada. Actualizar'.format(company_id.name))
+        company_id = env.company.sudo()
+        _logger.info('Multicompañia inactiva: actualizando compañia actual {}.'.format(company_id.name))
         company_id.partner_id.write({'x_exclud_from_sync': True})
-        company_id.sudo().write(values)
+        company_id.write(values)
         company_id.message_post(body='Empresa sincronizada con tienda en Tiendanube!')
     if main_lang and country_code:
         lang_code = '{}_{}'.format(main_lang, country_code)

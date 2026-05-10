@@ -22,3 +22,4 @@ from . import account_move
 from . import warehouse_sync_mapping
 from . import base_automation
 from . import solt_api_call_log
+from . import solt_tiendanube_sync_nonce
