@@ -22,6 +22,7 @@ webhook support.
     'application': True,
     'installable': True,
     'auto_install': False,
+    'uninstall_hook': 'uninstall_hook',
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',

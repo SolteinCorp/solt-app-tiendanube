@@ -149,24 +149,72 @@
                                                             confirm="This action will add the dynamic fields to the configured Odoo model and its views."/>
                                                 </group>
                                             </group>
-                                            <group string="Views">
-                                                <group name="form_view_group">
-                                                    <field name="form_view_id"
-                                                           domain="[('model','=',model),('type','=','form')]"/>
+                                            <group string="Views" colspan="2">
+                                                <!-- Form View -->
+                                                <field name="form_view_id"
+                                                       domain="[('model','=',model),('type','=','form')]"/>
+                                                <div class="d-flex align-items-center gap-2 mb-2"
+                                                     invisible="not create_dinamic_view"
+                                                     colspan="2">
+                                                    <label for="extended_form_view_id"
+                                                           class="o_form_label text-muted"
+                                                           style="min-width:160px; font-size:0.9em;"/>
                                                     <field name="extended_form_view_id"
-                                                           domain="[('id','=',0)]" invisible="not create_dinamic_view"/>
-                                                    <field name="list_view_id"
-                                                           domain="[('model','=',model),('type','=','list'),('mode','=','primary')]"/>
+                                                           domain="[('id','=',0)]"
+                                                           nolabel="1"
+                                                           class="flex-grow-1"/>
+                                                    <button name="action_remove_form_view"
+                                                            icon="fa-trash"
+                                                            title="Eliminar vista de formulario dinámica"
+                                                            type="object"
+                                                            class="btn btn-sm btn-outline-danger"
+                                                            invisible="not extended_form_view_id"
+                                                            confirm="¿Eliminar la vista de formulario dinámica? Esta acción no se puede deshacer."/>
+                                                </div>
+                                                <separator colspan="2" invisible="not create_dinamic_view"/>
+                                                <!-- List View -->
+                                                <field name="list_view_id"
+                                                       domain="[('model','=',model),('type','=','list'),('mode','=','primary')]"/>
+                                                <div class="d-flex align-items-center gap-2 mb-2"
+                                                     invisible="not create_dinamic_view"
+                                                     colspan="2">
+                                                    <label for="extended_list_view_id"
+                                                           class="o_form_label text-muted"
+                                                           style="min-width:160px; font-size:0.9em;"/>
                                                     <field name="extended_list_view_id"
-                                                           domain="[('id','=',0)]" invisible="not create_dinamic_view"/>
-                                                </group>
-                                                <group name="search_view_group">
-                                                    <field name="search_view_id"
-                                                           domain="[('model','=',model),('type','=','search'),('mode','=','primary')]"/>
+                                                           domain="[('id','=',0)]"
+                                                           nolabel="1"
+                                                           class="flex-grow-1"/>
+                                                    <button name="action_remove_list_view"
+                                                            icon="fa-trash"
+                                                            title="Eliminar vista de lista dinámica"
+                                                            type="object"
+                                                            class="btn btn-sm btn-outline-danger"
+                                                            invisible="not extended_list_view_id"
+                                                            confirm="¿Eliminar la vista de lista dinámica? Esta acción no se puede deshacer."/>
+                                                </div>
+                                                <separator colspan="2" invisible="not create_dinamic_view"/>
+                                                <!-- Search View -->
+                                                <field name="search_view_id"
+                                                       domain="[('model','=',model),('type','=','search'),('mode','=','primary')]"/>
+                                                <div class="d-flex align-items-center gap-2 mb-2"
+                                                     invisible="not create_dinamic_view"
+                                                     colspan="2">
+                                                    <label for="extended_search_view_id"
+                                                           class="o_form_label text-muted"
+                                                           style="min-width:160px; font-size:0.9em;"/>
                                                     <field name="extended_search_view_id"
-                                                           domain="[('id','=',0)]" invisible="not create_dinamic_view"/>
-                                                </group>
-
+                                                           domain="[('id','=',0)]"
+                                                           nolabel="1"
+                                                           class="flex-grow-1"/>
+                                                    <button name="action_remove_search_view"
+                                                            icon="fa-trash"
+                                                            title="Eliminar vista de búsqueda dinámica (group_by: x_state_sync)"
+                                                            type="object"
+                                                            class="btn btn-sm btn-outline-danger"
+                                                            invisible="not extended_search_view_id"
+                                                            confirm="¿Eliminar la vista de búsqueda dinámica? Previene errores de inicio si el módulo no está disponible en el addons path."/>
+                                                </div>
                                             </group>
                                             <group string="Fields">
                                                 <field name="ir_meta_field_ids" nolabel="1" colspan="2"
