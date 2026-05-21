@@ -245,6 +245,79 @@ class SoltApiMetaFields(models.Model):
             else:
                 view.write(view_data)
 
+    def _unlink_dynamic_view(self, view, xml_id):
+        """Helper: elimina una ir.ui.view dinámica y su ir.model.data asociado."""
+        if not view:
+            return
+        imd = self.env['ir.model.data'].sudo().search([
+            ('module', '=', xml_id.split('.')[0]),
+            ('name', '=', xml_id.split('.')[1]),
+        ])
+        imd.unlink()
+        view.sudo().unlink()
+
+    def action_remove_form_view(self):
+        """Elimina la vista de formulario dinámica creada por make_form_view()."""
+        self.ensure_one()
+        if self.extended_form_view_id:
+            xml_id = (
+                f"solt_api_connector.solt_api_connector{self.id}"
+                f"_{self.model.replace('.', '_')}_form_view"
+            )
+            self._unlink_dynamic_view(self.extended_form_view_id, xml_id)
+            self.extended_form_view_id = False
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Vista eliminada'),
+                'message': _('Vista de formulario dinámica eliminada correctamente.'),
+                'type': 'success',
+            },
+        }
+
+    def action_remove_list_view(self):
+        """Elimina la vista de lista dinámica creada por make_tree_view()."""
+        self.ensure_one()
+        if self.extended_list_view_id:
+            xml_id = (
+                f"solt_api_connector.{self.model.replace('.', '_')}"
+                f"_{self.list_view_id.id}_api_connector_list_view"
+            )
+            self._unlink_dynamic_view(self.extended_list_view_id, xml_id)
+            self.extended_list_view_id = False
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Vista eliminada'),
+                'message': _('Vista de lista dinámica eliminada correctamente.'),
+                'type': 'success',
+            },
+        }
+
+    def action_remove_search_view(self):
+        """Elimina la vista de búsqueda dinámica (group_by: x_state_sync).
+        Previene errores de inicio cuando solt_api_connector no está en el addons path.
+        """
+        self.ensure_one()
+        if self.extended_search_view_id:
+            xml_id = (
+                f"solt_api_connector.{self.model.replace('.', '_')}"
+                f"_{self.search_view_id.id}_api_connector_search_view"
+            )
+            self._unlink_dynamic_view(self.extended_search_view_id, xml_id)
+            self.extended_search_view_id = False
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Vista eliminada'),
+                'message': _('Vista de búsqueda dinámica eliminada correctamente.'),
+                'type': 'success',
+            },
+        }
+
     def add_dynamic_fields_to_extended_view(self, model, new_field_names):
         # Buscar la vista extendida
         self.ensure_one()
