@@ -29,8 +29,8 @@ class SaleOrderLine(models.Model):
             line.warehouse_ids = line.order_id.warehouse_ids
             line.warehouse_id_domain = json.dumps([('id', 'in', line.warehouse_ids.ids)])
 
-    def _prepare_procurement_values(self, group_id=False):
-        values = super(SaleOrderLine, self)._prepare_procurement_values(group_id=group_id)
+    def _prepare_procurement_values(self):
+        values = super(SaleOrderLine, self)._prepare_procurement_values()
         if self.order_id.can_use_sale_multi_stock:
             values.update({'warehouse_id': self.warehouse_id or False})
 
