@@ -155,9 +155,9 @@ class SaleOrder(models.Model):
                 'name': kwargs_.get('description', ''),
                 'product_id': kwargs_.get('product_id'),
                 'price_unit': kwargs_.get('price_unit'),
-                'tax_id': [(6, 0, kwargs_.get('tax_ids', []))],
+                'tax_ids': [(6, 0, kwargs_.get('tax_ids', []))],
                 'product_uom_qty': quantity_,
-                'product_uom': kwargs_.get('product_uom'),
+                'product_uom_id': kwargs_.get('product_uom'),
                 'display_type': kwargs_.get('display_type', False),
                 'x_external_id': kwargs_.get('x_external_id', ''),
                 'multi_warehouse_id': kwargs_.get('warehouse_id', False),
@@ -319,11 +319,10 @@ class SaleOrder(models.Model):
             'product_id': product.id,
             'sequence': 999,
             'price_unit': -amount,
-            'tax_id': [Command.set(taxes.ids)],
+            'tax_ids': [Command.set(taxes.ids)],
             'display_type': False,
             'product_uom_qty': 1,
-            'product_uom': product.uom_id.id
-
+            'product_uom_id': product.uom_id.id
         }
         if description:
             vals['name'] = description
@@ -541,7 +540,7 @@ class SaleOrder(models.Model):
                     break
 
             if found_fulfillment:
-                items_data = fulfillment.get('line_items')
+                items_data = found_fulfillment.get('line_items')
                 for item_data in items_data:
                     sku = item_data.get('sku', '')
                     x_product_id = item_data.get('product', {}).get('product_id')
@@ -555,7 +554,7 @@ class SaleOrder(models.Model):
 
                         # get warehouse
                         warehouse_id = self.env['sale.order.line']._get_warehouse_from_data(
-                            fulfillment.get('assigned_location'))
+                            found_fulfillment.get('assigned_location'))
                         # get the inventory level
                         warehouse_id = self.env['stock.warehouse'].sudo().browse(warehouse_id)
                         vals = {
@@ -854,7 +853,7 @@ class SaleOrder(models.Model):
 
                 new_order.write({
                     'x_state_sync': 'yes',
-                    'x_date_last_sync': datetime.datetime.now(),
+                    'x_date_last_sync': datetime.now(),
                 })
 
                 _logger.info(
@@ -875,7 +874,7 @@ class SaleOrder(models.Model):
             self._action_cancel()
             self.write({
                 'x_state_sync': 'yes',
-                'x_date_last_sync': datetime.datetime.now(),
+                'x_date_last_sync': datetime.now(),
                 'x_exclud_from_sync': True,
             })
             self.message_post(body=_(
@@ -975,8 +974,3 @@ class SaleOrder(models.Model):
                 f"TN Sync State [{company.name}]: Error en campos personalizados "
                 f"para {order.name}: {str(e)}"
             )
-
-
-
-
-
