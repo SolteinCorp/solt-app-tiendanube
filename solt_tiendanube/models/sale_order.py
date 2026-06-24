@@ -9,7 +9,7 @@ import pytz
 from odoo import models, fields, api, _, Command
 from odoo.exceptions import ValidationError, UserError
 from odoo.tools import float_is_zero, DEFAULT_SERVER_DATETIME_FORMAT
-from odoo.addons.solt_tiendanube import const
+from .. import const
 
 _logger = logging.getLogger(__name__)
 
