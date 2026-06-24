@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 import dateutil.parser
 import pytz
 from odoo import Command, _, api, fields, models
-from odoo.addons.solt_tiendanube import const
+from .. import const
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, float_is_zero
 
