@@ -9,10 +9,16 @@ import pytz
 from odoo import models, fields, api, _, Command
 from odoo.exceptions import ValidationError, UserError
 from odoo.tools import float_is_zero, DEFAULT_SERVER_DATETIME_FORMAT
-from .. import const
 
 _logger = logging.getLogger(__name__)
 
+STATUS_TO_SYNCHRONIZE = {
+    'UNPACKED': 'UNPACKED',
+    'PACKED': 'PACKED',
+    'DISPATCHED': 'DISPATCHED',
+    'READY_FOR_PICKUP': 'READY_FOR_PICKUP',
+    'DELIVERED': 'DELIVERED',
+}
 
 class SaleOrder(models.Model):
     _name = 'sale.order'
@@ -502,7 +508,7 @@ class SaleOrder(models.Model):
                     fulfillment_sync.append(found_fulfillment.get('id'))
 
                 fulfillment_status = found_fulfillment.get('status')
-                if nube_picking.state not in ['cancel', 'done'] and (shipping_status == 'shipped' or shipping_status == 'partially_fulfilled' and const.STATUS_TO_SYNCHRONIZE[fulfillment_status] == 'DISPATCHED'):
+                if nube_picking.state not in ['cancel', 'done'] and (shipping_status == 'shipped' or shipping_status == 'partially_fulfilled' and STATUS_TO_SYNCHRONIZE[fulfillment_status] == 'DISPATCHED'):
                     stock_move = self.env['stock.move'].search([('sale_line_id', '=', order_line.id)])
                     stock_move._set_quantity_done(order_line.product_uom_qty)
                     stock_move.picked = True
