@@ -19,6 +19,8 @@ class SoltApiConnector(models.Model):
     name = fields.Char('Name', required=True)
     base_url = fields.Char('Base URL', required=True, help="Base API URL (e.g. https://api.example.com)")
     active = fields.Boolean('Active', default=True)
+    advanced_config = fields.Boolean('Advanced configuration', default=False, help="Show the technical tabs (automations, endpoints, headers, retry, default field configuration). When off, only the operational tabs are shown.")
+    install_url = fields.Char('Install URL', help="External URL to install or authorize the app for a store (e.g. the app listing in the marketplace). Shown as a button in the form.")
     auth_type = fields.Selection([
         ('none', 'No authentication'),
         ('basic', 'Basic authentication'),
@@ -202,6 +204,13 @@ class SoltApiConnector(models.Model):
             connector.automation_ids.filtered(lambda a: a.active).toggle_active()
         return True
 
+    def action_open_install_url(self):
+        """Open the connector's external install/authorize URL in a new tab."""
+        self.ensure_one()
+        if not self.install_url:
+            raise UserError(_("This connector has no install URL configured."))
+        return {'type': 'ir.actions.act_url', 'url': self.install_url, 'target': 'new'}
+
     @api.ondelete(at_uninstall=False)
     def _unlink_except_active(self):
         if any(connector.active for connector in self):
@@ -219,7 +228,7 @@ class SoltApiConnector(models.Model):
         arch, view = super()._get_view(view_id, view_type, **options)
         if view_type in ['form']:
             for field in self._fields.keys():
-                if field not in models.MAGIC_COLUMNS + ['active']:
+                if field not in models.MAGIC_COLUMNS + ['active', 'advanced_config']:
                     field_node = next(iter(arch.xpath(f'//field[@name="{field}"]')), None)
                     if field_node is not None:
                         field_node.attrib['readonly'] = "not active"
