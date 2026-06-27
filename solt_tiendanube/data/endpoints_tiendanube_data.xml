@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<odoo noupdate="1">
+<odoo noupdate="0">
 
     <!--  Conector API  -->
     <record id="tn_connector_api" model="solt.api.connector">
