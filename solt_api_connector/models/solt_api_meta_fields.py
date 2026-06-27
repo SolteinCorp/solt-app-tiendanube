@@ -43,6 +43,8 @@ class SoltApiMetaFields(models.Model):
     model_id = fields.Many2one('ir.model', string='Modelo Odoo')
     model = fields.Char('Model', related="model_id.model")
     active = fields.Boolean(default=True, string="Activar")
+    is_required = fields.Boolean(string="Requerido", default=False,
+                                 help="If set, this meta field configuration is auto-created when provisioning a store.")
 
     form_view_id = fields.Many2one('ir.ui.view', 'Vista de formulario', help="Vista de formulario del modelo")
     extended_form_view_id = fields.Many2one('ir.ui.view', 'Vista de formulario extendida', readonly=True, help="The form view of the model that want to extend")
@@ -216,6 +218,16 @@ class SoltApiMetaFields(models.Model):
                                         SET api_meta_field_id = %s
                                         WHERE id = %s
                                     """, (self.id, fd_id.id))
+                selection_definitions = mf_dict.get('selection_ids')
+                if selection_definitions and fd_id.ttype == 'selection':
+                    existing_selection_values = set(fd_id.selection_ids.mapped('value'))
+                    missing_selection_commands = [
+                        command for command in selection_definitions
+                        if command[0] == Command.CREATE
+                        and command[2].get('value') not in existing_selection_values
+                    ]
+                    if missing_selection_commands:
+                        fd_id.write({'selection_ids': missing_selection_commands})
             fd_obj |= fd_id
 
         return fd_obj
