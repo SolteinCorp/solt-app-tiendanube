@@ -1,0 +1,30 @@
+#. module: solt_api_connector
+#: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_connector__advanced_config
+msgid "Advanced configuration"
+msgstr "Configuraciones avanzadas"
+
+#. module: solt_api_connector
+#: model:ir.model.fields,help:solt_api_connector.field_solt_api_connector__advanced_config
+msgid "Show the technical tabs (automations, endpoints, headers, retry, default field configuration). When off, only the operational tabs are shown."
+msgstr "Muestra las pestañas técnicas (automatizaciones, endpoints, encabezados, reintentos, configuración de campos por defecto). Si está apagado, solo se muestran las pestañas operativas."
+
+#. module: solt_api_connector
+#: model:ir.model.fields,field_description:solt_api_connector.field_solt_api_connector__install_url
+msgid "Install URL"
+msgstr "URL de instalación"
+
+#. module: solt_api_connector
+#: model:ir.model.fields,help:solt_api_connector.field_solt_api_connector__install_url
+msgid "External URL to install or authorize the app for a store (e.g. the app listing in the marketplace). Shown as a button in the form."
+msgstr "URL externa para instalar o autorizar la app para una tienda (p. ej. la ficha de la app en el marketplace). Se muestra como un botón en el formulario."
+
+#. module: solt_api_connector
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.view_solt_api_connector_form
+msgid "Install app"
+msgstr "Instalar app"
+
+#. module: solt_api_connector
+#. odoo-python
+#: code:addons/solt_api_connector/models/solt_api_connector.py:0
+msgid "This connector has no install URL configured."
+msgstr "Este conector no tiene una URL de instalación configurada."
