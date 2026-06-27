@@ -43,6 +43,8 @@ class SoltApiMetaFields(models.Model):
     model_id = fields.Many2one('ir.model', string='Modelo Odoo', help="Odoo model to add dynamic fields to.")
     model = fields.Char('Model', related="model_id.model")
     active = fields.Boolean(default=True, string="Activar", help="Whether this meta field configuration is active.")
+    is_required = fields.Boolean(string="Requerido", default=False,
+                                 help="If set, this meta field configuration is auto-created when provisioning a store.")
 
     form_view_id = fields.Many2one('ir.ui.view', 'Vista de formulario', help="Vista de formulario del modelo")
     extended_form_view_id = fields.Many2one('ir.ui.view', 'Vista de formulario extendida', readonly=True,
@@ -304,6 +306,16 @@ class SoltApiMetaFields(models.Model):
                             SET api_meta_field_id = %s
                             WHERE id = %s
                         """, (self.id, fd_id.id))
+                selection_definitions = mf_dict.get('selection_ids')
+                if selection_definitions and fd_id.ttype == 'selection':
+                    existing_selection_values = set(fd_id.selection_ids.mapped('value'))
+                    missing_selection_commands = [
+                        command for command in selection_definitions
+                        if command[0] == Command.CREATE
+                        and command[2].get('value') not in existing_selection_values
+                    ]
+                    if missing_selection_commands:
+                        fd_id.write({'selection_ids': missing_selection_commands})
             fd_obj |= fd_id
 
         return fd_obj
@@ -313,14 +325,14 @@ class SoltApiMetaFields(models.Model):
         if self.tree_view_id:
             view_obj = self.env['ir.ui.view'].sudo()
             data = XML('<data/>')
-            arch = XML("""<xpath expr="//list" position="inside"></xpath>""")
+            arch = XML("""<xpath expr="//tree" position="inside"></xpath>""")
             data.append(arch)
             arch.append(XML(tree_field_template % {'tree_field': 'x_store_external_id'}))
             arch.append(XML(tree_field_template % {'tree_field': 'x_date_last_sync'}))
             arch.append(XML(tree_field_template % {'tree_field': 'x_state_sync'}))
             arch.append(XML("""<field name="%(tree_field)s" readonly="True" optional="hide"/>""" % {'tree_field': 'x_external_id'}))
             arch.append(XML("""<field name="%(tree_field)s" readonly="False" optional="hide"/>""" % {'tree_field': 'x_exclud_from_sync'}))
-            view_data = {'name': f"{self.model}.{self.tree_view_id.id}.api.connector.list.view", 'type': 'list',
+            view_data = {'name': f"{self.model}.{self.tree_view_id.id}.api.connector.list.view", 'type': 'tree',
                          'model': self.model, 'inherit_id': self.tree_view_id.id, 'mode': 'extension',
                          'arch': tostring(data, pretty_print=True)}
             # update or create view

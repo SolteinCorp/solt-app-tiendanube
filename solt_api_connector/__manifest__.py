@@ -9,7 +9,7 @@
     'website': 'https://www.soltein.mx',
     'support': 'soporte@soltein.mx',
     'category': 'Tools/Connectivity',
-    'version': '17.0.1.1.0',
+    'version': '17.0.1.1.1',
     'license': 'LGPL-3',
     'depends': ['base', 'base_automation', 'social_media'],
     'application': True,
