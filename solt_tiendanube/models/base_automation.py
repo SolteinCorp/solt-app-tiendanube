@@ -1,10 +1,13 @@
-from odoo import models, fields, api
+from odoo import models, fields
 
 
 class BaseAutomation(models.Model):
     _inherit = 'base.automation'
 
-    event = fields.Char("Event", prefetch=False)
+    event = fields.Char("Event", prefetch=False, help="Evento de Tiendanube manejado por esta automatización.")
+    tn_webhook_optional = fields.Boolean(
+        "Webhook opcional", default=False, prefetch=False,
+        help="Si está activo, este webhook no se publica automáticamente al aprovisionar (queda como avanzado).")
 
     def _prepare_tn_webhooks(self, company):
         self.ensure_one()

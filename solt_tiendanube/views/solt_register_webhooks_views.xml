@@ -9,6 +9,7 @@
                             <field name="name"/>
                             <field name="event"/>
                             <field name="automation_id" options="{'no_create': True}"/>
+                            <field name="direction"/>
                             <field name="webhook_url"/>
                             <field name="active" invisible="1"/>
                             <field name="company_id" options="{'no_create': True}"/>
@@ -22,10 +23,11 @@
             <field name="name">tnube.register.webhook.view.list</field>
             <field name="model">solt.register.webhook</field>
             <field name="arch" type="xml">
-                <list string="Tiendanube Webhook Registrations" decoration-muted="(not active)">
+                <list decoration-muted="(not active)">
                     <field name="name"/>
                     <field name="event"/>
                     <field name="automation_id" string="Webhook"/>
+                    <field name="direction" optional="show"/>
                     <field name="webhook_url"/>
                     <field name="active" optional="show"/>
                     <field name="connector_id" optional="hide"/>

@@ -31,3 +31,11 @@ def post_init_hook(env):
             _logger.info(f"Custom address format applied to {country.name} ({country.code})")
         except ValueError:
             _logger.warning(f"Country not found with XMLID {country_xmlid}")
+
+    connector = env.ref('solt_tiendanube.tn_connector_api', raise_if_not_found=False)
+    if connector:
+        try:
+            connector.action_create_all_meta_fields()
+            _logger.info("Tiendanube meta-fields created on install.")
+        except Exception as meta_error:
+            _logger.warning("Could not create Tiendanube meta-fields on install: %s", str(meta_error))
