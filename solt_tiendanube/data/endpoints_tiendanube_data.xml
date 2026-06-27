@@ -17,6 +17,7 @@
         <field name="max_retry_count">5</field>
         <field name="retry_strategy">exponential</field>
         <field name="retry_delay_minutes">5</field>
+        <field name="install_url">https://www.tiendanube.com/mx/tienda-aplicaciones-nube/soltein-odoo-tiendanube</field>
     </record>
 
     <!--  Endpoints  -->
