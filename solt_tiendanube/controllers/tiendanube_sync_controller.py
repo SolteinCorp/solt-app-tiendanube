@@ -86,6 +86,19 @@ class TiendaNubeSyncController(http.Controller):
             _logger.error(error_msg)
             return request.make_response('Internal server error', status=500)
 
+    @route(['/tiendanube/health'], type='http', auth='public', methods=['GET'], csrf=False)
+    def tiendanube_health(self, **kwargs):
+        """Public probe used by the installer to detect that the connector module
+        is installed and reachable at the customer's Odoo domain.
+        """
+        module = request.env['ir.module.module'].sudo().search(
+            [('name', '=', 'solt_tiendanube'), ('state', '=', 'installed')], limit=1)
+        return request.make_json_response({
+            'installed': bool(module),
+            'version': module.installed_version or '',
+            'ready': bool(module),
+        })
+
     def _validate_sync_data(self, sync_data):
         required_fields = ['store_info', 'sync_token', 'odoo_version', 'callback_url']
         return all(field in sync_data for field in required_fields)

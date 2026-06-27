@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-import json
 import logging
-from odoo import models, fields, _, api, Command
+from odoo import models, fields, _, api
 from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
@@ -14,17 +13,30 @@ class SoltRegisterWebhook(models.Model):
     _description = 'Registros de webhooks de Tiendanube'
 
     name = fields.Char("Nombre")
-    event = fields.Char("Evento")
+    event = fields.Char("Evento", help="Evento de Tiendanube que dispara este webhook (p. ej. order/created).")
     webhook_url = fields.Char("Url", related="automation_id.url")
     active = fields.Boolean("Activo", default=False)
-    automation_id = fields.Many2one('base.automation', 'Webhook', domain="[('trigger', '=', 'on_webhook'), ('active', 'in', [True, False]), ('connector_id', '!=', False)]")
+    automation_id = fields.Many2one('base.automation', 'Webhook', domain="[('trigger', '=', 'on_webhook'), ('active', 'in', [True, False]), ('connector_id', '!=', False)]", help="Automatización de tipo webhook asociada a este registro.")
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
     connector_id = fields.Many2one('solt.api.connector', related='automation_id.connector_id', string='Conector')
     is_connector_active = fields.Boolean(related="connector_id.active")
+    direction = fields.Selection([
+        ('odoo_to_tn', 'Odoo → Tiendanube'),
+        ('tn_to_odoo', 'Tiendanube → Odoo'),
+    ], string="Dirección", compute='_compute_direction',
+        help="Sentido del flujo del webhook según la dirección de sincronización de la automatización.")
 
     _sql_constraints = [
         ('event_url_unique', 'UNIQUE(event, webhook_url)', 'Event and URL must be unique.'),
     ]
+
+    @api.depends('automation_id.trigger', 'automation_id.sync_direction')
+    def _compute_direction(self):
+        for record in self:
+            if record.automation_id.trigger == 'on_webhook':
+                record.direction = 'tn_to_odoo'
+            else:
+                record.direction = 'odoo_to_tn' if record.automation_id.sync_direction == 'to_store' else 'tn_to_odoo'
 
     def _register_webhook(self, connector):
         self.ensure_one()
@@ -58,6 +70,8 @@ class SoltRegisterWebhook(models.Model):
                     _('No puedes eliminar el Registro con un webhook configurado y activo. Desactívalo primero.'))
 
     def toggle_active(self):
+        """Toggle the record and, per the ``wh_action`` context, publish or
+        delete the webhook in Tiendanube, updating its sync state."""
         res = super().toggle_active()
         for record in self.with_context(active_test=False):
             wh_action = self._context.get('wh_action', False)
