@@ -92,10 +92,10 @@
                                 </list>
                             </field>
                         </page>
-                        <page string="Additional Headers" name="headers" invisible="not id">
+                        <page string="Avanzado" name="advanced" invisible="not id">
+                            <separator string="Additional Headers"/>
                             <field name="headers" widget="ace"/>
-                        </page>
-                        <page string="Retry System" name="retry_config">
+                            <separator string="Retry System"/>
                             <group string="Configuration">
                                 <group>
                                     <field name="retry_enabled"/>
