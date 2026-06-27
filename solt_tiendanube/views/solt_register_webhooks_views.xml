@@ -1,5 +1,4 @@
 <odoo>
-    <data>
         <record id="tnube_register_webhook_view_form" model="ir.ui.view">
             <field name="name">tnube.register.webhook.view.form</field>
             <field name="model">solt.register.webhook</field>
@@ -10,6 +9,7 @@
                             <field name="name"/>
                             <field name="event"/>
                             <field name="automation_id" options="{'no_create': True}"/>
+                            <field name="direction"/>
                             <field name="webhook_url"/>
                             <field name="active" invisible="1"/>
                             <field name="company_id" options="{'no_create': True}"/>
@@ -23,10 +23,11 @@
             <field name="name">tnube.register.webhook.view.list</field>
             <field name="model">solt.register.webhook</field>
             <field name="arch" type="xml">
-                <tree string="Tiendanube Webhook Registrations" decoration-muted="(not active)">
+                <tree decoration-muted="(not active)">
                     <field name="name"/>
                     <field name="event"/>
                     <field name="automation_id" string="Webhook"/>
+                    <field name="direction" optional="show"/>
                     <field name="webhook_url"/>
                     <field name="active" optional="show"/>
                     <field name="connector_id" optional="hide"/>
@@ -75,5 +76,4 @@
             <field name="context">{'active_test': False, 'search_default_all': 1}</field>
             <field name="view_mode">tree,form</field>
         </record>
-    </data>
 </odoo>

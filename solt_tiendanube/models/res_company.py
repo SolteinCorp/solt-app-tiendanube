@@ -28,6 +28,72 @@ class ResCompany(models.Model):
         readonly=False,
         help="Allow sales orders to pick stock from multiple warehouses for this company.",
     )
+    tn_provisioned = fields.Boolean(
+        string='Tiendanube provisioned', default=False, prefetch=False,
+        help="True once the connector webhooks have been activated and registered for this company.")
+
+    def _cron_tn_provision(self):
+        """Cron entry point: provision pending Tiendanube companies asynchronously.
+
+        Triggered right after the install handshake (via ``ir_cron_tn_provision``)
+        so it runs in a fresh transaction where the dynamic meta-fields already
+        exist, publishing webhooks without the synchronous-handshake timeout.
+        """
+        pending = self.search([
+            ('connector_id', '!=', False),
+            ('external_id', '!=', False),
+            ('bearer_token', '!=', False),
+            ('tn_provisioned', '=', False),
+        ])
+        pending._tn_provision()
+
+    def _tn_provision(self):
+        """Activate the basic webhook automations, register their webhooks with
+        Tiendanube, and enable the sync crons by installed module. Idempotent.
+        """
+        installed_modules = self.env['ir.module.module'].sudo()
+        has_stock = bool(installed_modules.search_count([('name', '=', 'stock'), ('state', '=', 'installed')]))
+        has_account = bool(installed_modules.search_count([('name', '=', 'account'), ('state', '=', 'installed')]))
+        for company in self:
+            connector = company.connector_id
+            if not connector:
+                continue
+            try:
+                has_webhooks, webhook_records = connector._has_webhook_tn(company)
+                if not has_webhooks:
+                    connector.with_company(company).action_create_tn_webhooks()
+                    has_webhooks, webhook_records = connector._has_webhook_tn(company)
+                required_webhooks = webhook_records.filtered(
+                    lambda webhook: not webhook.automation_id.tn_webhook_optional)
+                for webhook in required_webhooks:
+                    if not webhook.automation_id.active:
+                        webhook.automation_id.toggle_active()
+                    if webhook.x_state_sync != 'yes':
+                        try:
+                            webhook.with_company(company).with_context(wh_action='public').toggle_active()
+                        except Exception as webhook_error:
+                            _logger.warning("No se pudo publicar el webhook %s: %s", webhook.name, str(webhook_error))
+                if has_stock:
+                    inventory_cron = self.env.ref('solt_tiendanube.ir_cron_sync_tn_inventory', raise_if_not_found=False)
+                    if inventory_cron and not inventory_cron.active:
+                        inventory_cron.sudo().write({'active': True})
+                if has_account:
+                    cost_cron = self.env.ref('solt_tiendanube.ir_cron_sync_tn_variant_cost', raise_if_not_found=False)
+                    if cost_cron and not cost_cron.active:
+                        cost_cron.sudo().write({'active': True})
+                required_webhooks.invalidate_recordset(['x_state_sync'])
+                all_required_published = all(
+                    webhook.x_state_sync == 'yes' for webhook in required_webhooks)
+                if webhook_records and all_required_published:
+                    company.tn_provisioned = True
+                else:
+                    published_webhooks = required_webhooks.filtered(
+                        lambda webhook: webhook.x_state_sync == 'yes')
+                    _logger.info(
+                        "Aprovisionamiento parcial de %s (%s/%s webhooks publicados). Se reintentará en el próximo cron.",
+                        company.name, len(published_webhooks), len(required_webhooks))
+            except Exception as provision_error:
+                _logger.warning("No se pudo aprovisionar la compañía %s: %s", company.name, str(provision_error))
 
     def _sync_inventory(self, offset, limit):
         """Sincronizar la disponibilidad del inventario de los productos vendidos en TN.
