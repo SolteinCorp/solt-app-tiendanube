@@ -1,0 +1,14 @@
+{
+  "extraKnownMarketplaces": {
+    "solt-agent-skills": {
+      "source": {
+        "source": "github",
+        "repo": "soltein-net/solt-claude-plugins"
+      },
+      "autoUpdate": true
+    }
+  },
+  "enabledPlugins": {
+    "soltein@solt-agent-skills": true
+  }
+}
