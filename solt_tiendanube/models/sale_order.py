@@ -5,20 +5,15 @@ import logging
 import dateutil.parser
 from datetime import datetime, timedelta
 import pytz
+from markupsafe import Markup, escape
 
 from odoo import models, fields, api, _, Command
 from odoo.exceptions import ValidationError, UserError
 from odoo.tools import float_is_zero, DEFAULT_SERVER_DATETIME_FORMAT
+from .. import const
 
 _logger = logging.getLogger(__name__)
 
-STATUS_TO_SYNCHRONIZE = {
-    'UNPACKED': 'UNPACKED',
-    'PACKED': 'PACKED',
-    'DISPATCHED': 'DISPATCHED',
-    'READY_FOR_PICKUP': 'READY_FOR_PICKUP',
-    'DELIVERED': 'DELIVERED',
-}
 
 class SaleOrder(models.Model):
     _name = 'sale.order'
@@ -29,6 +24,10 @@ class SaleOrder(models.Model):
     payment_method_id = fields.Many2one(
         string="Payment method", comodel_name='payment.method'
     )
+    x_tn_salesperson_id = fields.Many2one(
+        'res.partner', string="Vendedor TN", readonly=True, copy=False,
+        help="Vendedor asociado a la venta en el POS de Tiendanube. "
+             "Solo aplica a ventas realizadas desde el POS; queda vacío en órdenes de tienda online.")
 
     # Multi Warehouse fields
     can_use_sale_multi_stock = fields.Boolean(compute='_compute_use_sale_multi_stock')
@@ -68,16 +67,16 @@ class SaleOrder(models.Model):
         if not data:
             return False, False, False
         if type in ['contact', 'invoice']:
-            contact, delivery, invoice = self.env['res.partner'].sudo()._find_or_create_partners_from_data(data.get("customer", {}))
+            contact, delivery, invoice = self.env['res.partner'].sudo()._find_or_create_partners_from_data(data.get("customer") or {})
         else:
-            contact, delivery, invoice = self.env['res.partner'].sudo()._find_or_create_partners_from_data(data.get("customer", {}), data.get("shipping_address", {}))
+            contact, delivery, invoice = self.env['res.partner'].sudo()._find_or_create_partners_from_data(data.get("customer") or {}, data.get("shipping_address") or {})
         return contact and contact.id or False, delivery and delivery.id or False, invoice and invoice.id or contact and contact.id
 
     def _find_fiscal_position_from_data(self, data):
         if not data:
             return False
 
-        contact, delivery, invoice = self.env['res.partner'].sudo()._find_or_create_partners_from_data(data.get("customer", {}))
+        contact, delivery, invoice = self.env['res.partner'].sudo()._find_or_create_partners_from_data(data.get("customer") or {})
         fiscal_position = self.env['account.fiscal.position'].with_company(
             self.env.company
         )._get_fiscal_position(contact, delivery)
@@ -177,7 +176,7 @@ class SaleOrder(models.Model):
         currency = self.env['res.currency'].with_context(active_test=False).search(
             [('name', '=', order_data['currency'])], limit=1
         )
-        contact_partner, delivery_partner, invoice_partner = self.env['res.partner'].sudo()._find_or_create_partners_from_data(order_data.get("customer", {}))
+        contact_partner, delivery_partner, invoice_partner = self.env['res.partner'].sudo()._find_or_create_partners_from_data(order_data.get("customer") or {})
         fiscal_position = self.env['account.fiscal.position'].with_company(
             self.env.company
         )._get_fiscal_position(contact_partner, delivery_partner)
@@ -417,7 +416,7 @@ class SaleOrder(models.Model):
         shipping_data = val.get("shipping")
         carrier_data = shipping_data.get('carrier')
         option_data = shipping_data.get('option')
-        name = carrier_data.get('name') + '-' + option_data.get('name')
+        name = (carrier_data.get('name') or '') + '-' + (option_data.get('name') or '')
         x_external_id = carrier_data.get('carrier_id') if carrier_data.get('carrier_id') else ''
         shipping_code = option_data.get("name")
         shipping_product = self._find_matching_product(
@@ -450,6 +449,66 @@ class SaleOrder(models.Model):
                 _logger.error(f"Error al crear delivery carrier: {e}")
 
         return carrier_id.id
+
+    def _find_or_create_tn_salesperson_partner(self, sold_by_data):
+        """ Busca o crea el res.partner que representa al vendedor de Tiendanube
+        (campo 'origin.sold_by' del pedido). Solo viene en órdenes hechas desde el
+        POS de TN, y únicamente cuando se asigna explícitamente un vendedor
+        distinto del dueño de la tienda; en el resto de los casos 'sold_by_data'
+        viene vacío y no se crea/enlaza nada. Cualquier error al crear el partner
+        se loguea y se ignora,
+        para que nunca tumbe la sincronización de la orden. """
+        sold_by_data = sold_by_data or {}
+        email = sold_by_data.get('email') or ''
+        x_external_id = sold_by_data.get('id') or ''
+        name = ' '.join(filter(None, [sold_by_data.get('first_name'), sold_by_data.get('last_name')])).strip() or email
+        if not email and not x_external_id:
+            return False
+
+        if x_external_id and email:
+            domain = ['|', ('x_external_id', '=', x_external_id), ('email', '=', email)]
+        elif email:
+            domain = [('email', '=', email)]
+        else:
+            domain = [('x_external_id', '=', x_external_id)]
+
+        partner = self.env['res.partner'].sudo().search(
+            [*self.env['res.partner']._check_company_domain(self.env.company), *domain], limit=1
+        )
+        if not partner:
+            try:
+                partner = self.env['res.partner'].sudo().with_context(
+                    tracking_disable=True, not_execute_base_automation=True
+                ).create({
+                    'name': name or _('Vendedor TN'),
+                    'email': email,
+                    'x_external_id': x_external_id,
+                    'company_id': self.env.company.id,
+                    'company_type': 'person',
+                    'x_state_sync': 'yes',
+                    'x_date_last_sync': datetime.now(),
+                    'x_store_external_id': self.env.company.external_id,
+                })
+            except Exception as e:
+                _logger.error(f"Error al crear partner de vendedor TN: {e}")
+                return False
+
+        return partner.id
+
+    def _log_tn_pos_session_note(self, data):
+        """ Deja constancia en el chatter de la orden de la sesión/usuario del POS
+        de Tiendanube que registró la venta (campo 'initiated_by' del pedido).
+        Solo viene en órdenes hechas desde el POS; en órdenes de tienda online no
+        se postea nada. """
+        initiated_by = (data or {}).get('initiated_by') or {}
+        if not initiated_by:
+            return
+        name = ' '.join(filter(None, [initiated_by.get('first_name'), initiated_by.get('last_name')])).strip()
+        body = _("Tiendanube — Sesión POS que registró la venta: %s (%s)") % (
+            escape(name or _('Sin nombre')),
+            escape(initiated_by.get('email') or ''),
+        )
+        self.message_post(body=Markup("<p>%s</p>") % body)
 
     def tiendanube_sync_picking_from_order(self, order_response_dict):
         """
@@ -488,7 +547,7 @@ class SaleOrder(models.Model):
                     shipping_data = found_fulfillment.get("shipping")
                     carrier_data = shipping_data.get('carrier')
                     option_data = shipping_data.get('option')
-                    name = carrier_data.get('name') + '-' + option_data.get('name')
+                    name = (carrier_data.get('name') or '') + '-' + (option_data.get('name') or '')
                     x_external_id = carrier_data.get('carrier_id') if carrier_data.get('carrier_id') else ''
                     carrier_id = self.env['delivery.carrier'].sudo().with_company(self.env.company).search([
                         ('name', '=', name), ('x_external_id', '=', x_external_id)
@@ -508,15 +567,26 @@ class SaleOrder(models.Model):
                     fulfillment_sync.append(found_fulfillment.get('id'))
 
                 fulfillment_status = found_fulfillment.get('status')
-                if nube_picking.state not in ['cancel', 'done'] and (shipping_status == 'shipped' or shipping_status == 'partially_fulfilled' and STATUS_TO_SYNCHRONIZE[fulfillment_status] == 'DISPATCHED'):
+                if nube_picking.state not in ['cancel', 'done'] and (
+                    shipping_status in ('shipped', 'delivered')
+                    or shipping_status == 'partially_fulfilled' and const.STATUS_TO_SYNCHRONIZE[fulfillment_status] == 'DISPATCHED'
+                ):
                     stock_move = self.env['stock.move'].search([('sale_line_id', '=', order_line.id)])
-                    stock_move._set_quantity_done(order_line.product_uom_qty)
+                    # Reservar contra el stock real disponible antes de marcar como
+                    # hecho, en vez de forzar ciegamente la cantidad pedida (evita
+                    # dejar stock negativo cuando no hay suficiente inventario).
+                    stock_move._action_assign()
+                    stock_move._set_quantity_done(stock_move.quantity)
                     stock_move.picked = True
                     picking_to_valiate |= nube_picking
 
         if picking_to_valiate:
             _logger.info(f"Validar las entregas {','.join(picking_to_valiate.mapped('name'))}")
-            picking_to_valiate.button_validate()
+            # skip_backorder evita el wizard interactivo de "crear backorder?" que
+            # nunca se resuelve al correr desde un webhook (nadie lo confirma) — con
+            # create_backorder='ask' en el tipo de operación, esto genera el backorder
+            # automaticamente para lo que falte en vez de dejar la entrega sin validar.
+            picking_to_valiate.with_context(skip_backorder=True).button_validate()
 
     def tiendanube_create_initial_stock_quants_from_order(self, order_response_dict):
         """
@@ -980,3 +1050,43 @@ class SaleOrder(models.Model):
                 f"TN Sync State [{company.name}]: Error en campos personalizados "
                 f"para {order.name}: {str(e)}"
             )
+
+    @api.model
+    def _tn_reconcile_missing_order(self, company, payload):
+        """Crea una orden como último recurso, cuando ningún webhook (ni
+        order/created ni sus reintentos) logró crearla dentro de la ventana
+        de reintentos de Tiendanube. Llamado únicamente por
+        solt.api.call.log.cron_reconcile_incoming_order_webhooks.
+
+        Replica el mismo flujo de creación que usa el webhook order/created
+        (obtener la orden vía SALE_ORDER_GET_SINGLE, crearla, confirmarla y
+        sincronizar el picking).
+        """
+        automation = self.env['base.automation'].search([
+            ('event', '=', 'order/created'),
+            ('connector_id', '!=', False),
+        ], limit=1)
+        if not automation or not automation.connector_id:
+            _logger.error("Reconciliación: no se encontró la automatización de order/created para crear la orden.")
+            return False
+
+        admin_user = self.env.ref('base.user_admin')
+        connector = automation.connector_id.with_company(company).with_user(admin_user)
+        response = connector.execute_endpoint('SALE_ORDER_GET_SINGLE', record=company, data=payload)
+        if not (200 <= response.get('status_code', 0) < 300):
+            _logger.error(
+                "Reconciliación: no se pudo obtener la orden con ID externo %s: %s",
+                payload.get('id'), response.get('error_message'),
+            )
+            return False
+
+        order = self.with_context(mail_create_nosubscribe=True).with_company(company).with_user(admin_user).create(
+            response['values'])
+        order._log_tn_pos_session_note(response['raw_response'])
+        if order.state == 'draft':
+            order.action_confirm()
+            order_response_dict = {str(order.x_external_id): response['raw_response']}
+            order.tiendanube_sync_picking_from_order(order_response_dict)
+        sync_vals = {'x_state_sync': 'yes', 'x_date_last_sync': datetime.now()}
+        order.write(sync_vals)
+        return order

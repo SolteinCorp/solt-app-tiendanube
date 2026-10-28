@@ -10,11 +10,24 @@
                         <group>
                             <field name="order_number" readonly="1" force_save="1"/>
                             <field name="payment_method_id" readonly="1" force_save="1"/>
+                            <field name="x_tn_salesperson_id" readonly="1" force_save="1"/>
                         </group>
                     </page>
                 </notebook>
                 <field name="origin" position="after">
                     <field name="new_version_id" force_save="1"/>
+                </field>
+            </field>
+        </record>
+
+        <!-- Muestra el vendedor de TN en las listas de Cotizaciones y Órdenes de Venta -->
+        <record id="nube_sale_order_tree_inherit" model="ir.ui.view">
+            <field name="name">nube.sale.order.list.inherit</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.sale_order_tree"/>
+            <field name="arch" type="xml">
+                <field name="user_id" position="after">
+                    <field name="x_tn_salesperson_id" optional="show"/>
                 </field>
             </field>
         </record>

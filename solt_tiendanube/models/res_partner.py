@@ -427,9 +427,9 @@ class Respartner(models.Model):
 
         # default address
         if 'default_address' in data:  # customer data
-            default_shipping_address_info = data.get('default_address', {})
+            default_shipping_address_info = data.get('default_address') or {}
         else:  # shipping address
-            default_shipping_address_info = data
+            default_shipping_address_info = data or {}
 
         default_name = default_shipping_address_info.get('name', '') or name  # if not name we use the name of contact
         default_phone = default_shipping_address_info.get('phone', '') or ''
