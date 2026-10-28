@@ -16,9 +16,9 @@ webhook support.
     'website': 'https://www.soltein.mx',
     'support': 'soporte@soltein.mx',
     'category': 'Tools/Connectivity',
-    'version': '19.0.1.1.4',
+    'version': '19.0.1.2.0',
     'license': 'LGPL-3',
-    'depends': ['base', 'base_automation', 'social_media'],
+    'depends': ['base', 'base_automation', 'social_media', 'onboarding'],
     'application': True,
     'installable': True,
     'auto_install': False,
@@ -27,6 +27,7 @@ webhook support.
         'security/security.xml',
         'security/ir.model.access.csv',
         'data/ir_cron_data.xml',
+        'data/onboarding_data.xml',
         'views/res_company.xml',
         'views/solt_api_call_log.xml',
         'views/solt_api_connector.xml',
@@ -38,6 +39,8 @@ webhook support.
     'assets': {
         'web.assets_backend': [
             'solt_api_connector/static/src/scss/**/*',
+            'solt_api_connector/static/src/components/**/*',
+            'solt_api_connector/static/src/views/**/*',
         ],
         'web.assets_common': [
             'solt_api_connector/static/description/icon.png',

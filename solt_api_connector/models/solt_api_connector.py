@@ -70,6 +70,19 @@ class SoltApiConnector(models.Model):
         for connector in self:
             connector.call_log_count = self.env['solt.api.call.log'].search_count([('connector_id', '=', connector.id)])
 
+    store_connected = fields.Boolean(
+        'Store connected', compute='_compute_store_connected',
+        help="True when the current company is already linked to a store through this connector "
+             "(it has an external ID and a token).")
+
+    @api.depends_context('company')
+    @api.depends('company_ids.external_id', 'company_ids.bearer_token')
+    def _compute_store_connected(self):
+        company = self.env.company
+        for connector in self:
+            connector.store_connected = bool(
+                company.connector_id == connector and company.external_id and company.bearer_token)
+
     @api.depends('company_ids')
     def _compute_company_count(self):
         for connector in self:

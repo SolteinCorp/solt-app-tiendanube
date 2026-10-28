@@ -26,6 +26,12 @@ class SoltRegisterWebhook(models.Model):
     ], string="Dirección", compute='_compute_direction',
         help="Sentido del flujo del webhook según la dirección de sincronización de la automatización.")
 
+    tn_publish_choice = fields.Selection([
+        ('yes', 'Publish'),
+        ('no', 'Do not publish'),
+    ], string="Publish choice", help="Choice made in the onboarding wizard. Empty means the default: "
+                                     "publish unless the automation is flagged as optional.")
+
     _constraints = [
         models.Constraint(
             'UNIQUE(event, webhook_url)',
@@ -41,11 +47,24 @@ class SoltRegisterWebhook(models.Model):
             else:
                 record.direction = 'odoo_to_tn' if record.automation_id.sync_direction == 'to_store' else 'tn_to_odoo'
 
+    def _tn_is_wanted(self):
+        """True when this webhook must be published for its company."""
+        self.ensure_one()
+        if self.tn_publish_choice:
+            return self.tn_publish_choice == 'yes'
+        return not self.automation_id.tn_webhook_optional
+
+    def _get_tn_publish_url(self):
+        """URL sent to Tiendanube when publishing this webhook. It does not change
+        the automation URL; extension point for environments Tiendanube cannot reach."""
+        self.ensure_one()
+        return self.automation_id.url
+
     def _register_webhook(self, connector):
         self.ensure_one()
         values = {
             "event": self.event,
-            "url": self.automation_id.url
+            "url": self._get_tn_publish_url()
         }
         try:
             res = connector.execute_endpoint('WEBHOOK_CREATE', record=self, data=values)
@@ -86,7 +105,7 @@ class SoltRegisterWebhook(models.Model):
             if wh_action and wh_action == 'public':
                 values = {
                     "event": record.event,
-                    "url": record.automation_id.url
+                    "url": record._get_tn_publish_url()
                 }
                 try:
                     response = record.connector_id.execute_endpoint('WEBHOOK_CREATE', record=record, data=values)

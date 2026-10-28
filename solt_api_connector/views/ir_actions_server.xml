@@ -47,4 +47,37 @@
         </field>
     </record>-->
 
+    <!-- Initial import/export actions of a connector, used by the onboarding "Initial sync" step -->
+    <record id="view_ir_actions_server_initial_sync_list" model="ir.ui.view">
+        <field name="name">ir.actions.server.initial.sync.list</field>
+        <field name="model">ir.actions.server</field>
+        <field name="arch" type="xml">
+            <list create="0" delete="0" js_class="solt_initial_sync_list">
+                <header>
+                    <button name="action_mark_initial_sync_completed" type="object" string="Mark as completed"
+                            display="always" class="btn-primary"/>
+                    <!-- Hidden for now: reverts "Mark as completed". -->
+                    <button name="action_mark_initial_sync_pending" type="object" string="Mark as pending"
+                            display="always" invisible="1"/>
+                </header>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="model_id"/>
+                <field name="use_for_initial_import" column_invisible="True"/>
+                <field name="use_for_initial_export" column_invisible="True"/>
+                <field name="importing_state" widget="badge" invisible="not use_for_initial_import"
+                       decoration-warning="importing_state == 'scheduled'" decoration-info="importing_state == 'running'"
+                       decoration-success="importing_state == 'done'" decoration-danger="importing_state == 'error'"/>
+                <field name="last_import_date" invisible="not use_for_initial_import"/>
+                <field name="exporting_state" widget="badge" invisible="not use_for_initial_export"
+                       decoration-warning="exporting_state == 'scheduled'" decoration-info="exporting_state == 'running'"
+                       decoration-success="exporting_state == 'done'" decoration-danger="exporting_state == 'error'"/>
+                <field name="last_export_date" invisible="not use_for_initial_export"/>
+                <button name="execute_initial_import" icon="fa-cloud-download fa-2x" type="object" title="Import"
+                        invisible="not use_for_initial_import"/>
+                <button name="execute_initial_export" icon="fa-cloud-upload fa-2x" type="object" title="Export"
+                        invisible="not use_for_initial_export"/>
+            </list>
+        </field>
+    </record>
 </odoo>

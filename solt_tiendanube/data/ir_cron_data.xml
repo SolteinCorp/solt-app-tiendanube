@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<odoo noupdate="1">
+<odoo>
+    <data noupdate="1">
         <record id="ir_cron_sync_tn_inventory" model="ir.cron">
             <field name="name">Tiendanube: sync available stock</field>
             <field name="model_id" ref="model_res_company"/>
@@ -50,4 +51,20 @@
             <field name="active" eval="True"/>
             <field name="priority">10</field>
         </record>
+
+        <!-- Red de seguridad: crea una orden como ultimo recurso si ningun webhook
+             (order/created ni sus reintentos) logro crearla dentro de la ventana
+             de 48h de reintentos de Tiendanube. Ver solt_tiendanube/models/solt_api_call_log.py -->
+        <record id="ir_cron_reconcile_incoming_order_webhooks" model="ir.cron">
+            <field name="name">Tiendanube: reconciliar webhooks de orden fallidos (ultimo recurso)</field>
+            <field name="model_id" ref="solt_api_connector.model_solt_api_call_log"/>
+            <field name="state">code</field>
+            <field name="code">model.cron_reconcile_incoming_order_webhooks()</field>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">6</field>
+            <field name="interval_type">hours</field>
+            <field name="nextcall" eval="(DateTime.now() + timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="active" eval="True"/>
+        </record>
+    </data>
 </odoo>

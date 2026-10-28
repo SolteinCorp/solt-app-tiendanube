@@ -2029,3 +2029,107 @@ msgstr "Instalar app"
 #: code:addons/solt_api_connector/models/solt_api_connector.py:0
 msgid "This connector has no install URL configured."
 msgstr "Este conector no tiene una URL de instalación configurada."
+
+#. module: solt_api_connector
+#. odoo-javascript
+#: code:addons/solt_api_connector/static/src/components/onboarding/onboarding.xml:0
+msgid "Close the setup guide"
+msgstr "Cerrar la guía de configuración"
+
+#. module: solt_api_connector
+#: model:onboarding.onboarding,name:solt_api_connector.onboarding_onboarding_connector_optional
+msgid "Connector optional steps"
+msgstr "Pasos opcionales del conector"
+
+#. module: solt_api_connector
+#: model:onboarding.onboarding,name:solt_api_connector.onboarding_onboarding_connector
+msgid "Connector setup"
+msgstr "Configuración del conector"
+
+#. module: solt_api_connector
+#: model:ir.model,name:solt_api_connector.model_onboarding_onboarding_step
+msgid "Onboarding Step"
+msgstr "Paso de incorporación"
+
+#. module: solt_api_connector
+#. odoo-javascript
+#: code:addons/solt_api_connector/static/src/components/onboarding/onboarding.xml:0
+msgid "Optional"
+msgstr "Opcional"
+
+#. module: solt_api_connector
+#. odoo-javascript
+#: code:addons/solt_api_connector/static/src/components/onboarding/onboarding.xml:0
+msgid "Show the setup guide"
+msgstr "Mostrar la guía de configuración"
+
+#. module: solt_api_connector
+#. odoo-javascript
+#: code:addons/solt_api_connector/static/src/components/onboarding/onboarding.xml:0
+msgid "Change"
+msgstr "Cambiar"
+
+#. module: solt_api_connector
+#: model:ir.model.fields,field_description:solt_api_connector.field_ir_cron__export_company_id
+msgid "Company of the export"
+msgstr "Compañía de la exportación"
+
+#. module: solt_api_connector
+#: model:ir.model.fields,field_description:solt_api_connector.field_ir_cron__import_company_id
+msgid "Company of the import"
+msgstr "Compañía de la importación"
+
+#. module: solt_api_connector
+#: model:ir.model.fields,help:solt_api_connector.field_ir_cron__export_company_id
+msgid "Company that scheduled the export: the cron runs as the system user, so it is applied explicitly."
+msgstr "Compañía que programó la exportación: el cron corre como usuario del sistema, por eso se aplica de forma explícita."
+
+#. module: solt_api_connector
+#: model:ir.model.fields,help:solt_api_connector.field_ir_cron__import_company_id
+msgid "Company that scheduled the import: the cron runs as the system user, so it is applied explicitly."
+msgstr "Compañía que programó la importación: el cron corre como usuario del sistema, por eso se aplica de forma explícita."
+
+#. module: solt_api_connector
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.view_ir_actions_server_initial_sync_list
+msgid "Import"
+msgstr "Importar"
+
+#. module: solt_api_connector
+#. odoo-python
+#: code:addons/solt_api_connector/models/ir_actions_server.py:0
+msgid "Initial sync"
+msgstr "Sincronización inicial"
+
+#. module: solt_api_connector
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.view_ir_actions_server_initial_sync_list
+msgid "Mark as completed"
+msgstr "Marcar como completada"
+
+#. module: solt_api_connector
+#: model_terms:ir.ui.view,arch_db:solt_api_connector.view_ir_actions_server_initial_sync_list
+msgid "Mark as pending"
+msgstr "Marcar como pendiente"
+
+#. module: solt_api_connector
+#. odoo-python
+#: code:addons/solt_api_connector/models/ir_actions_server.py:0
+msgid "The initial sync of %s was marked as completed."
+msgstr "La sincronización inicial de %s se marcó como completada."
+
+#. module: solt_api_connector
+#. odoo-python
+#: code:addons/solt_api_connector/models/ir_actions_server.py:0
+msgid "The initial sync of %s was marked as pending."
+msgstr "La sincronización inicial de %s se marcó como pendiente."
+
+#. module: solt_api_connector
+#. odoo-javascript
+#: code:addons/solt_api_connector/static/src/views/initial_sync_list/initial_sync_list.js:0
+msgid "%(name)s completed."
+msgstr "%(name)s completada."
+
+#. module: solt_api_connector
+#. odoo-javascript
+#: code:addons/solt_api_connector/static/src/views/initial_sync_list/initial_sync_list.js:0
+msgid "%(name)s finished with an error."
+msgstr "%(name)s terminó con un error."

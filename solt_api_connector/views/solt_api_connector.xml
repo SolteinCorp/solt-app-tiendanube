@@ -15,7 +15,7 @@
                     <button name="test_connection" string="Test Connection" type="object" class="btn-primary"
                             invisible="auth_type in ['none'] or not active"/>
                     <button name="action_open_install_url" string="Install app" type="object" class="btn-primary"
-                            invisible="not install_url"/>
+                            invisible="not install_url or store_connected"/>
                     <button name="action_all_active" string="Activate Webhooks/Automations" type="object" class="btn-secondary"
                             invisible="not active"
                             confirm="This action will activate all webhook/automation records. Continue?"/>
@@ -24,6 +24,7 @@
                             confirm="This action will deactivate all webhook/automation records. Continue?"/>
                 </header>
                 <sheet>
+                    <widget name="solt_connector_onboarding" invisible="not id"/>
                     <div class="oe_button_box" name="button_box">
                         <button name="action_view_call_logs" type="object" class="oe_stat_button" icon="fa-list">
                             <field name="call_log_count" widget="statinfo" string="API Calls"/>
@@ -40,6 +41,7 @@
                             <field name="active" readonly="True" force_save="1"/>
                             <field name="advanced_config"/>
                             <field name="install_url" invisible="1"/>
+                            <field name="store_connected" invisible="1"/>
                         </group>
                         <group>
                             <field name="auth_type"/>

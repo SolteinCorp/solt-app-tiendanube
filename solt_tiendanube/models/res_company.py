@@ -24,6 +24,10 @@ class ResCompany(models.Model):
 
     callback_url = fields.Char(string='Callback URL', help="URL to send synchronization status callbacks", prefetch=False)
     sync_token = fields.Char(string='Sync Token', help="Unique token for synchronization", index=True, prefetch=False)
+    tn_email = fields.Char(
+        string='Tiendanube email', prefetch=False,
+        help="Email of the Tiendanube store. Used to match this company with the store; "
+             "the company email is left untouched.")
     use_sale_multi_stock = fields.Boolean(string='Use multi warehouse in Sales Orders', readonly=False)
     tn_provisioned = fields.Boolean(
         string='Tiendanube provisioned', default=False, prefetch=False,
@@ -60,11 +64,8 @@ class ResCompany(models.Model):
                 if not has_webhooks:
                     connector.with_company(company).action_create_tn_webhooks()
                     has_webhooks, webhook_records = connector._has_webhook_tn(company)
-                required_webhooks = webhook_records.filtered(
-                    lambda webhook: not webhook.automation_id.tn_webhook_optional)
+                required_webhooks = webhook_records.filtered(lambda webhook: webhook._tn_is_wanted())
                 for webhook in required_webhooks:
-                    if not webhook.automation_id.active:
-                        webhook.automation_id.toggle_active()
                     if webhook.x_state_sync != 'yes':
                         try:
                             webhook.with_company(company).with_context(wh_action='public').toggle_active()
@@ -89,6 +90,7 @@ class ResCompany(models.Model):
                     _logger.info(
                         "Aprovisionamiento parcial de %s (%s/%s webhooks publicados). Se reintentará en el próximo cron.",
                         company.name, len(published_webhooks), len(required_webhooks))
+                connector.with_company(company)._onboarding_sync()
             except Exception as provision_error:
                 _logger.warning("No se pudo aprovisionar la compañía %s: %s", company.name, str(provision_error))
 
@@ -367,11 +369,12 @@ class ResCompany(models.Model):
                 'timestamp': datetime.now().isoformat(),
                 'company_id': self.id,
                 'company_name': self.name,
-                'company_email': self.email,
+                'company_email': self.tn_email or self.email,
                 'external_id': self.external_id,
                 'modules_count': modules_info.get('count', 0),
                 'modules_list': modules_info.get('modules', [])
             }
+            callback_data['onboarding'] = self._get_onboarding_report()
             return callback_data
 
         except Exception as e:
@@ -382,6 +385,18 @@ class ResCompany(models.Model):
                 'error_message': f"Error preparando callback: {str(e)}",
                 'timestamp': datetime.now().isoformat()
             }
+
+    def _get_onboarding_report(self):
+        """Progress of the setup assistant of this company, reported to the installation server.
+        Best effort: a failure here must not prevent the callback."""
+        self.ensure_one()
+        connector = self.connector_id.with_company(self)
+        try:
+            connector._onboarding_sync()
+            return connector._onboarding_summary()
+        except Exception as error:
+            _logger.warning("Could not build the onboarding report of %s: %s", self.name, error)
+            return {}
 
     def _get_database_info(self):
         """

@@ -197,17 +197,16 @@ class TiendaNubeSyncController(http.Controller):
     def _get_company_info_from_payload(self, payload):
         try:
             ResCompany = request.env['res.company'].sudo()
-            company_id = ResCompany.search([
-                '|',
-                ('name', '=ilike', payload.get('name', '')),
-                ('email', '=ilike', payload.get('email', '')),
-            ], limit=1)
+            domain = [('name', '=ilike', payload.get('name', ''))]
+            if payload.get('email'):
+                domain = ['|', ('tn_email', '=ilike', payload['email'])] + domain
+            company_id = ResCompany.search(domain, limit=1)
 
             if company_id:
                 return {
                     'company_id': company_id.id,
                     'company_name': company_id.name,
-                    'company_email': company_id.email,
+                    'company_email': company_id.tn_email or company_id.email,
                     'external_id': company_id.external_id,
                     'bearer_token': company_id.bearer_token,
                 }
@@ -218,7 +217,7 @@ class TiendaNubeSyncController(http.Controller):
                 return {
                     'company_id': company_id.id,
                     'company_name': company_id.name,
-                    'company_email': company_id.email,
+                    'company_email': company_id.tn_email or company_id.email,
                     'external_id': company_id.external_id,
                     'bearer_token': company_id.bearer_token,
                 }

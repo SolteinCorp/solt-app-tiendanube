@@ -9,6 +9,9 @@
             <xpath expr="//field[@name='external_id']" position="attributes">
                 <attribute name="string">ID en Tiendanube</attribute>
             </xpath>
+            <xpath expr="//field[@name='external_id']" position="after">
+                <field name="tn_email"/>
+            </xpath>
         </field>
     </record>
 

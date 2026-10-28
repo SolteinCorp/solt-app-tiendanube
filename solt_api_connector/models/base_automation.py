@@ -47,6 +47,12 @@ class BaseAutomation(models.Model):
         """
         return {}
 
+    def _verify_webhook_signature(self, payload):
+        """Hook for connector-specific modules to validate the authenticity of an
+        incoming webhook (e.g. HMAC signature header). No-op by default; override
+        in a connector-specific module and raise an exception on failure."""
+        return
+
     def _execute_webhook(self, payload):
         """Override to redirect webhook logs to solt.api.call.log when a connector is set."""
         if not self.connector_id:
@@ -63,6 +69,7 @@ class BaseAutomation(models.Model):
         }
         call_log_vals.update(self._get_webhook_log_vals(payload))
         try:
+            self._verify_webhook_signature(payload)
             result = super()._execute_webhook(payload)
             return result
         except Exception:
