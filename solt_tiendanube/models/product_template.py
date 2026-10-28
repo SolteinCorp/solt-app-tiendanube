@@ -296,6 +296,24 @@ class ProductTemplate(models.Model):
             self.ensure_one()
             ProductAttribute = self.env['product.attribute']
 
+            # FIX PENDIENTE DE APROBACION DEL CLIENTE: a la espera del criterio
+            # de un tecnico de Tiendanube sobre la causa real de por que TN
+            # manda el mismo atributo con distinta capitalizacion (ej. "color"
+            # vs "Color"). Cuando se apruebe, descomentar este bloque y borrar
+            # la busqueda exacta de la linea de abajo.
+            #
+            # =ilike hace una comparacion EXACTA pero insensible a mayusculas
+            # (no es un "contiene") — evita crear un atributo duplicado si TN
+            # manda el mismo nombre con distinta capitalizacion que uno ya
+            # existente en Odoo.
+            #
+            # attribute = ProductAttribute.search([('name', '=ilike', attr_name)], limit=1)
+            # if attribute and attribute.name != attr_name:
+            #     _logger.warning(
+            #         "Atributo '%s' recibido de TN coincide (sin distinguir mayusculas) con el atributo "
+            #         "existente '%s' (id %s). Se reutiliza en vez de crear uno duplicado.",
+            #         attr_name, attribute.name, attribute.id,
+            #     )
             attribute = ProductAttribute.search([('name', '=', attr_name)], limit=1)
             current_time = fields.Datetime.now()
 
@@ -327,6 +345,22 @@ class ProductTemplate(models.Model):
         try:
             ProductAttributeValue = self.env['product.attribute.value']
 
+            # FIX PENDIENTE DE APROBACION DEL CLIENTE (ver nota en
+            # _find_or_create_attribute): mismo motivo, comparacion exacta
+            # pero insensible a mayusculas, para no duplicar valores como
+            # "PLATA" vs "Plata" ya existente. Descomentar junto con el fix
+            # del atributo cuando se apruebe.
+            #
+            # value = ProductAttributeValue.search([
+            #     ('attribute_id', '=', attribute_id),
+            #     ('name', '=ilike', value_name)
+            # ], limit=1)
+            # if value and value.name != value_name:
+            #     _logger.warning(
+            #         "Valor '%s' recibido de TN coincide (sin distinguir mayusculas) con el valor "
+            #         "existente '%s' (id %s, atributo id %s). Se reutiliza en vez de crear uno duplicado.",
+            #         value_name, value.name, value.id, attribute_id,
+            #     )
             value = ProductAttributeValue.search([
                 ('attribute_id', '=', attribute_id),
                 ('name', '=', value_name)
