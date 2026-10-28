@@ -37,7 +37,7 @@
                                         <code>
                                             {
                                             "client_id": "15612", // Constant direct value
-                                            "client_secret": "a356cdf67a71ca483d309a56315744be646e6d5816531afc",
+                                            "client_secret": "your-client-secret",
                                             "grant_type": "authorization_code",
                                             "code": {"payload": "code"}, // Payload value
                                             "customer_name": {"field": "partner_id.name"}, // Odoo field
@@ -102,7 +102,7 @@
                             </div>
                             <field name="request_mapping" widget="ace" placeholder='{
   "client_id": "15612",
-  "client_secret": "a356cdf67a71ca483d309a56315744be646e6d5816531afc",
+  "client_secret": "your-client-secret",
   "grant_type": "authorization_code",
   "code": {"payload": "code"}
 }' required="method in ['PUT', 'POST']"/>
