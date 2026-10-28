@@ -22,32 +22,6 @@
 
     <!--  Endpoints  -->
     <!--  Generals Endpoints  -->
-    <record id="endpoint_token" model="solt.api.endpoint">
-        <field name="name">ACCESS TOKEN</field>
-        <field name="code">TOKEN</field>
-        <field name="endpoint_path">https://www.tiendanube.com/apps/authorize/token</field>
-        <field name="method">POST</field>
-        <field name="model_id" ref="base.model_res_company"/>
-        <field name="connector_id" ref="tn_connector_api"/>
-        <field name="request_mapping"><![CDATA[
-{
-"client_id": "15612",
-"client_secret": "a356cdf67a71ca483d309a56315744be646e6d5816531afc",
-"grant_type": "authorization_code",
-"code": {"payload": "code"}
-}
-]]></field>
-        <field name="response_mapping"><![CDATA[
-{
-"bearer_token": "data.get('access_token')",
-"external_id": "data.get('user_id')"
-}
-]]></field>
-    <field name="headers"><![CDATA[
-{}
-]]></field>
-    </record>
-
     <record id="endpoint_store" model="solt.api.endpoint">
         <field name="name">DATOS TIENDA</field>
         <field name="code">STORE</field>
