@@ -4,12 +4,12 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 18.0-20251203\n"
+"Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-04 15:00+0000\n"
-"PO-Revision-Date: 2025-12-04 15:00+0000\n"
-"Last-Translator: \n"
-"Language-Team: \n"
+"POT-Creation-Date: 2026-08-26 14:56+0000\n"
+"PO-Revision-Date: 2026-08-26 15:00+0000\n"
+"Last-Translator: Soltein SA de CV\n"
+"Language-Team: es_MX\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
@@ -30,6 +30,11 @@ msgstr "<i>Visible en todas las variantes</i>"
 #: code:addons/solt_tiendanube/models/sale_order.py:0
 msgid "A new version will only be created for a confirmed order."
 msgstr "Una nueva versión solo se creará para una orden confirmada."
+
+#. module: solt_tiendanube
+#: model:ir.model.fields,help:solt_tiendanube.field_sale_order_line__product_is_storable
+msgid "A storable product is a product for which you manage stock."
+msgstr "Un producto almacenable es un producto para el que gestiona el stock."
 
 #. module: solt_tiendanube
 #: model:base.automation,name:solt_tiendanube.tn_ba_automation_ba_warehouse_update
@@ -72,6 +77,11 @@ msgid "AJUSTE DE INVENTARIO DE UNA VARIANTE DE UN PRODUCTO"
 msgstr "Ajuste de Inventario de una Variante de un Producto"
 
 #. module: solt_tiendanube
+#: model:ir.model,name:solt_tiendanube.model_solt_api_call_log
+msgid "API Call Log"
+msgstr "Registro de llamadas API"
+
+#. module: solt_tiendanube
 #: model:ir.model,name:solt_tiendanube.model_solt_api_connector
 msgid "API Connector"
 msgstr "Conector API"
@@ -102,6 +112,11 @@ msgid "Acceptable file size"
 msgstr "Tamaño de archivo aceptable"
 
 #. module: solt_tiendanube
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_brand__message_needaction
+msgid "Action Needed"
+msgstr "Acción Requerida"
+
+#. module: solt_tiendanube
 #: model_terms:ir.ui.view,arch_db:solt_tiendanube.tnube_register_webhook_view_list
 msgid "Activate Webhook"
 msgstr "Activar Webhook"
@@ -118,6 +133,19 @@ msgid "Activo"
 msgstr "Activo"
 
 #. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.nube_product_template_form_inherit
+msgid "Add image"
+msgstr "Agregar imagen"
+
+#. module: solt_tiendanube
+#: model:ir.model.fields,help:solt_tiendanube.field_product_product__categ_ids
+#: model:ir.model.fields,help:solt_tiendanube.field_product_template__categ_ids
+msgid ""
+"Additional categories for product classification. Categories created by "
+"store connectors."
+msgstr "Categorías adicionales para la clasificación de productos. Categorías creadas por conectores de tienda."
+
+#. module: solt_tiendanube
 #: model_terms:ir.ui.view,arch_db:solt_tiendanube.nube_res_partner_form_inherit
 msgid "Address"
 msgstr "Dirección"
@@ -128,6 +156,11 @@ msgid "All"
 msgstr "Todos"
 
 #. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.res_config_settings_view_form_multi_warehouse
+msgid "Allows using multi warehouse in Sales Orders"
+msgstr "Permite usar múltiples almacenes en Órdenes de Venta"
+
+#. module: solt_tiendanube
 #: model:ir.model.fields,field_description:solt_tiendanube.field_product_product__product_height
 msgid "Altura"
 msgstr "Altura"
@@ -136,6 +169,11 @@ msgstr "Altura"
 #: model:ir.model.fields,field_description:solt_tiendanube.field_product_product__product_width
 msgid "Ancho"
 msgstr "Ancho"
+
+#. module: solt_tiendanube
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_brand__message_attachment_count
+msgid "Attachment Count"
+msgstr "Cantidad de archivos adjuntos"
 
 #. module: solt_tiendanube
 #. odoo-python
@@ -151,6 +189,21 @@ msgstr ""
 #: model:ir.model,name:solt_tiendanube.model_base_automation
 msgid "Automation Rule"
 msgstr "Regla de automatización"
+
+#. module: solt_tiendanube
+#: model:ir.actions.act_window,name:solt_tiendanube.action_product_brand
+#: model:ir.model.fields,field_description:solt_tiendanube.field_product_product__product_brand_id
+#: model:ir.model.fields,field_description:solt_tiendanube.field_product_template__product_brand_id
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.product_template_form_brand_inherit
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.view_product_template_search_brand_inherit
+msgid "Brand"
+msgstr "Marca"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.view_product_product_kanban_brand_inherit
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.view_product_template_kanban_brand_inherit
+msgid "Brand:"
+msgstr "Marca:"
 
 #. module: solt_tiendanube
 #: model:base.automation,name:solt_tiendanube.tn_ba_automation_warehouse_create
@@ -193,16 +246,32 @@ msgid "Can Image 1024 be zoomed"
 msgstr "¿Se puede ampliar la imagen 1024?"
 
 #. module: solt_tiendanube
+#: model:ir.model.fields,field_description:solt_tiendanube.field_sale_order__can_use_sale_multi_stock
+msgid "Can Use Sale Multi Stock"
+msgstr "Puede usar multi-stock en ventas"
+
+#. module: solt_tiendanube
 #. odoo-python
 #: code:addons/solt_tiendanube/models/solt_api_connector.py:0
 msgid "Cannot delete the API connector while active."
 msgstr "No se puede eliminar el conector API mientras está activo."
 
 #. module: solt_tiendanube
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_brand__products_count
+msgid "Cantidad de productos"
+msgstr "Cantidad de productos"
+
+#. module: solt_tiendanube
 #: model:ir.model.fields,field_description:solt_tiendanube.field_product_product__categ_ids_domain
 #: model:ir.model.fields,field_description:solt_tiendanube.field_product_template__categ_ids_domain
 msgid "Categ Ids Domain"
 msgstr "Dominio de Ids de categoría"
+
+#. module: solt_tiendanube
+#: model:ir.model.fields,field_description:solt_tiendanube.field_product_product__categ_ids
+#: model:ir.model.fields,field_description:solt_tiendanube.field_product_template__categ_ids
+msgid "Categories"
+msgstr "Categorías"
 
 #. module: solt_tiendanube
 #. odoo-python
@@ -227,8 +296,10 @@ msgstr "Empresas"
 #. module: solt_tiendanube
 #: model:ir.model.fields,field_description:solt_tiendanube.field_product_product__company_id
 #: model:ir.model.fields,field_description:solt_tiendanube.field_product_template__company_id
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_brand__company_id
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_register_webhook__company_id
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_warehouse_sync_mapping__company_id
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.product_brand_search_view
 #: model_terms:ir.ui.view,arch_db:solt_tiendanube.tnube_register_webhook_view_search
 msgid "Company"
 msgstr "Empresa"
@@ -237,6 +308,11 @@ msgstr "Empresa"
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_register_webhook__connector_id
 msgid "Conector"
 msgstr "Conector"
+
+#. module: solt_tiendanube
+#: model:ir.model,name:solt_tiendanube.model_res_config_settings
+msgid "Config Settings"
+msgstr "Ajustes de configuración"
 
 #. module: solt_tiendanube
 #: model:ir.model,name:solt_tiendanube.model_res_partner
@@ -266,22 +342,26 @@ msgid "Create"
 msgstr "Crear"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.nube_view_solt_api_connector_form_inherit
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.nube_view_product_image_form
 msgid "Create Tiendanube Webhook"
 msgstr "Crear Webhook de Tiendanube"
 
 #. module: solt_tiendanube
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_brand__create_uid
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_image__create_uid
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_region__create_uid
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_register_webhook__create_uid
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_tiendanube_sync_nonce__create_uid
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_warehouse_sync_mapping__create_uid
 msgid "Created by"
 msgstr "Creado por"
 
 #. module: solt_tiendanube
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_brand__create_date
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_image__create_date
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_region__create_date
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_register_webhook__create_date
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_tiendanube_sync_nonce__create_date
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_warehouse_sync_mapping__create_date
 msgid "Created on"
 msgstr "Creado el"
@@ -290,6 +370,11 @@ msgstr "Creado el"
 #: model_terms:ir.ui.view,arch_db:solt_tiendanube.tnube_register_webhook_view_list
 msgid "Deactivate Webhook"
 msgstr "Desactivar Webhook"
+
+#. module: solt_tiendanube
+#: model:ir.model.fields,field_description:solt_tiendanube.field_sale_order_line__commitment_date
+msgid "Delivery Date"
+msgstr "Fecha de entrega"
 
 #. module: solt_tiendanube
 #: model:ir.model.fields,field_description:solt_tiendanube.field_product_template__product_depth
@@ -308,8 +393,10 @@ msgstr "Etiqueta de unidad de medida de profundidad"
 #: model:ir.model.fields,field_description:solt_tiendanube.field_product_category__nube_description
 #: model:ir.model.fields,field_description:solt_tiendanube.field_product_product__website_description
 #: model:ir.model.fields,field_description:solt_tiendanube.field_product_template__website_description
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_brand__description
 #: model_terms:ir.ui.view,arch_db:solt_tiendanube.nube_product_category_form_inherit
 #: model_terms:ir.ui.view,arch_db:solt_tiendanube.nube_product_template_form_inherit
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.view_product_brand_form
 msgid "Description"
 msgstr "Descripción"
 
@@ -326,10 +413,29 @@ msgid "Discount"
 msgstr "Descuento"
 
 #. module: solt_tiendanube
+#: model:ir.model.fields,field_description:solt_tiendanube.field_account_move__display_name
+#: model:ir.model.fields,field_description:solt_tiendanube.field_base_automation__display_name
+#: model:ir.model.fields,field_description:solt_tiendanube.field_ir_model_fields__display_name
+#: model:ir.model.fields,field_description:solt_tiendanube.field_product_attribute__display_name
+#: model:ir.model.fields,field_description:solt_tiendanube.field_product_category__display_name
+#: model:ir.model.fields,field_description:solt_tiendanube.field_product_product__display_name
+#: model:ir.model.fields,field_description:solt_tiendanube.field_product_template__display_name
+#: model:ir.model.fields,field_description:solt_tiendanube.field_res_company__display_name
+#: model:ir.model.fields,field_description:solt_tiendanube.field_res_config_settings__display_name
+#: model:ir.model.fields,field_description:solt_tiendanube.field_res_partner__display_name
+#: model:ir.model.fields,field_description:solt_tiendanube.field_sale_order__display_name
+#: model:ir.model.fields,field_description:solt_tiendanube.field_sale_order_line__display_name
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_api_call_log__display_name
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_api_connector__display_name
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_api_meta_fields__display_name
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_brand__display_name
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_image__display_name
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_region__display_name
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_register_webhook__display_name
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_tiendanube_sync_nonce__display_name
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_warehouse_sync_mapping__display_name
+#: model:ir.model.fields,field_description:solt_tiendanube.field_stock_picking__display_name
+#: model:ir.model.fields,field_description:solt_tiendanube.field_stock_warehouse__display_name
 msgid "Display Name"
 msgstr "Nombre para mostrar"
 
@@ -379,6 +485,222 @@ msgid "EXPORTAR PRODUCTOS: CREAR EN TIENDANUBE"
 msgstr "Exportar Productos: Crear en Tiendanube"
 
 #. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_warehouse_update
+msgid "Ejecutar código: Actualizar Almacenes"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_product_template_custom_fields_update
+msgid "Ejecutar código: Actualizar Campos personalizados productos"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_product_category_update
+msgid "Ejecutar código: Actualizar Categoría de productos"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_customers_update
+msgid "Ejecutar código: Actualizar Clientes"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_product_image_update
+msgid "Ejecutar código: Actualizar Imagen del producto"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_product_image_variants_update
+msgid "Ejecutar código: Actualizar Imagen del producto en variantes"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_product_product_update
+msgid "Ejecutar código: Actualizar Variante de producto"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_customers_update_custom_fields
+msgid "Ejecutar código: Actualizar campos personalizados de Clientes"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_product_template_update
+msgid "Ejecutar código: Actualizar los campos de producto"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_product_template_archive
+msgid "Ejecutar código: Archivar Producto"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_product_product_archive
+msgid "Ejecutar código: Archivar Variante de producto"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_product_template_custom_fields
+msgid "Ejecutar código: Campos personalizados"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_product_product_custom_fields_update
+msgid "Ejecutar código: Campos personalizados Variantes del producto"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_warehouse_create
+msgid "Ejecutar código: Crear Almacenes"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_product_category_create
+msgid "Ejecutar código: Crear Categoría de productos"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_customers_create
+msgid "Ejecutar código: Crear Clientes"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_product_image_create
+msgid "Ejecutar código: Crear Imagen del producto"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_product_template_create
+msgid "Ejecutar código: Crear Producto"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_custom_field_create
+msgid "Ejecutar código: Crear campos personalizado"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_warehouse_delete
+msgid "Ejecutar código: Eliminar Almacenes"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_product_category_delete
+msgid "Ejecutar código: Eliminar Categoría de producto"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_customers_delete
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_warehouse_archive
+msgid "Ejecutar código: Eliminar Clientes"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_product_image_delete
+msgid "Ejecutar código: Eliminar Imagen de producto"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_product_template_delete
+msgid "Ejecutar código: Eliminar Producto"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_product_product_delete
+msgid "Ejecutar código: Eliminar Variante de producto"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_custom_field_delete
+msgid "Ejecutar código: Eliminar campos personalizado"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_inventory_stock_update
+msgid "Ejecutar código: Inventario de una Variante de producto"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_product_template_sync_images
+msgid "Ejecutar código: Sync Imagenes Producto"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_app_uninstall
+msgid "Ejecutar código: WEBHOOK EVENTO: app/uninstalled"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_update_store
+msgid "Ejecutar código: WH Actualizar Tienda"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_product_category_created
+msgid "Ejecutar código: WH category/created"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_product_category_deleted
+msgid "Ejecutar código: WH category/deleted"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_product_category_updated
+msgid "Ejecutar código: WH category/updated"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_fulfillment_updated
+msgid "Ejecutar código: WH fulfillment/updated"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_order_cancelled
+msgid "Ejecutar código: WH order/cancelled"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_order_created
+msgid "Ejecutar código: WH order/created"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_order_edited
+msgid "Ejecutar código: WH order/edited"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_order_fulfilled
+msgid "Ejecutar código: WH order/fulfilled"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_order_paid
+msgid "Ejecutar código: WH order/paid"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_order_updated
+msgid "Ejecutar código: WH order/updated"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_product_created
+msgid "Ejecutar código: WH product/created"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_product_deleted
+msgid "Ejecutar código: WH product/deleted"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_product_updated
+msgid "Ejecutar código: WH product/updated"
+msgstr "Ejecutar código"
+
+#. module: solt_tiendanube
 #. odoo-python
 #: code:addons/solt_tiendanube/models/product_product.py:0
 msgid "El costo debe ser mayor o igual a 1."
@@ -402,19 +724,26 @@ msgid "El producto no tiene configurado una empresa."
 msgstr "El producto no tiene configurado una empresa."
 
 #. module: solt_tiendanube
+#. odoo-python
+#: code:addons/solt_tiendanube/models/res_company.py:0
+msgid "Endpoint PRODUCT_VARIANT_STOCK_PRICE_PATCH is misconfigured!"
+msgstr "¡El endpoint PRODUCT_VARIANT_STOCK_PRICE_PATCH está mal configurado!"
+
+#. module: solt_tiendanube
+#. odoo-python
+#: code:addons/solt_tiendanube/models/res_company.py:0
+msgid "Endpoint PRODUCT_VARIANT_STOCK_PRICE_PATCH is not configured!"
+msgstr "¡El endpoint PRODUCT_VARIANT_STOCK_PRICE_PATCH no está configurado!"
+
+#. module: solt_tiendanube
 #: model:ir.model.fields.selection,name:solt_tiendanube.selection__product_product__x_state_sync__error
 msgid "Error"
-msgstr ""
+msgstr "Error"
 
 #. module: solt_tiendanube
 #: model:ir.model.fields,field_description:solt_tiendanube.field_base_automation__event
 msgid "Event"
-msgstr ""
-
-#. module: solt_tiendanube
-#: model:ir.model.constraint,message:solt_tiendanube.constraint_solt_register_webhook_event_url_unique
-msgid "Event and URL must be unique."
-msgstr "El evento y la URL deben ser únicos."
+msgstr "Evento"
 
 #. module: solt_tiendanube
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_register_webhook__event
@@ -437,59 +766,25 @@ msgid "Exclude from sync with external systems"
 msgstr "Excluir de la sincronización con sistemas externos"
 
 #. module: solt_tiendanube
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_app_uninstall
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_custom_field_create
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_custom_field_delete
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_customers_create
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_customers_delete
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_customers_update
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_customers_update_custom_fields
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_inventory_stock_update
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_product_category_delete
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_product_category_update
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_product_image_create
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_product_image_delete
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_product_image_update
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_product_image_variants_update
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_product_product_archive
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_product_product_custom_fields_update
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_product_product_delete
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_product_product_update
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_product_template_archive
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_product_template_create
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_product_template_custom_fields
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_product_template_custom_fields_update
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_product_template_delete
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_product_template_sync_images
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_product_template_update
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_warehouse_archive
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_warehouse_create
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_warehouse_delete
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_ba_warehouse_update
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_fulfillment_updated
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_order_cancelled
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_order_created
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_order_edited
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_order_fulfilled
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_order_paid
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_order_updated
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_product_category_create
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_product_category_created
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_product_category_deleted
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_product_category_updated
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_product_created
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_product_deleted
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_product_updated
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_register_store
-#: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_update_store
-msgid "Execute Code"
-msgstr "Ejecutar código"
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_brand__x_exclud_from_sync
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_image__x_exclud_from_sync
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_register_webhook__x_exclud_from_sync
+msgid "Exclude from synchronization"
+msgstr "Excluir de la sincronización"
+
+#. module: solt_tiendanube
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_tiendanube_sync_nonce__expires_at
+msgid "Expires At"
+msgstr "Fecha de expiración"
 
 #. module: solt_tiendanube
 #: model:ir.model.fields,field_description:solt_tiendanube.field_product_category__x_external_id
 #: model:ir.model.fields,field_description:solt_tiendanube.field_product_template__x_external_id
 #: model:ir.model.fields,field_description:solt_tiendanube.field_res_partner__x_external_id
 #: model:ir.model.fields,field_description:solt_tiendanube.field_sale_order__x_external_id
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_brand__x_external_id
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_image__x_external_id
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_register_webhook__x_external_id
 #: model:ir.model.fields,field_description:solt_tiendanube.field_stock_picking__x_external_id
 msgid "External ID"
 msgstr "ID Externo"
@@ -504,6 +799,13 @@ msgstr "ID de dirección externa"
 #: model:ir.model.fields,field_description:solt_tiendanube.field_sale_order_line__fulfillmen_external_id
 msgid "External shipment ID"
 msgstr "ID de envío externo"
+
+#. module: solt_tiendanube
+#: model:ir.model.fields,help:solt_tiendanube.field_solt_product_brand__x_store_external_id
+#: model:ir.model.fields,help:solt_tiendanube.field_solt_product_image__x_store_external_id
+#: model:ir.model.fields,help:solt_tiendanube.field_solt_register_webhook__x_store_external_id
+msgid "External store identifier."
+msgstr "Identificador de la tienda externa."
 
 #. module: solt_tiendanube
 #: model:ir.model.fields,field_description:solt_tiendanube.field_product_product__product_image_ids
@@ -530,10 +832,29 @@ msgid "File size exceeds configured maximum (%s bytes)"
 msgstr "El tamaño del archivo excede el máximo configurado (%s bytes)"
 
 #. module: solt_tiendanube
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_brand__message_follower_ids
+msgid "Followers"
+msgstr "Seguidores"
+
+#. module: solt_tiendanube
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_brand__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "Seguidores (Socios)"
+
+#. module: solt_tiendanube
 #: model:ir.model.fields,field_description:solt_tiendanube.field_product_product__nube_free_shipping
 #: model:ir.model.fields,field_description:solt_tiendanube.field_product_template__nube_free_shipping
 msgid "Free shipping"
 msgstr "Envío gratis"
+
+#. module: solt_tiendanube
+#: model:ir.model.fields,help:solt_tiendanube.field_sale_order_line__product_type
+msgid ""
+"Goods are tangible materials and merchandise you provide.\n"
+"A service is a non-material product you provide."
+msgstr ""
+"Los bienes son productos materiales tangibles que usted proporciona.\n"
+"Los servicios son productos inmateriales que usted proporciona."
 
 #. module: solt_tiendanube
 #: model:ir.model.fields,field_description:solt_tiendanube.field_product_category__nube_google_shopping_category
@@ -542,9 +863,9 @@ msgid "Google Shopping"
 msgstr "Google Shopping"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.tnube_register_webhook_view_search
-msgid "Group By"
-msgstr "Agrupar por"
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_brand__has_message
+msgid "Has Message"
+msgstr "Tiene Mensaje"
 
 #. module: solt_tiendanube
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_image__has_product_tmpl_variant
@@ -568,12 +889,31 @@ msgid "Huge file size. The image should be optimized or reduced."
 msgstr "Tamaño de archivo enorme. La imagen debe ser optimizada o reducida."
 
 #. module: solt_tiendanube
+#: model:ir.model.fields,field_description:solt_tiendanube.field_account_move__id
+#: model:ir.model.fields,field_description:solt_tiendanube.field_base_automation__id
+#: model:ir.model.fields,field_description:solt_tiendanube.field_ir_model_fields__id
+#: model:ir.model.fields,field_description:solt_tiendanube.field_product_attribute__id
+#: model:ir.model.fields,field_description:solt_tiendanube.field_product_category__id
+#: model:ir.model.fields,field_description:solt_tiendanube.field_product_product__id
+#: model:ir.model.fields,field_description:solt_tiendanube.field_product_template__id
+#: model:ir.model.fields,field_description:solt_tiendanube.field_res_company__id
+#: model:ir.model.fields,field_description:solt_tiendanube.field_res_config_settings__id
+#: model:ir.model.fields,field_description:solt_tiendanube.field_res_partner__id
+#: model:ir.model.fields,field_description:solt_tiendanube.field_sale_order__id
+#: model:ir.model.fields,field_description:solt_tiendanube.field_sale_order_line__id
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_api_call_log__id
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_api_connector__id
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_api_meta_fields__id
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_brand__id
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_image__id
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_region__id
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_register_webhook__id
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_tiendanube_sync_nonce__id
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_warehouse_sync_mapping__id
+#: model:ir.model.fields,field_description:solt_tiendanube.field_stock_picking__id
+#: model:ir.model.fields,field_description:solt_tiendanube.field_stock_warehouse__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: solt_tiendanube
 #: model:ir.model.fields,field_description:solt_tiendanube.field_product_product__x_store_external_id
@@ -600,6 +940,13 @@ msgstr "ID externo"
 #: model:ir.model.fields,help:solt_tiendanube.field_res_users__nube_id_default_address
 msgid "ID externo de la direccion principal"
 msgstr "ID externo de la dirección principal"
+
+#. module: solt_tiendanube
+#: model:ir.model.fields,help:solt_tiendanube.field_solt_product_brand__x_external_id
+#: model:ir.model.fields,help:solt_tiendanube.field_solt_product_image__x_external_id
+#: model:ir.model.fields,help:solt_tiendanube.field_solt_register_webhook__x_external_id
+msgid "ID of the record in the external system."
+msgstr "ID del registro en el sistema externo."
 
 #. module: solt_tiendanube
 #: model:ir.actions.server,name:solt_tiendanube.tn_ir_actions_server_init_load_warehouse
@@ -637,37 +984,47 @@ msgid "IMPORTAR PRODUCTOS: CREAR EN ODOO"
 msgstr "Importar Productos: Crear en Odoo"
 
 #. module: solt_tiendanube
-#: model:ir.model.fields,help:solt_tiendanube.field_solt_product_image__product_variant_ids
-msgid ""
-"If left empty, all variants will show this image. When selecting one or more"
-" available variants, you can restrict the availability of the image to those"
-" variants."
-msgstr ""
-"Si se deja vacío, todas las variantes mostrarán esta imagen. Al seleccionar "
-"una o más variantes disponibles, puede restringir la disponibilidad de la "
-"imagen a esas variantes."
+#: model:ir.model.fields,help:solt_tiendanube.field_solt_tiendanube_sync_nonce__key_id
+msgid "Identifier of the signing key associated with this nonce."
+msgstr "Identificador de la clave de firma asociada a este nonce."
 
 #. module: solt_tiendanube
+#: model:ir.model.fields,help:solt_tiendanube.field_solt_product_brand__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "Si está marcado, los nuevos mensajes requieren su atención."
+
+#. module: solt_tiendanube
+#: model:ir.model.fields,help:solt_tiendanube.field_solt_product_brand__message_has_error
+#: model:ir.model.fields,help:solt_tiendanube.field_solt_product_brand__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr "Si está marcado, algunos mensajes tienen un error de entrega."
+
+#. module: solt_tiendanube
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_brand__image_1920
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_image__image_1920
 msgid "Image"
 msgstr "Imagen"
 
 #. module: solt_tiendanube
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_brand__image_1024
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_image__image_1024
 msgid "Image 1024"
 msgstr "Imagen 1024"
 
 #. module: solt_tiendanube
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_brand__image_128
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_image__image_128
 msgid "Image 128"
 msgstr "Imagen 128"
 
 #. module: solt_tiendanube
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_brand__image_256
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_image__image_256
 msgid "Image 256"
 msgstr "Imagen 256"
 
 #. module: solt_tiendanube
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_brand__image_512
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_image__image_512
 msgid "Image 512"
 msgstr "Imagen 512"
@@ -716,10 +1073,29 @@ msgid "Indicates the date de la ultima sincronizacion."
 msgstr "Indica la fecha de la última sincronización."
 
 #. module: solt_tiendanube
+#: model:ir.model.fields,help:solt_tiendanube.field_solt_product_brand__x_date_last_sync
+#: model:ir.model.fields,help:solt_tiendanube.field_solt_product_image__x_date_last_sync
+#: model:ir.model.fields,help:solt_tiendanube.field_solt_register_webhook__x_date_last_sync
+msgid "Indicates the last synchronization timestamp."
+msgstr "Indica la marca de tiempo de la última sincronización."
+
+#. module: solt_tiendanube
+#: model:ir.model.fields,help:solt_tiendanube.field_solt_product_brand__x_state_sync
+#: model:ir.model.fields,help:solt_tiendanube.field_solt_product_image__x_state_sync
+#: model:ir.model.fields,help:solt_tiendanube.field_solt_register_webhook__x_state_sync
+msgid "Indicates whether the record is synchronized."
+msgstr "Indica si el registro está sincronizado."
+
+#. module: solt_tiendanube
 #. odoo-python
 #: code:addons/solt_tiendanube/models/solt_product_image.py:0
 msgid "Invalid WebP format"
 msgstr "Formato WebP inválido"
+
+#. module: solt_tiendanube
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_brand__message_is_follower
+msgid "Is Follower"
+msgstr "Es Seguidor"
 
 #. module: solt_tiendanube
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_warehouse_sync_mapping__is_synchronized
@@ -732,17 +1108,26 @@ msgid "Journal Entry"
 msgstr "Asiento contable"
 
 #. module: solt_tiendanube
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_tiendanube_sync_nonce__key_id
+msgid "Key ID"
+msgstr "ID de clave"
+
+#. module: solt_tiendanube
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_brand__write_uid
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_image__write_uid
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_region__write_uid
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_register_webhook__write_uid
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_tiendanube_sync_nonce__write_uid
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_warehouse_sync_mapping__write_uid
 msgid "Last Updated by"
 msgstr "Última actualización por"
 
 #. module: solt_tiendanube
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_brand__write_date
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_image__write_date
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_region__write_date
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_register_webhook__write_date
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_tiendanube_sync_nonce__write_date
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_warehouse_sync_mapping__write_date
 msgid "Last Updated on"
 msgstr "Última actualización el"
@@ -753,6 +1138,9 @@ msgstr "Última actualización el"
 #: model:ir.model.fields,field_description:solt_tiendanube.field_product_template__x_date_last_sync
 #: model:ir.model.fields,field_description:solt_tiendanube.field_res_partner__x_date_last_sync
 #: model:ir.model.fields,field_description:solt_tiendanube.field_sale_order__x_date_last_sync
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_brand__x_date_last_sync
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_image__x_date_last_sync
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_register_webhook__x_date_last_sync
 #: model:ir.model.fields,field_description:solt_tiendanube.field_stock_picking__x_date_last_sync
 msgid "Last synchronization"
 msgstr "Última sincronización"
@@ -768,9 +1156,19 @@ msgid "Mapeo de Respuesta"
 msgstr "Mapeo de Respuesta"
 
 #. module: solt_tiendanube
-#: model:ir.model,name:solt_tiendanube.model_solt_product_brand
-msgid "Marca del producto"
-msgstr "Marca del producto"
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.view_product_brand_kanban
+msgid "Marca"
+msgstr "Marca"
+
+#. module: solt_tiendanube
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_brand__message_has_error
+msgid "Message Delivery error"
+msgstr "Error de entrega de mensaje"
+
+#. module: solt_tiendanube
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_brand__message_ids
+msgid "Messages"
+msgstr "Mensajes"
 
 #. module: solt_tiendanube
 #: model:res.groups,name:solt_tiendanube.group_migrate_image
@@ -794,21 +1192,28 @@ msgid "Migration completed"
 msgstr "Migración completada"
 
 #. module: solt_tiendanube
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_brand__name
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_image__name
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_region__name
 #: model_terms:ir.ui.view,arch_db:solt_tiendanube.nube_view_product_image_form
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.view_product_brand_form
 msgid "Name"
 msgstr "Nombre de la Imagen"
-
-#. module: solt_tiendanube
-#: model:ir.model.constraint,message:solt_tiendanube.constraint_solt_region_name_country_unique
-msgid "Name and country must be unique."
-msgstr "El nombre y el país deben ser únicos."
 
 #. module: solt_tiendanube
 #: model:ir.model.fields,field_description:solt_tiendanube.field_sale_order__new_version_id
 msgid "New version"
 msgstr "Nueva versión"
+
+#. module: solt_tiendanube
+#. odoo-python
+#: code:addons/solt_tiendanube/models/sale_order.py:0
+msgid ""
+"Ninguna de las órdenes seleccionadas tiene un ID externo de TiendaNube. Solo"
+" se pueden sincronizar órdenes que fueron importadas desde TN."
+msgstr ""
+"Ninguna de las órdenes seleccionadas tiene un ID externo de TiendaNube. Solo"
+" se pueden sincronizar órdenes que fueron importadas desde TN."
 
 #. module: solt_tiendanube
 #. odoo-python
@@ -825,13 +1230,15 @@ msgstr "No se seleccionaron productos para actualizar el costo."
 #. module: solt_tiendanube
 #. odoo-python
 #: code:addons/solt_tiendanube/models/solt_register_webhook.py:0
-msgid "No puedes eliminar el Registro con un webhook configurado."
-msgstr "No puedes eliminar el Registro con un webhook configurado."
+msgid ""
+"No puedes eliminar el Registro con un webhook configurado y activo. "
+"Desactívalo primero."
+msgstr "No puedes eliminar el Registro con un webhook configurado y activo. Desactívalo primero."
 
 #. module: solt_tiendanube
 #: model:ir.model.fields.selection,name:solt_tiendanube.selection__product_product__x_state_sync__no
 msgid "No sincronizado"
-msgstr ""
+msgstr "No sincronizado"
 
 #. module: solt_tiendanube
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_register_webhook__name
@@ -844,9 +1251,41 @@ msgid "Nombre almacen externo"
 msgstr "Nombre almacén externo"
 
 #. module: solt_tiendanube
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_tiendanube_sync_nonce__value
+msgid "Nonce"
+msgstr "Nonce"
+
+#. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.nube_product_template_search_inherit
+msgid "Not Published in TN"
+msgstr "No publicado en TN"
+
+#. module: solt_tiendanube
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_brand__message_needaction_counter
+msgid "Number of Actions"
+msgstr "Número de acciones"
+
+#. module: solt_tiendanube
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_brand__message_has_error_counter
+msgid "Number of errors"
+msgstr "Número de errores"
+
+#. module: solt_tiendanube
+#: model:ir.model.fields,help:solt_tiendanube.field_solt_product_brand__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "Número de mensajes que requieren acción"
+
+#. module: solt_tiendanube
+#: model:ir.model.fields,help:solt_tiendanube.field_solt_product_brand__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "Número de mensajes con error de entrega"
+
+#. module: solt_tiendanube
 #: model_terms:ir.ui.view,arch_db:solt_tiendanube.nube_product_image_view_kanban
 msgid "Optimization required! Reduce the image size or increase compression."
-msgstr "¡Se requiere optimización! Reduce el tamaño de la imagen o aumenta la compresión."
+msgstr ""
+"¡Se requiere optimización! Reduce el tamaño de la imagen o aumenta la "
+"compresión."
 
 #. module: solt_tiendanube
 #: model_terms:ir.ui.view,arch_db:solt_tiendanube.nube_product_template_form_inherit
@@ -862,12 +1301,27 @@ msgid "Payment method"
 msgstr "Método de pago"
 
 #. module: solt_tiendanube
+#. odoo-python
+#: code:addons/solt_tiendanube/models/sale_order.py:0
+msgid ""
+"Pedido bloqueado por sincronización manual desde TiendaNube. Entrega "
+"completa confirmada."
+msgstr "Pedido bloqueado por sincronización manual desde TiendaNube. Entrega completa confirmada."
+
+#. module: solt_tiendanube
+#. odoo-python
+#: code:addons/solt_tiendanube/models/sale_order.py:0
+msgid "Pedido cancelado por sincronización manual desde TiendaNube."
+msgstr "Pedido cancelado por sincronización manual desde TiendaNube."
+
+#. module: solt_tiendanube
 #: model:ir.model.fields,field_description:solt_tiendanube.field_product_product__promotional_price
 msgid "Precio promocional"
 msgstr "Precio promocional"
 
 #. module: solt_tiendanube
 #: model:ir.model,name:solt_tiendanube.model_product_template
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.product_brand_search_view
 msgid "Product"
 msgstr "Producto"
 
@@ -875,6 +1329,20 @@ msgstr "Producto"
 #: model:ir.model,name:solt_tiendanube.model_product_attribute
 msgid "Product Attribute"
 msgstr "Atributo de producto"
+
+#. module: solt_tiendanube
+#: model:ir.model,name:solt_tiendanube.model_solt_product_brand
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.product_brand_search_view
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.view_product_brand_form
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.view_product_brand_kanban
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.view_product_brand_tree
+msgid "Product Brand"
+msgstr "Marca del producto"
+
+#. module: solt_tiendanube
+#: model:ir.ui.menu,name:solt_tiendanube.menu_product_brand
+msgid "Product Brands"
+msgstr "Marcas de Producto"
 
 #. module: solt_tiendanube
 #: model:ir.model,name:solt_tiendanube.model_product_category
@@ -898,6 +1366,11 @@ msgid "Product Template"
 msgstr "Producto"
 
 #. module: solt_tiendanube
+#: model:ir.model.fields,field_description:solt_tiendanube.field_sale_order_line__product_type
+msgid "Product Type"
+msgstr "Tipo de producto"
+
+#. module: solt_tiendanube
 #: model:ir.model,name:solt_tiendanube.model_product_product
 msgid "Product Variant"
 msgstr "Variante del producto"
@@ -912,6 +1385,14 @@ msgstr "Cantidad de variantes de producto"
 #: model:ir.model.fields,help:solt_tiendanube.field_product_template__nube_video_url
 msgid "Product video URL hosted on YouTube or Vimeo"
 msgstr "URL del video del producto alojado en YouTube o Vimeo"
+
+#. module: solt_tiendanube
+#: model:ir.actions.act_window,name:solt_tiendanube.action_open_related_brand_products
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_brand__product_ids
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.view_product_brand_form
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.view_product_brand_kanban
+msgid "Products"
+msgstr "Productos"
 
 #. module: solt_tiendanube
 #. odoo-python
@@ -936,15 +1417,25 @@ msgid "Promotional price"
 msgstr "Precio promocional"
 
 #. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.action_server_publish_selected_products
+msgid "Publish in TN"
+msgstr "Publicar en TN"
+
+#. module: solt_tiendanube
 #: model:ir.model.fields,field_description:solt_tiendanube.field_product_product__is_published
 #: model:ir.model.fields,field_description:solt_tiendanube.field_product_template__is_published
 msgid "Published"
 msgstr "Publicado"
 
 #. module: solt_tiendanube
-#: model:base.automation,name:solt_tiendanube.tn_automation_register_store
-msgid "REGISTRO DE TIENDA"
-msgstr "Registro de Tienda"
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.nube_product_template_search_inherit
+msgid "Published in TN"
+msgstr "Publicado en TN"
+
+#. module: solt_tiendanube
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_brand__rating_ids
+msgid "Ratings"
+msgstr "Calificaciones"
 
 #. module: solt_tiendanube
 #: model:ir.actions.act_window,name:solt_tiendanube.action_regions
@@ -970,6 +1461,11 @@ msgid "Remote image URL."
 msgstr "URL remota de la imagen."
 
 #. module: solt_tiendanube
+#: model:ir.model.constraint,message:solt_tiendanube.constraint_solt_tiendanube_sync_nonce_uniq_nonce
+msgid "Replayed nonce"
+msgstr "Nonce repetido"
+
+#. module: solt_tiendanube
 #: model:ir.model.fields,field_description:solt_tiendanube.field_product_product__nube_requires_shipping
 #: model:ir.model.fields,field_description:solt_tiendanube.field_product_template__nube_requires_shipping
 msgid "Requires shipping"
@@ -984,7 +1480,7 @@ msgstr "Respuesta"
 #: model_terms:ir.ui.view,arch_db:solt_tiendanube.nube_product_category_form_inherit
 #: model_terms:ir.ui.view,arch_db:solt_tiendanube.nube_product_template_form_inherit
 msgid "SEO"
-msgstr ""
+msgstr "SEO"
 
 #. module: solt_tiendanube
 #: model:ir.model.fields,field_description:solt_tiendanube.field_product_category__nube_seo_description
@@ -1015,6 +1511,11 @@ msgid "SINCRONIZAR PRODUCTOS DE ODOO Y TIENDANUBE"
 msgstr "Sincronizar Productos de Odoo y Tiendanube"
 
 #. module: solt_tiendanube
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_brand__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr "Error de entrega de SMS"
+
+#. module: solt_tiendanube
 #: model:ir.model,name:solt_tiendanube.model_sale_order
 msgid "Sales Order"
 msgstr "Orden de venta"
@@ -1028,6 +1529,12 @@ msgstr "Línea de la orden de venta"
 #: model:ir.model.fields,field_description:solt_tiendanube.field_product_product__lst_price
 msgid "Sales Price"
 msgstr "Precio de venta"
+
+#. module: solt_tiendanube
+#: model:ir.model.fields,help:solt_tiendanube.field_product_product__product_brand_id
+#: model:ir.model.fields,help:solt_tiendanube.field_product_template__product_brand_id
+msgid "Select a brand for the product"
+msgstr "Selecciona una marca para el producto"
 
 #. module: solt_tiendanube
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_image__sequence
@@ -1057,6 +1564,12 @@ msgstr "Significa que no será exportado a sistemas externos."
 
 #. module: solt_tiendanube
 #. odoo-python
+#: code:addons/solt_tiendanube/models/sale_order.py:0
+msgid "Sin nombre"
+msgstr "Sin nombre"
+
+#. module: solt_tiendanube
+#. odoo-python
 #: code:addons/solt_tiendanube/models/stock_picking.py:0
 msgid ""
 "Since the current carrier doesn't automatically provide a tracking "
@@ -1066,15 +1579,37 @@ msgstr ""
 "referencia de seguimiento, debe establecer una manualmente."
 
 #. module: solt_tiendanube
+#. odoo-python
+#: code:addons/solt_tiendanube/models/sale_order.py:0
+msgid "Sincronización TiendaNube"
+msgstr "Sincronización TiendaNube"
+
+#. module: solt_tiendanube
+#. odoo-python
+#: code:addons/solt_tiendanube/models/sale_order.py:0
+msgid ""
+"Sincronización completada con errores: Revisar logs del servidor para más "
+"detalle."
+msgstr "Sincronización completada con errores: Revisar logs del servidor para más detalle."
+
+#. module: solt_tiendanube
 #: model:ir.model.fields.selection,name:solt_tiendanube.selection__product_product__x_state_sync__yes
 msgid "Sincronizado"
-msgstr ""
+msgstr "Sincronizado"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.action_server_tn_sync_order_state
+msgid "Sincronizar orden desde TiendaNube"
+msgstr "Sincronizar orden desde TiendaNube"
 
 #. module: solt_tiendanube
 #: model:ir.model.fields,field_description:solt_tiendanube.field_product_category__x_store_external_id
 #: model:ir.model.fields,field_description:solt_tiendanube.field_product_template__x_store_external_id
 #: model:ir.model.fields,field_description:solt_tiendanube.field_res_partner__x_store_external_id
 #: model:ir.model.fields,field_description:solt_tiendanube.field_sale_order__x_store_external_id
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_brand__x_store_external_id
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_image__x_store_external_id
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_register_webhook__x_store_external_id
 #: model:ir.model.fields,field_description:solt_tiendanube.field_stock_picking__x_store_external_id
 msgid "Store external ID"
 msgstr "ID externo de la tienda"
@@ -1106,6 +1641,9 @@ msgstr "Sincronizar Almacén"
 #: model:ir.model.fields,field_description:solt_tiendanube.field_product_template__x_state_sync
 #: model:ir.model.fields,field_description:solt_tiendanube.field_res_partner__x_state_sync
 #: model:ir.model.fields,field_description:solt_tiendanube.field_sale_order__x_state_sync
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_brand__x_state_sync
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_image__x_state_sync
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_register_webhook__x_state_sync
 #: model:ir.model.fields,field_description:solt_tiendanube.field_stock_picking__x_state_sync
 msgid "Sync status"
 msgstr "Estado de sincronización"
@@ -1142,22 +1680,19 @@ msgstr "Sincronizaciones"
 #: model_terms:ir.ui.view,arch_db:solt_tiendanube.tnube_register_webhook_view_list
 msgid ""
 "The action will activate and publish the webhook. Do you want to continue?"
-msgstr ""
-"La acción activará y publicará el webhook. ¿Desea continuar?"
+msgstr "La acción activará y publicará el webhook. ¿Desea continuar?"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.nube_view_solt_api_connector_form_inherit
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.nube_product_template_form_inherit
 msgid ""
 "The action will create all Tiendanube Webhooks. Do you want to continue?"
-msgstr ""
-"La acción creará todos los Webhooks de Tiendanube. ¿Desea continuar?"
+msgstr "La acción creará todos los Webhooks de Tiendanube. ¿Desea continuar?"
 
 #. module: solt_tiendanube
 #: model_terms:ir.ui.view,arch_db:solt_tiendanube.solt_warehouse_sync_mapping_view_list
 msgid ""
 "The action will create and sync the warehouse. Do you want to continue?"
-msgstr ""
-"La acción creará y sincronizará el almacén. ¿Desea continuar?"
+msgstr "La acción creará y sincronizará el almacén. ¿Desea continuar?"
 
 #. module: solt_tiendanube
 #: model_terms:ir.ui.view,arch_db:solt_tiendanube.tnube_register_webhook_view_list
@@ -1185,7 +1720,8 @@ msgstr "El producto no tiene una empresa asignada."
 #. odoo-python
 #: code:addons/solt_tiendanube/models/product_template.py:0
 msgid "The product has not been synchronized yet. Please sync it first."
-msgstr "El producto aún no se ha sincronizado. Por favor, sincronícelo primero."
+msgstr ""
+"El producto aún no se ha sincronizado. Por favor, sincronícelo primero."
 
 #. module: solt_tiendanube
 #. odoo-python
@@ -1223,9 +1759,9 @@ msgid ""
 "yet. You can either use a per-line discount, or ask an administrator to "
 "grant the discount the first time."
 msgstr ""
-"Parece que todavía no hay ningún producto de descuento configurado para esta "
-"empresa. Puede usar un descuento por línea o pedirle a un administrador que "
-"otorgue el descuento la primera vez."
+"Parece que todavía no hay ningún producto de descuento configurado para esta"
+" empresa. Puede usar un descuento por línea o pedirle a un administrador que"
+" otorgue el descuento la primera vez."
 
 #. module: solt_tiendanube
 #: model_terms:ir.ui.view,arch_db:solt_tiendanube.nube_product_template_form_inherit
@@ -1242,6 +1778,11 @@ msgstr ""
 #: code:addons/solt_tiendanube/models/sale_order.py:0
 msgid "This order is a new version of the order with folio %s."
 msgstr "Este pedido es una nueva versión del pedido con folio %s."
+
+#. module: solt_tiendanube
+#: model:ir.model,name:solt_tiendanube.model_solt_tiendanube_sync_nonce
+msgid "TiendaNube sync request nonce (replay protection)"
+msgstr "Nonce de solicitud de sincronización TiendaNube (protección de repetición)"
 
 #. module: solt_tiendanube
 #: model_terms:ir.ui.view,arch_db:solt_tiendanube.nube_account_move_form_inherit
@@ -1266,12 +1807,23 @@ msgstr "Envío de Tiendanube"
 #: model_terms:ir.ui.view,arch_db:solt_tiendanube.tnube_register_webhook_view_list
 #: model_terms:ir.ui.view,arch_db:solt_tiendanube.tnube_register_webhook_view_search
 msgid "Tiendanube Webhook Registrations"
-msgstr "Webhook de Tiendanube"
+msgstr "Registros de Webhooks de Tiendanube"
 
 #. module: solt_tiendanube
 #: model:ir.ui.menu,name:solt_tiendanube.menu_solt_config_webhook_tnube
 msgid "Tiendanube Webhooks"
 msgstr "Webhooks de Tiendanube"
+
+#. module: solt_tiendanube
+#. odoo-python
+#: code:addons/solt_tiendanube/models/sale_order.py:0
+msgid "Tiendanube — Sesión POS que registró la venta: %s (%s)"
+msgstr "Tiendanube — Sesión POS que registró la venta: %s (%s)"
+
+#. module: solt_tiendanube
+#: model:ir.actions.server,name:solt_tiendanube.ir_cron_reconcile_incoming_order_webhooks_ir_actions_server
+msgid "Tiendanube: reconciliar webhooks de orden fallidos (ultimo recurso)"
+msgstr "Tiendanube: reconciliar webhooks de orden fallidos (último recurso)"
 
 #. module: solt_tiendanube
 #: model:ir.actions.server,name:solt_tiendanube.ir_cron_sync_tn_inventory_ir_actions_server
@@ -1304,6 +1856,11 @@ msgid "Total Orders"
 msgstr "Órdenes Totales"
 
 #. module: solt_tiendanube
+#: model:ir.model.fields,help:solt_tiendanube.field_sale_order_line__product_is_storable
+msgid "Track Inventory"
+msgstr "Rastrear inventario"
+
+#. module: solt_tiendanube
 #: model:ir.model,name:solt_tiendanube.model_stock_picking
 msgid "Transfer"
 msgstr "Transferencia"
@@ -1326,9 +1883,20 @@ msgid "URL to send synchronization status callbacks"
 msgstr "URL para enviar notificaciones del estado de sincronización"
 
 #. module: solt_tiendanube
+#: model:ir.model.fields,help:solt_tiendanube.field_solt_tiendanube_sync_nonce__value
+msgid "Unique nonce value used to prevent replay attacks."
+msgstr "Valor único de nonce utilizado para prevenir ataques de repetición."
+
+#. module: solt_tiendanube
 #: model:ir.model.fields,help:solt_tiendanube.field_res_company__sync_token
 msgid "Unique token for synchronization"
 msgstr "Token único para sincronización"
+
+#. module: solt_tiendanube
+#: model:ir.model.fields,help:solt_tiendanube.field_solt_tiendanube_sync_nonce__expires_at
+msgid ""
+"Unix epoch seconds at which this nonce expires and can be garbage-collected."
+msgstr "Segundos de época Unix en los que este nonce expira y puede ser eliminado."
 
 #. module: solt_tiendanube
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_register_webhook__webhook_url
@@ -1336,9 +1904,35 @@ msgid "Url"
 msgstr "Url"
 
 #. module: solt_tiendanube
+#: model:ir.model.fields,field_description:solt_tiendanube.field_res_company__use_sale_multi_stock
+#: model:ir.model.fields,field_description:solt_tiendanube.field_res_config_settings__use_sale_multi_stock
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.res_config_settings_view_form_multi_warehouse
+msgid "Use multi warehouse in Sales Orders"
+msgstr "Usar múltiples almacenes en Órdenes de Venta"
+
+#. module: solt_tiendanube
+#: model:ir.model.fields,help:solt_tiendanube.field_solt_register_webhook__webhook_url
+msgid "Use this URL in the third-party app to call this webhook."
+msgstr "Use esta URL en la aplicación de terceros para llamar a este webhook."
+
+#. module: solt_tiendanube
 #: model_terms:ir.ui.view,arch_db:solt_tiendanube.nube_view_product_image_form
 msgid "Variants"
 msgstr "Variantes"
+
+#. module: solt_tiendanube
+#. odoo-python
+#: code:addons/solt_tiendanube/models/sale_order.py:0
+#: model:ir.model.fields,field_description:solt_tiendanube.field_sale_order__x_tn_salesperson_id
+msgid "Vendedor TN"
+msgstr "Vendedor TN"
+
+#. module: solt_tiendanube
+#: model:ir.model.fields,help:solt_tiendanube.field_sale_order__x_tn_salesperson_id
+msgid ""
+"Vendedor asociado a la venta en el POS de Tiendanube. Solo aplica a ventas "
+"realizadas desde el POS; queda vacio en ordenes de tienda online."
+msgstr "Vendedor asociado a la venta en el POS de Tiendanube. Solo aplica a ventas realizadas desde el POS; queda vacío en órdenes de tienda en línea."
 
 #. module: solt_tiendanube
 #: model:ir.model.fields,field_description:solt_tiendanube.field_product_product__visible
@@ -1358,86 +1952,91 @@ msgstr "Visible en estas variantes"
 #. module: solt_tiendanube
 #: model:base.automation,name:solt_tiendanube.tn_automation_app_uninstall
 msgid "WEBHOOK EVENTO: app/uninstalled"
-msgstr ""
+msgstr "WEBHOOK EVENTO: app/uninstalled"
 
 #. module: solt_tiendanube
 #: model:base.automation,name:solt_tiendanube.tn_wh_automation_product_category_created
 msgid "WEBHOOK EVENTO: category/created"
-msgstr ""
+msgstr "WEBHOOK EVENTO: category/created"
 
 #. module: solt_tiendanube
 #: model:base.automation,name:solt_tiendanube.tn_wh_automation_product_category_deleted
 msgid "WEBHOOK EVENTO: category/deleted"
-msgstr ""
+msgstr "WEBHOOK EVENTO: category/deleted"
 
 #. module: solt_tiendanube
 #: model:base.automation,name:solt_tiendanube.tn_wh_automation_product_category_updated
 msgid "WEBHOOK EVENTO: category/updated"
-msgstr ""
+msgstr "WEBHOOK EVENTO: category/updated"
 
 #. module: solt_tiendanube
 #: model:base.automation,name:solt_tiendanube.tn_wh_automation_fulfillment_updated
 msgid "WEBHOOK EVENTO: fulfillment/updated"
-msgstr ""
+msgstr "WEBHOOK EVENTO: fulfillment/updated"
 
 #. module: solt_tiendanube
 #: model:base.automation,name:solt_tiendanube.tn_wh_automation_order_cancelled
 msgid "WEBHOOK EVENTO: order/cancelled"
-msgstr ""
+msgstr "WEBHOOK EVENTO: order/cancelled"
 
 #. module: solt_tiendanube
 #: model:base.automation,name:solt_tiendanube.tn_wh_automation_order_created
 msgid "WEBHOOK EVENTO: order/created"
-msgstr ""
+msgstr "WEBHOOK EVENTO: order/created"
 
 #. module: solt_tiendanube
 #: model:base.automation,name:solt_tiendanube.tn_wh_automation_order_edited
 msgid "WEBHOOK EVENTO: order/edited"
-msgstr ""
+msgstr "WEBHOOK EVENTO: order/edited"
 
 #. module: solt_tiendanube
 #: model:base.automation,name:solt_tiendanube.tn_wh_automation_order_fulfilled
 msgid "WEBHOOK EVENTO: order/fulfilled"
-msgstr ""
+msgstr "WEBHOOK EVENTO: order/fulfilled"
 
 #. module: solt_tiendanube
 #: model:base.automation,name:solt_tiendanube.tn_wh_automation_order_paid
 msgid "WEBHOOK EVENTO: order/paid"
-msgstr ""
+msgstr "WEBHOOK EVENTO: order/paid"
 
 #. module: solt_tiendanube
 #: model:base.automation,name:solt_tiendanube.tn_wh_automation_order_updated
 msgid "WEBHOOK EVENTO: order/updated"
-msgstr ""
+msgstr "WEBHOOK EVENTO: order/updated"
 
 #. module: solt_tiendanube
 #: model:base.automation,name:solt_tiendanube.tn_wh_automation_product_created
 msgid "WEBHOOK EVENTO: product/created"
-msgstr ""
+msgstr "WEBHOOK EVENTO: product/created"
 
 #. module: solt_tiendanube
 #: model:base.automation,name:solt_tiendanube.tn_wh_automation_product_deleted
 msgid "WEBHOOK EVENTO: product/deleted"
-msgstr ""
+msgstr "WEBHOOK EVENTO: product/deleted"
 
 #. module: solt_tiendanube
 #: model:base.automation,name:solt_tiendanube.tn_wh_automation_product_updated
 msgid "WEBHOOK EVENTO: product/updated"
-msgstr ""
+msgstr "WEBHOOK EVENTO: product/updated"
 
 #. module: solt_tiendanube
 #: model:ir.model,name:solt_tiendanube.model_stock_warehouse
+#: model:ir.model.fields,field_description:solt_tiendanube.field_sale_order__warehouse_ids
+#: model:ir.model.fields,field_description:solt_tiendanube.field_sale_order_line__multi_warehouse_id
+#: model:ir.model.fields,field_description:solt_tiendanube.field_sale_order_line__warehouse_id
+#: model:ir.model.fields,field_description:solt_tiendanube.field_sale_order_line__warehouse_ids
 #: model:ir.model.fields,field_description:solt_tiendanube.field_solt_warehouse_sync_mapping__warehouse_id
 msgid "Warehouse"
 msgstr "Almacén"
 
 #. module: solt_tiendanube
+#: model:ir.model.fields,field_description:solt_tiendanube.field_sale_order_line__warehouse_id_domain
+msgid "Warehouse Id Domain"
+msgstr "Dominio de ID de almacén"
+
+#. module: solt_tiendanube
 #: model:ir.actions.act_window,name:solt_tiendanube.tnube_menu_solt_sync_mapping_view_action
 #: model_terms:ir.ui.view,arch_db:solt_tiendanube.solt_warehouse_sync_mapping_view_list
-#: model:ir.actions.act_window,name:solt_tiendanube.tnube_register_webhook_view_action
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.tnube_register_webhook_view_form
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.tnube_register_webhook_view_list
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.tnube_register_webhook_view_search
 msgid "Warehouse Sync Mapper"
 msgstr "Mapeador de Sincronización de Almacenes"
 
@@ -1446,6 +2045,23 @@ msgstr "Mapeador de Sincronización de Almacenes"
 #: model_terms:ir.ui.view,arch_db:solt_tiendanube.tnube_register_webhook_view_list
 msgid "Webhook"
 msgstr "Webhook"
+
+#. module: solt_tiendanube
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_product_brand__website_message_ids
+msgid "Website Messages"
+msgstr "Mensajes del sitio web"
+
+#. module: solt_tiendanube
+#: model:ir.model.fields,help:solt_tiendanube.field_solt_product_brand__website_message_ids
+msgid "Website communication history"
+msgstr "Historial de comunicación del sitio web"
+
+#. module: solt_tiendanube
+#: model:ir.model.fields,help:solt_tiendanube.field_solt_product_brand__x_exclud_from_sync
+#: model:ir.model.fields,help:solt_tiendanube.field_solt_product_image__x_exclud_from_sync
+#: model:ir.model.fields,help:solt_tiendanube.field_solt_register_webhook__x_exclud_from_sync
+msgid "When enabled, the record will not be exported to external systems."
+msgstr "Cuando está habilitado, el registro no se exportará a sistemas externos."
 
 #. module: solt_tiendanube
 #: model:ir.model.fields,field_description:solt_tiendanube.field_product_template__product_width
@@ -1489,6 +2105,11 @@ msgid "[%s] Delivery cost"
 msgstr "[%s] Costo de envío"
 
 #. module: solt_tiendanube
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.view_product_brand_form
+msgid "e.g. Lenovo"
+msgstr "ej. Lenovo"
+
+#. module: solt_tiendanube
 #: model_terms:ir.ui.view,arch_db:solt_tiendanube.nube_view_solt_api_connector_kanban_inherit
 msgid "last 24h / total orders"
 msgstr "últimas 24h / pedidos totales"
@@ -1505,637 +2126,449 @@ msgid "{} product images were migrated."
 msgstr "Se migraron {} imágenes de productos."
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Official Odoo-Tiendanube Integration to Centralize Your eCommerce"
-msgstr "Integración Oficial Odoo-Tiendanube para Centralizar tu eCommerce"
+#: model:onboarding.onboarding.step,done_text:solt_tiendanube.onboarding_step_review
+msgid "All set!"
+msgstr "¡Todo listo!"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Automatically Sync Products, Inventory, Orders and Customers"
-msgstr "Sincroniza Automáticamente Productos, Inventario, Pedidos y Clientes"
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.solt_tn_warehouse_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.solt_tn_webhook_wizard_view_form
+msgid "Apply"
+msgstr "Aplicar"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "The <strong>Odoo-Tiendanube</strong> application is an integration connector that acts as a bridge between your Tiendanube online store and your Odoo ERP system. It is a tool designed to automate data and process management between both platforms, eliminating manual tasks and reducing operational errors."
-msgstr "La aplicación <strong>Odoo-Tiendanube</strong> es un conector de integración que actúa como puente entre tu tienda en línea de Tiendanube y tu sistema ERP Odoo. Es una herramienta diseñada para automatizar la gestión de datos y procesos entre ambas plataformas, eliminando tareas manuales y reduciendo errores operativos."
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.solt_tn_warehouse_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.solt_tn_webhook_wizard_view_form
+msgid "Cancel"
+msgstr "Cancelar"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Integrate your online store with your management system and keep products, inventory, orders and customers automatically synchronized between Tiendanube and Odoo. This integration prioritizes security (HTTPS and OAuth 2.0) and offers a guided setup so you can get started without advanced technical knowledge."
-msgstr "Integra tu tienda en línea con tu sistema de gestión y mantén productos, inventario, pedidos y clientes sincronizados automáticamente entre Tiendanube y Odoo. Esta integración prioriza la seguridad (HTTPS y OAuth 2.0) y ofrece una configuración guiada para que puedas comenzar sin conocimientos técnicos avanzados."
+#: model:onboarding.onboarding.step,button_text:solt_tiendanube.onboarding_step_meta_fields
+msgid "Check fields"
+msgstr "Revisar campos"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "<strong>Odoo-Tiendanube</strong> is a connector that integrates Tiendanube with Odoo ERP to centralize your ecommerce operation: catalog, stock, prices, orders, customers and invoicing are managed from a single place, reducing manual tasks and errors."
-msgstr "<strong>Odoo-Tiendanube</strong> es un conector que integra Tiendanube con Odoo ERP para centralizar tu operación de ecommerce: catálogo, stock, precios, pedidos, clientes y facturación se gestionan desde un solo lugar, reduciendo tareas manuales y errores."
+#: model:onboarding.onboarding.step,description:solt_tiendanube.onboarding_step_review
+msgid "Check that everything is configured."
+msgstr "Comprueba que todo esté configurado."
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Key Features:"
-msgstr "Características Principales:"
+#: model:ir.model.fields,help:solt_tiendanube.field_solt_register_webhook__tn_publish_choice
+msgid "Choice made in the onboarding wizard. Empty means the default: publish unless the automation is flagged as optional."
+msgstr "Elección hecha en el asistente de configuración. Vacío significa el valor por defecto: se publica salvo que la automatización esté marcada como opcional."
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Bidirectional Product Sync"
-msgstr "Sincronización Bidireccional de Productos"
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.solt_tn_webhook_wizard_view_form
+msgid "Choose the Tiendanube events you want to receive in Odoo. Checked webhooks are published and their automations activated; unchecked ones are removed. Required events cannot be unchecked."
+msgstr "Elige los eventos de Tiendanube que quieres recibir en Odoo. Los webhooks marcados se publican y sus automatizaciones se activan; los desmarcados se eliminan. Los eventos obligatorios no se pueden desmarcar."
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Publish, update and unpublish catalogs from Odoo to Tiendanube automatically"
-msgstr "Publica, actualiza y despublica catálogos desde Odoo a Tiendanube automáticamente"
+#: model:onboarding.onboarding.step,button_text:solt_tiendanube.onboarding_step_webhooks
+msgid "Choose webhooks"
+msgstr "Elegir webhooks"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Real-time Stock"
-msgstr "Stock en Tiempo Real"
+#: model:onboarding.onboarding.step,description:solt_tiendanube.onboarding_step_webhooks
+msgid "Choose which Tiendanube events are published and automated."
+msgstr "Elige qué eventos de Tiendanube se publican y automatizan."
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Adjust inventory levels instantly, preventing stockouts or overstock"
-msgstr "Ajusta niveles de inventario instantáneamente, previniendo agotamientos o exceso de stock"
+#: model:onboarding.onboarding.step,title:solt_tiendanube.onboarding_step_connect_store
+msgid "Connect your store"
+msgstr "Conecta tu tienda"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Integrated Sales"
-msgstr "Ventas Integradas"
+#: model:ir.model.fields,help:solt_tiendanube.field_solt_tn_warehouse_wizard_line__create_new
+msgid "Create a new warehouse for this location."
+msgstr "Crear un almacén nuevo para esta ubicación."
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Transfer orders from Tiendanube to Odoo at the moment of purchase"
-msgstr "Transfiere pedidos de Tiendanube a Odoo en el momento de la compra"
+#: model:onboarding.onboarding.step,description:solt_tiendanube.onboarding_step_meta_fields
+msgid "Create the fields that track the synchronization state in your records."
+msgstr "Crea los campos que registran el estado de sincronización en tus registros."
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Category Management"
-msgstr "Gestión de Categorías"
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_tn_warehouse_wizard_line__create_new
+msgid "Create warehouse"
+msgstr "Crear almacén"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Synchronize product categories between both platforms"
-msgstr "Sincroniza categorías de productos entre ambas plataformas"
+#: model:ir.model.fields.selection,name:solt_tiendanube.selection__solt_register_webhook__tn_publish_choice__no
+msgid "Do not publish"
+msgstr "No publicar"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Unified Customers"
-msgstr "Clientes Unificados"
+#: model:ir.model.fields,help:solt_tiendanube.field_res_company__tn_email
+msgid "Email of the Tiendanube store. Used to match this company with the store; the company email is left untouched."
+msgstr "Correo de la tienda de Tiendanube. Se usa para emparejar esta empresa con la tienda; el correo de la empresa no se modifica."
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Automatically register and update buyer data"
-msgstr "Registra y actualiza automáticamente los datos de los compradores"
+#. odoo-python
+#: code:addons/solt_tiendanube/models/onboarding_onboarding_step.py:0
+msgid "Everything is configured."
+msgstr "Todo está configurado."
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Multi-warehouse"
-msgstr "Multi-almacén"
+#: model:onboarding.onboarding.step,done_text:solt_tiendanube.onboarding_step_meta_fields
+msgid "Fields ready!"
+msgstr "¡Campos listos!"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Supports multiple warehouses, syncing stock with each one"
-msgstr "Soporta múltiples almacenes, sincronizando stock con cada uno"
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.solt_tn_warehouse_wizard_view_form
+msgid "For each Tiendanube location, link an existing warehouse or let Odoo create a new one. Locations left unchecked and without a warehouse are skipped."
+msgstr "Para cada ubicación de Tiendanube, vincula un almacén existente o deja que Odoo cree uno nuevo. Las ubicaciones sin almacén y sin marcar se omiten."
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Product Images"
-msgstr "Imágenes de Productos"
+#: model:onboarding.onboarding.step,description:solt_tiendanube.onboarding_step_initial_sync
+msgid "Import or export products, customers and orders."
+msgstr "Importa o exporta productos, clientes y pedidos."
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Sync complete image galleries for products"
-msgstr "Sincroniza galerías de imágenes completas para productos"
+#: model:onboarding.onboarding.step,description:solt_tiendanube.onboarding_step_warehouses
+msgid "Import your Tiendanube locations and link them to Odoo warehouses."
+msgstr "Importa tus ubicaciones de Tiendanube y vincúlalas con almacenes de Odoo."
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Automated Fulfillment"
-msgstr "Cumplimiento Automatizado"
+#: model:onboarding.onboarding.step,title:solt_tiendanube.onboarding_step_initial_sync
+msgid "Initial sync"
+msgstr "Sincronización inicial"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Update shipping status and tracking from Odoo"
-msgstr "Actualiza el estado de envío y seguimiento desde Odoo"
+#: model:onboarding.onboarding.step,done_text:solt_tiendanube.onboarding_step_initial_sync
+msgid "Initial sync done!"
+msgstr "¡Sincronización inicial lista!"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Real-time Webhooks"
-msgstr "Webhooks en Tiempo Real"
+#: model:onboarding.onboarding.step,button_text:solt_tiendanube.onboarding_step_connect_store
+msgid "Install app"
+msgstr "Instalar app"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Receive instant notifications of changes in Tiendanube"
-msgstr "Recibe notificaciones instantáneas de cambios en Tiendanube"
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_tn_warehouse_wizard_line__warehouse_id
+msgid "Link to warehouse"
+msgstr "Vincular al almacén"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Enterprise Security"
-msgstr "Seguridad Empresarial"
+#: model:onboarding.onboarding.step,button_text:solt_tiendanube.onboarding_step_warehouses
+msgid "Link warehouses"
+msgstr "Vincular almacenes"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "HTTPS, OAuth 2.0, and secure tokens"
-msgstr "HTTPS, OAuth 2.0 y tokens seguros"
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_tn_warehouse_wizard__line_ids
+msgid "Locations"
+msgstr "Ubicaciones"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Community"
-msgstr "Community"
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_tn_warehouse_wizard_line__mapping_id
+msgid "Mapping"
+msgstr "Mapeo"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Enterprise"
-msgstr "Enterprise"
+#: model:ir.model,name:solt_tiendanube.model_onboarding_onboarding_step
+msgid "Onboarding Step"
+msgstr "Paso de incorporación"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "(On-premises)"
-msgstr "(En local)"
+#: model:onboarding.onboarding.step,step_image_alt:solt_tiendanube.onboarding_step_connect_store
+#: model:onboarding.onboarding.step,step_image_alt:solt_tiendanube.onboarding_step_initial_sync
+#: model:onboarding.onboarding.step,step_image_alt:solt_tiendanube.onboarding_step_meta_fields
+#: model:onboarding.onboarding.step,step_image_alt:solt_tiendanube.onboarding_step_review
+#: model:onboarding.onboarding.step,step_image_alt:solt_tiendanube.onboarding_step_warehouses
+#: model:onboarding.onboarding.step,step_image_alt:solt_tiendanube.onboarding_step_webhooks
+msgid "Onboarding Step Image"
+msgstr "Imagen del paso de incorporación"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "What Problems Does It Solve?"
-msgstr "¿Qué Problemas Resuelve?"
+#: model:onboarding.onboarding.step,description:solt_tiendanube.onboarding_step_connect_store
+msgid "Only if you installed the module from the Odoo app store and have not started the installation from Tiendanube yet: opens the Tiendanube partners portal to install the app."
+msgstr "Solo si instalaste el módulo desde la tienda de apps de Odoo y aún no iniciaste la instalación desde Tiendanube: abre el portal de socios de Tiendanube para instalar la app."
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Inventory Discrepancies"
-msgstr "Discrepancias de Inventario"
+#: model:onboarding.onboarding.step,button_text:solt_tiendanube.onboarding_step_initial_sync
+msgid "Open sync"
+msgstr "Abrir sincronización"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Eliminates mismatches between platforms through automatic updates"
-msgstr "Elimina desajustes entre plataformas mediante actualizaciones automáticas"
+#. odoo-python
+#: code:addons/solt_tiendanube/models/onboarding_onboarding_step.py:0
+msgid "Pending steps: %s"
+msgstr "Pasos pendientes: %s"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Manual Processes and Errors"
-msgstr "Procesos Manuales y Errores"
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_tn_webhook_wizard_line__selected
+#: model:ir.model.fields.selection,name:solt_tiendanube.selection__solt_register_webhook__tn_publish_choice__yes
+msgid "Publish"
+msgstr "Publicar"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Reduces management time and minimizes human errors"
-msgstr "Reduce el tiempo de gestión y minimiza errores humanos"
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_register_webhook__tn_publish_choice
+msgid "Publish choice"
+msgstr "Elección de publicación"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Fragmented Business Vision"
-msgstr "Visión Empresarial Fragmentada"
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_tn_webhook_wizard_line__locked
+msgid "Required"
+msgstr "Obligatorio"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Provides centralized data in Odoo for deeper analysis"
-msgstr "Proporciona datos centralizados en Odoo para un análisis más profundo"
+#: model:ir.model.fields,help:solt_tiendanube.field_solt_tn_webhook_wizard_line__locked
+msgid "Required webhooks cannot be unchecked."
+msgstr "Los webhooks obligatorios no se pueden desmarcar."
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Sales Channel Limitations"
-msgstr "Limitaciones de Canales de Venta"
+#. odoo-python
+#: code:addons/solt_tiendanube/models/solt_api_connector_onboarding.py:0
+msgid "Requires connecting the store"
+msgstr "Requiere conectar la tienda"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Facilitates multichannel expansion without multiplying operational tasks"
-msgstr "Facilita la expansión multicanal sin multiplicar tareas operativas"
+#. odoo-python
+#: code:addons/solt_tiendanube/models/onboarding_onboarding_step.py:0
+#: model:onboarding.onboarding.step,button_text:solt_tiendanube.onboarding_step_review
+#: model:onboarding.onboarding.step,title:solt_tiendanube.onboarding_step_review
+msgid "Review"
+msgstr "Revisión"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "High Operating Costs"
-msgstr "Altos Costos Operativos"
+#. odoo-python
+#: code:addons/solt_tiendanube/wizard/solt_tn_warehouse_wizard.py:0
+msgid ""
+"Some locations failed:\n"
+"%s"
+msgstr ""
+"Algunas ubicaciones fallaron:\n"
+"%s"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Automates processes reducing the need for manual intervention"
-msgstr "Automatiza procesos reduciendo la necesidad de intervención manual"
+#. odoo-python
+#: code:addons/solt_tiendanube/wizard/solt_tn_webhook_wizard.py:0
+msgid ""
+"Some webhooks failed:\n"
+"%s"
+msgstr ""
+"Algunos webhooks fallaron:\n"
+"%s"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Key Benefits"
-msgstr "Beneficios Clave"
+#: model:onboarding.onboarding.step,done_text:solt_tiendanube.onboarding_step_connect_store
+msgid "Store connected!"
+msgstr "¡Tienda conectada!"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Centralized Operation"
-msgstr "Operación Centralizada"
+#. odoo-python
+#: code:addons/solt_tiendanube/models/onboarding_onboarding_step.py:0
+#: model:onboarding.onboarding.step,title:solt_tiendanube.onboarding_step_meta_fields
+msgid "Sync fields"
+msgstr "Campos de sincronización"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Manage everything from a single system (Odoo)"
-msgstr "Gestiona todo desde un solo sistema (Odoo)"
+#. odoo-python
+#: code:addons/solt_tiendanube/models/onboarding_onboarding_step.py:0
+msgid "The synchronization fields are ready."
+msgstr "Los campos de sincronización están listos."
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Fewer Errors"
-msgstr "Menos Errores"
+#: model:ir.model.fields,field_description:solt_tiendanube.field_res_company__tn_email
+msgid "Tiendanube email"
+msgstr "Correo de Tiendanube"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Automation drastically reduces manual mistakes"
-msgstr "La automatización reduce drásticamente los errores manuales"
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_tn_warehouse_wizard_line__tn_name
+msgid "Tiendanube location"
+msgstr "Ubicación de Tiendanube"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "HTTPS, OAuth 2.0, secure tokens and data encryption"
-msgstr "HTTPS, OAuth 2.0, tokens seguros y cifrado de datos"
+#: model:ir.model.fields,field_description:solt_tiendanube.field_res_company__tn_provisioned
+msgid "Tiendanube provisioned"
+msgstr "Tiendanube aprovisionada"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Guided Setup"
-msgstr "Configuración Guiada"
+#. odoo-python
+#: code:addons/solt_tiendanube/models/onboarding_onboarding_step.py:0
+msgid "Tiendanube warehouses"
+msgstr "Almacenes de Tiendanube"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Step-by-step installation process without needing experts"
-msgstr "Proceso de instalación paso a paso sin necesidad de expertos"
+#: model:ir.model,name:solt_tiendanube.model_solt_tn_warehouse_wizard
+msgid "Tiendanube warehouses linking"
+msgstr "Vinculación de almacenes de Tiendanube"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Support in Mexico"
-msgstr "Soporte en México"
+#: model:ir.model,name:solt_tiendanube.model_solt_tn_warehouse_wizard_line
+msgid "Tiendanube warehouses linking line"
+msgstr "Línea de vinculación de almacenes de Tiendanube"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Technical support during business hours GMT-6 timezone"
-msgstr "Soporte técnico durante horario laboral zona horaria GMT-6"
+#. odoo-python
+#: code:addons/solt_tiendanube/models/onboarding_onboarding_step.py:0
+msgid "Tiendanube webhooks"
+msgstr "Webhooks de Tiendanube"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "How Does It Work?"
-msgstr "¿Cómo Funciona?"
+#: model:ir.model,name:solt_tiendanube.model_solt_tn_webhook_wizard
+msgid "Tiendanube webhooks selection"
+msgstr "Selección de webhooks de Tiendanube"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "1. Configure"
-msgstr "1. Configurar"
+#: model:ir.model,name:solt_tiendanube.model_solt_tn_webhook_wizard_line
+msgid "Tiendanube webhooks selection line"
+msgstr "Línea de selección de webhooks de Tiendanube"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Set up your Tiendanube credentials in Odoo"
-msgstr "Configura tus credenciales de Tiendanube en Odoo"
+#: model:ir.actions.server,name:solt_tiendanube.ir_cron_tn_provision_ir_actions_server
+msgid "Tiendanube: provision store (webhooks)"
+msgstr "Tiendanube: aprovisionar tienda (webhooks)"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "2. Connect"
-msgstr "2. Conectar"
+#: model:ir.model.fields,help:solt_tiendanube.field_res_company__tn_provisioned
+msgid "True once the connector webhooks have been activated and registered for this company."
+msgstr "Verdadero cuando los webhooks del conector se activaron y registraron para esta empresa."
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Authorize the secure OAuth 2.0 connection"
-msgstr "Autoriza la conexión segura OAuth 2.0"
+#. odoo-python
+#: code:addons/solt_tiendanube/wizard/solt_tn_warehouse_wizard.py:0
+#: model:onboarding.onboarding.step,title:solt_tiendanube.onboarding_step_warehouses
+msgid "Warehouses"
+msgstr "Almacenes"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "3. Sync"
-msgstr "3. Sincronizar"
+#: model:onboarding.onboarding.step,done_text:solt_tiendanube.onboarding_step_warehouses
+msgid "Warehouses linked!"
+msgstr "¡Almacenes vinculados!"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Products, stock, orders and customers flow automatically"
-msgstr "Productos, stock, pedidos y clientes fluyen automáticamente"
+#. odoo-python
+#: code:addons/solt_tiendanube/wizard/solt_tn_webhook_wizard.py:0
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_tn_webhook_wizard__line_ids
+#: model:onboarding.onboarding.step,title:solt_tiendanube.onboarding_step_webhooks
+msgid "Webhooks"
+msgstr "Webhooks"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "4. Manage"
-msgstr "4. Gestionar"
+#: model:onboarding.onboarding.step,done_text:solt_tiendanube.onboarding_step_webhooks
+msgid "Webhooks published!"
+msgstr "¡Webhooks publicados!"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Control everything from Odoo's centralized dashboard"
-msgstr "Controla todo desde el panel centralizado de Odoo"
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_tn_warehouse_wizard_line__wizard_id
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_tn_webhook_wizard_line__wizard_id
+msgid "Wizard"
+msgstr "Asistente"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Synchronization Details"
-msgstr "Detalles de Sincronización"
+#. odoo-python
+#: code:addons/solt_tiendanube/models/onboarding_onboarding_step.py:0
+msgid "%s automations activated."
+msgstr "%s automatizaciones activadas."
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Products"
-msgstr "Productos"
+#: model:onboarding.onboarding.step,button_text:solt_tiendanube.onboarding_step_activate_automations
+msgid "Activate"
+msgstr "Activar"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Name, description, SKU"
-msgstr "Nombre, descripción, SKU"
+#: model:onboarding.onboarding.step,title:solt_tiendanube.onboarding_step_activate_automations
+msgid "Activate automations"
+msgstr "Activar automatizaciones"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Prices and special prices"
-msgstr "Precios y precios especiales"
+#. odoo-python
+#: code:addons/solt_tiendanube/models/onboarding_onboarding_step.py:0
+msgid "Automations"
+msgstr "Automatizaciones"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Product variants"
-msgstr "Variantes de producto"
+#: model:onboarding.onboarding.step,done_text:solt_tiendanube.onboarding_step_activate_automations
+msgid "Automations active!"
+msgstr "¡Automatizaciones activas!"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Categories and tags"
-msgstr "Categorías y etiquetas"
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.solt_tn_webhook_wizard_view_form
+msgid "Choose the Tiendanube events you want to receive in Odoo. Checked webhooks are published in Tiendanube; unchecked ones that are already published are removed from Tiendanube. Required events cannot be unchecked. Automations are activated later, in the Activate automations step."
+msgstr "Elige los eventos de Tiendanube que quieres recibir en Odoo. Los webhooks marcados se publican en Tiendanube; los desmarcados que ya estén publicados se eliminan de Tiendanube. Los eventos obligatorios no se pueden desmarcar. Las automatizaciones se activan después, en el paso Activar automatizaciones."
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Image galleries"
-msgstr "Galerías de imágenes"
+#. odoo-python
+#: code:addons/solt_tiendanube/models/solt_api_connector_onboarding.py:0
+msgid "Complete the initial sync first"
+msgstr "Completa primero la sincronización inicial"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Weight and dimensions"
-msgstr "Peso y dimensiones"
+#. odoo-python
+#: code:addons/solt_tiendanube/wizard/solt_tn_webhook_wizard.py:0
+msgid "Not published"
+msgstr "No publicado"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Orders"
-msgstr "Pedidos"
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_tn_webhook_wizard_line__state_sync
+msgid "Status in Tiendanube"
+msgstr "Estado en Tiendanube"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Order details and lines"
-msgstr "Detalles y líneas de pedido"
+#: model:onboarding.onboarding.step,description:solt_tiendanube.onboarding_step_activate_automations
+msgid "Turn on the automations of your published webhooks so Odoo starts processing Tiendanube events. Do it after the initial sync."
+msgstr "Activa las automatizaciones de tus webhooks publicados para que Odoo empiece a procesar los eventos de Tiendanube. Hazlo después de la sincronización inicial."
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Customer information"
-msgstr "Información del cliente"
+#. odoo-python
+#: code:addons/solt_tiendanube/wizard/solt_tn_automation_wizard.py:0
+msgid "%(activated)s automations activated, %(deactivated)s deactivated."
+msgstr "%(activated)s automatizaciones activadas, %(deactivated)s desactivadas."
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Shipping addresses"
-msgstr "Direcciones de envío"
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_tn_automation_wizard_line__is_active
+msgid "Active now"
+msgstr "Activa ahora"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Payment status"
-msgstr "Estado de pago"
+#: model_terms:ir.ui.view,arch_db:solt_tiendanube.solt_tn_automation_wizard_view_form
+msgid "Choose the automations to activate. The ones of your published webhooks come checked. The other automations send changes from Odoo to Tiendanube. Do it after the initial sync, so the imported records do not trigger them."
+msgstr "Elige las automatizaciones que quieres activar. Las de tus webhooks publicados vienen marcadas. Las demás envían cambios de Odoo a Tiendanube. Hazlo después de la sincronización inicial, para que los registros importados no las disparen."
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Fulfillment tracking"
-msgstr "Seguimiento de cumplimiento"
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_tn_automation_wizard_line__model_name
+msgid "Model"
+msgstr "Modelo"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Order notes"
-msgstr "Notas del pedido"
+#: model:ir.model.fields,help:solt_tiendanube.field_solt_tn_automation_wizard_line__locked
+msgid "The webhook of this automation is not published in Tiendanube yet."
+msgstr "El webhook de esta automatización aún no está publicado en Tiendanube."
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Inventory"
-msgstr "Inventario"
+#. odoo-python
+#: code:addons/solt_tiendanube/models/onboarding_onboarding_step.py:0
+msgid "Tiendanube automations"
+msgstr "Automatizaciones de Tiendanube"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Real-time stock levels"
-msgstr "Niveles de stock en tiempo real"
+#: model:ir.model,name:solt_tiendanube.model_solt_tn_automation_wizard
+msgid "Tiendanube automations activation"
+msgstr "Activación de automatizaciones de Tiendanube"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Multi-warehouse support"
-msgstr "Soporte multi-almacén"
+#: model:ir.model,name:solt_tiendanube.model_solt_tn_automation_wizard_line
+msgid "Tiendanube automations activation line"
+msgstr "Línea de activación de automatizaciones de Tiendanube"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Automatic adjustments"
-msgstr "Ajustes automáticos"
+#: model:ir.model.fields,field_description:solt_tiendanube.field_solt_tn_automation_wizard_line__locked
+msgid "Webhook not published"
+msgstr "Webhook no publicado"
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Low stock alerts"
-msgstr "Alertas de stock bajo"
+#. odoo-python
+#: code:addons/solt_tiendanube/models/solt_api_connector_onboarding.py:0
+msgid "Webhooks: %(wh)s of %(wh_total)s active. Other automations: %(ot)s of %(ot_total)s active."
+msgstr "Webhooks: %(wh)s de %(wh_total)s activos. Otras automatizaciones: %(ot)s de %(ot_total)s activas."
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Reservation handling"
-msgstr "Manejo de reservas"
+#: model:onboarding.onboarding.step,description:solt_tiendanube.onboarding_step_initial_sync
+msgid "Import or export products, customers and orders, then mark the sync as completed."
+msgstr "Importa o exporta productos, clientes y pedidos, y luego marca la sincronización como completada."
 
 #. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Variant stock tracking"
-msgstr "Seguimiento de stock por variante"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Technical Requirements"
-msgstr "Requisitos Técnicos"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Odoo Requirements"
-msgstr "Requisitos de Odoo"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Odoo 18.0 (Community or Enterprise)"
-msgstr "Odoo 19.0 (Community o Enterprise)"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Sales, Inventory, and Contacts modules"
-msgstr "Módulos de Ventas, Inventario y Contactos"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "HTTPS enabled server"
-msgstr "Servidor con HTTPS habilitado"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Public URL for webhooks"
-msgstr "URL pública para webhooks"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Subscription Required"
-msgstr "Suscripción Requerida"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "A subscription is required to use this service."
-msgstr "Se requiere una suscripción para usar este servicio."
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "View plans and pricing here"
-msgstr "Ver planes y precios aquí"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Tiendanube Requirements"
-msgstr "Requisitos de Tiendanube"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Active Tiendanube store"
-msgstr "Tienda Tiendanube activa"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "API access enabled"
-msgstr "Acceso API habilitado"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Admin permissions"
-msgstr "Permisos de administrador"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Products configured"
-msgstr "Productos configurados"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Enterprise-Grade Security"
-msgstr "Seguridad de Nivel Empresarial"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "OAuth 2.0"
-msgstr "OAuth 2.0"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Industry standard authentication protocol"
-msgstr "Protocolo de autenticación estándar de la industria"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "HTTPS"
-msgstr "HTTPS"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "All communications encrypted in transit"
-msgstr "Todas las comunicaciones encriptadas en tránsito"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Secure Tokens"
-msgstr "Tokens Seguros"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Encrypted credential storage"
-msgstr "Almacenamiento de credenciales encriptado"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Audit Logs"
-msgstr "Registros de Auditoría"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Complete activity tracking"
-msgstr "Seguimiento completo de actividad"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Professional Services by Soltein"
-msgstr "Servicios Profesionales por Soltein"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Odoo Implementation"
-msgstr "Implementación de Odoo"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Cloud Hosting"
-msgstr "Hospedaje en la Nube"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Customization"
-msgstr "Personalización"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Functional Training"
-msgstr "Capacitación Funcional"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Technical Training"
-msgstr "Capacitación Técnica"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Support &amp; Maintenance"
-msgstr "Soporte y Mantenimiento"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Dedicated Developer"
-msgstr "Desarrollador Dedicado"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Version Migration"
-msgstr "Migración de Versión"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "API Integration"
-msgstr "Integración de API"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Vertical Apps"
-msgstr "Aplicaciones Verticales"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Years of Experience"
-msgstr "Años de Experiencia"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Implementations"
-msgstr "Implementaciones"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Gold"
-msgstr "Gold"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Official Odoo Partner"
-msgstr "Partner Oficial de Odoo"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Guadalajara, Mexico"
-msgstr "Guadalajara, México"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Get In Touch"
-msgstr "Contáctanos"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Mon-Fri 9:00-18:00 GMT-6"
-msgstr "Lun-Vie 9:00-18:00 GMT-6"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Guadalajara, Jalisco, MX"
-msgstr "Guadalajara, Jalisco, MX"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "License:"
-msgstr "Licencia:"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Author:"
-msgstr "Autor:"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Odoo Version:"
-msgstr "Versión de Odoo:"
-
-#. module: solt_tiendanube
-#: model_terms:ir.ui.view,arch_db:solt_tiendanube.index
-msgid "Official Gold Partner of Odoo in Mexico."
-msgstr "Partner Gold Oficial de Odoo en México."
-
+#. odoo-python
+#: code:addons/solt_tiendanube/models/solt_api_connector_onboarding.py:0
+msgid "Completed from the Warehouses step."
+msgstr "Completado desde el paso de Almacenes."

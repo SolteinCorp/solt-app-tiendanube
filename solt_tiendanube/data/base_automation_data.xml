@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<odoo noupdate="0">
+<odoo noupdate="1">
 
     <!--  Base automation  -->
     <!--  Webhooks  -->
@@ -82,13 +82,13 @@ try:
     multi_company_active = ResCompany.search_count([]) > 1
 
     if multi_company_active:
-        company_id = ResCompany.search(['|', ('name', '=ilike', values.get('name')), ('email', '=ilike', values.get('email'))], limit=1)
+        company_domain = [('name', '=ilike', values.get('name'))]
+        if values.get('tn_email'):
+            company_domain = ['|', ('tn_email', '=ilike', values.get('tn_email'))] + company_domain
+        company_id = ResCompany.search(company_domain, limit=1)
         if not company_id:
-            company_id = ResCompany.search([], order='id', limit=1)
-            _logger.warning('Multicompañia activa: empresa no encontrada con nombre {} o email {}. Se usa la primera compañia por defecto {}; no se crea una nueva.'.format(values.get('name'), values.get('email'), company_id.name))
-            company_id.partner_id.write({'x_exclud_from_sync': True})
-            company_id.sudo().write(values)
-            company_id.message_post(body='Empresa sincronizada con tienda en Tiendanube (compañia por defecto)!')
+            _logger.info('Multicompañia activa: empresa no encontrada con nombre {} o email {}. Crear'.format(values.get('name'), values.get('tn_email')))
+            company_id = ResCompany.with_context(exclud_contact_from_sync=True, not_execute_warehouse_base_automation=True).create(values)
         else:
             _logger.info('Multicompañia activa: empresa {} encontrada. Actualizar'.format(company_id.name))
             company_id.partner_id.write({'x_exclud_from_sync': True})
@@ -120,7 +120,6 @@ except Exception as e:
     </record>
 
     <record id="tn_automation_app_uninstall" model="base.automation">
-        <field name="tn_webhook_optional" eval="True"/>
         <field name="name">WEBHOOK EVENTO: app/uninstalled</field>
         <field name="active" eval="False"/>
         <field name="trigger">on_webhook</field>
@@ -165,6 +164,7 @@ else:
 
     <!--  Product Categories  -->
     <record id="tn_wh_automation_product_category_created" model="base.automation">
+        <field name="tn_webhook_optional" eval="True"/>
         <field name="name">WEBHOOK EVENTO: category/created</field>
         <field name="active" eval="False"/>
         <field name="trigger">on_webhook</field>
@@ -251,6 +251,7 @@ else:
     </record>
 
     <record id="tn_wh_automation_product_category_updated" model="base.automation">
+        <field name="tn_webhook_optional" eval="True"/>
         <field name="name">WEBHOOK EVENTO: category/updated</field>
         <field name="active" eval="False"/>
         <field name="trigger">on_webhook</field>
@@ -339,6 +340,7 @@ else:
     </record>
 
     <record id="tn_wh_automation_product_category_deleted" model="base.automation">
+        <field name="tn_webhook_optional" eval="True"/>
         <field name="name">WEBHOOK EVENTO: category/deleted</field>
         <field name="active" eval="False"/>
         <field name="trigger">on_webhook</field>
@@ -376,6 +378,7 @@ else:
 
     <!--  Product  -->
     <record id="tn_wh_automation_product_created" model="base.automation">
+        <field name="tn_webhook_optional" eval="True"/>
         <field name="name">WEBHOOK EVENTO: product/created</field>
         <field name="active" eval="False"/>
         <field name="trigger">on_webhook</field>
@@ -425,6 +428,7 @@ else:
     </record>
 
     <record id="tn_wh_automation_product_updated" model="base.automation">
+        <field name="tn_webhook_optional" eval="True"/>
         <field name="name">WEBHOOK EVENTO: product/updated</field>
         <field name="active" eval="False"/>
         <field name="trigger">on_webhook</field>
@@ -475,6 +479,7 @@ else:
     </record>
 
     <record id="tn_wh_automation_product_deleted" model="base.automation">
+        <field name="tn_webhook_optional" eval="True"/>
         <field name="name">WEBHOOK EVENTO: product/deleted</field>
         <field name="active" eval="False"/>
         <field name="trigger">on_webhook</field>
@@ -533,7 +538,11 @@ model.search([('external_id','=', payload.get('store_id'))])
         <field name="model_id" ref="base.model_res_company"/>
         <field name="code"><![CDATA[_logger.info('Ejecutar Webhook order/created.')
 if record.external_id and record.bearer_token and (str(record.external_id) == str(payload.get('store_id'))):
+    env.cr.execute("SELECT pg_advisory_xact_lock(hashtext(%s))", (str(payload.get('id')),))
     found_so_id = env['sale.order'].search([('x_external_id', '=', payload.get('id')), ('state', 'not in', ['cancel'])])
+    if len(found_so_id) > 1:
+        _logger.warning('Se encontraron {} ordenes duplicadas con ID externo {}: {}. Usando la mas reciente.'.format(len(found_so_id), payload.get('id'), found_so_id.ids))
+        found_so_id = found_so_id.sorted('id', reverse=True)[:1]
     if not found_so_id:
         try:
             _logger.info('Company {}'.format(record.name))
@@ -544,6 +553,7 @@ if record.external_id and record.bearer_token and (str(record.external_id) == st
                 order_id = env['sale.order'].with_context(mail_create_nosubscribe=True).with_company(record).with_user(admin_user).create(response['values'])
                 _logger.info('Orden {} sincronizado!.'.format(order_id.name))
                 if order_id:
+                    order_id._log_tn_pos_session_note(response['raw_response'])
                     order_response_dict = {str(order_id.x_external_id): response['raw_response']}
                     if order_id.state == 'draft':
                         _logger.info('Orden a confirmar {}'.format(order_id.order_number))
@@ -595,12 +605,16 @@ model.search([('external_id','=', payload.get('store_id'))])
         <field name="model_id" ref="base.model_res_company"/>
         <field name="code"><![CDATA[_logger.info('Ejecutar Webhook order/updated.')
 if record.external_id and record.bearer_token and (str(record.external_id) == str(payload.get('store_id'))):
+    env.cr.execute("SELECT pg_advisory_xact_lock(hashtext(%s))", (str(payload.get('id')),))
     found_so_id = env['sale.order']
     try:
         admin_user = env.ref('base.user_admin')
         response = base_automation.with_company(record).with_user(admin_user).connector_id.execute_endpoint('SALE_ORDER_GET_SINGLE', record=record, data=payload)
         _logger.info('Response: {}'.format(response))
         found_so_id = env['sale.order'].search([('x_external_id', '=', payload.get('id')), ('state', 'not in', ['cancel'])])
+        if len(found_so_id) > 1:
+            _logger.warning('Se encontraron {} ordenes duplicadas con ID externo {}: {}. Usando la mas reciente.'.format(len(found_so_id), payload.get('id'), found_so_id.ids))
+            found_so_id = found_so_id.sorted('id', reverse=True)[:1]
         found_so_id = found_so_id.with_company(record).with_user(admin_user)
         if 200 <= response.get('status_code') < 300:
             order_status = response['raw_response'].get('status')
@@ -608,15 +622,7 @@ if record.external_id and record.bearer_token and (str(record.external_id) == st
             order_shipping = response['raw_response'].get('shipping')
             order_payment_status = response['raw_response'].get('payment_status')
             if not found_so_id and order_status in ['closed', 'open']:
-                _logger.info('Orden no encontrada con ID externo {}!. Crear orden'.format(payload.get('id')))
-                found_so_id = env['sale.order'].with_context(mail_create_nosubscribe=True).with_company(record).with_user(admin_user).create(response['values'])
-                _logger.info('Orden {} sincronizado!.'.format(found_so_id.name))
-                if found_so_id:
-                    order_response_dict = {str(found_so_id.x_external_id): response['raw_response']}
-                    if found_so_id.state == 'draft':
-                        _logger.info('Orden a confirmar {}'.format(found_so_id.order_number))
-                        found_so_id.action_confirm()
-                        found_so_id.tiendanube_sync_picking_from_order(order_response_dict)
+                raise UserError('Orden con ID externo {} aun no existe en Odoo (probablemente order/created no se ha procesado todavia).'.format(payload.get('id')))
             if found_so_id and order_status in ['closed']:
                 found_so_id.action_lock()
                 _logger.info('Orden {} bloqueada.'.format(found_so_id.name))
@@ -637,6 +643,8 @@ if record.external_id and record.bearer_token and (str(record.external_id) == st
                 found_so_id.sudo().write(sync_vals)
             _logger.error('Error: {}'.format(response.get('error_message', '')))
         _logger.error('Fin: Webhook Actualizar orden de venta: order/updated')
+    except UserError:
+        raise
     except Exception as e:
         if found_so_id:
             sync_vals = {'x_state_sync': 'error', 'x_date_last_sync': datetime.datetime.now()}
@@ -667,6 +675,7 @@ model.search([('external_id','=', payload.get('store_id'))])
         <field name="model_id" ref="base.model_res_company"/>
         <field name="code"><![CDATA[_logger.info('Ejecutar Webhook order/cancelled.')
 if record.external_id and record.bearer_token and (str(record.external_id) == str(payload.get('store_id'))):
+    env.cr.execute("SELECT pg_advisory_xact_lock(hashtext(%s))", (str(payload.get('id')),))
     try:
         admin_user = env.ref('base.user_admin')
         response = base_automation.with_company(record).with_user(admin_user).connector_id.execute_endpoint('SALE_ORDER_GET_SINGLE', record=record, data=payload)
@@ -675,16 +684,11 @@ if record.external_id and record.bearer_token and (str(record.external_id) == st
         if 200 <= response.get('status_code') < 300:
             order_status = response['raw_response'].get('status')
             found_so_id = env['sale.order'].search([('x_external_id', '=', payload.get('id')), ('state', 'not in', ['cancel'])])
+            if len(found_so_id) > 1:
+                _logger.warning('Se encontraron {} ordenes duplicadas con ID externo {}: {}. Usando la mas reciente.'.format(len(found_so_id), payload.get('id'), found_so_id.ids))
+                found_so_id = found_so_id.sorted('id', reverse=True)[:1]
             if not found_so_id:
-                _logger.info('Orden no encontrada con ID externo {}!. Crear orden'.format(payload.get('id')))
-                found_so_id = env['sale.order'].with_context(mail_create_nosubscribe=True).with_company(record).with_user(admin_user).create(response['values'])
-                _logger.info('Orden {} sincronizado!.'.format(found_so_id.name))
-                if found_so_id:
-                    order_response_dict = {str(found_so_id.x_external_id): response['raw_response']}
-                    if found_so_id.state == 'draft':
-                        _logger.info('Orden a confirmar {}'.format(found_so_id.order_number))
-                        found_so_id.action_confirm()
-                        found_so_id.tiendanube_sync_picking_from_order(order_response_dict)
+                raise UserError('Orden con ID externo {} aun no existe en Odoo (probablemente order/created no se ha procesado todavia).'.format(payload.get('id')))
             if found_so_id and order_status in ['cancelled']:
                 found_so_id._action_cancel()
                 vals_to_update = {'x_state_sync': 'yes', 'x_date_last_sync': datetime.datetime.now(), 'x_exclud_from_sync': True}
@@ -696,6 +700,8 @@ if record.external_id and record.bearer_token and (str(record.external_id) == st
             _logger.error('Error: {}'.format(response.get('error_message', '')))
         else:
             _logger.error('Error: {}'.format(response.get('error_message', '')))
+    except UserError:
+        raise
     except Exception as e:
         _logger.error('Webhook Cancelar orden de venta: order/cancelled')
         _logger.error('Error al ejecutar endpoint SALE_ORDER_GET_SINGLE: {}'.format(str(e)))
@@ -705,7 +711,6 @@ else:
     </record>
 
     <record id="tn_wh_automation_order_fulfilled" model="base.automation">
-        <field name="tn_webhook_optional" eval="True"/>
         <field name="name">WEBHOOK EVENTO: order/fulfilled</field>
         <field name="active" eval="False"/>
         <field name="trigger">on_webhook</field>
@@ -724,6 +729,7 @@ model.search([('external_id','=', payload.get('store_id'))])
         <field name="model_id" ref="base.model_res_company"/>
         <field name="code"><![CDATA[_logger.info('Ejecutar Webhook order/fulfilled.')
 if record.external_id and record.bearer_token and (str(record.external_id) == str(payload.get('store_id'))):
+    env.cr.execute("SELECT pg_advisory_xact_lock(hashtext(%s))", (str(payload.get('id')),))
     try:
         admin_user = env.ref('base.user_admin')
         response = base_automation.with_company(record).with_user(admin_user).connector_id.execute_endpoint('SALE_ORDER_GET_SINGLE', record=record, data=payload)
@@ -731,10 +737,11 @@ if record.external_id and record.bearer_token and (str(record.external_id) == st
         admin_user = env.ref('base.user_admin')
         if 200 <= response.get('status_code') < 300:
             found_so_id = env['sale.order'].search([('x_external_id', '=', payload.get('id')), ('state', 'not in', ['cancel'])])
+            if len(found_so_id) > 1:
+                _logger.warning('Se encontraron {} ordenes duplicadas con ID externo {}: {}. Usando la mas reciente.'.format(len(found_so_id), payload.get('id'), found_so_id.ids))
+                found_so_id = found_so_id.sorted('id', reverse=True)[:1]
             if not found_so_id:
-                _logger.info('Orden no encontrada con ID externo {}!. Crear orden'.format(payload.get('id')))
-                found_so_id = env['sale.order'].with_context(mail_create_nosubscribe=True).with_company(record).with_user(admin_user).create(response['values'])
-                _logger.info('Orden {} sincronizado!.'.format(found_so_id.name))
+                raise UserError('Orden con ID externo {} aun no existe en Odoo (probablemente order/created no se ha procesado todavia).'.format(payload.get('id')))
             if found_so_id:
                 found_so_id = found_so_id.with_company(record).with_user(admin_user)
                 order_response_dict = {str(found_so_id.x_external_id): response['raw_response']}
@@ -757,6 +764,8 @@ if record.external_id and record.bearer_token and (str(record.external_id) == st
             _logger.error('Error: {}'.format(response.get('error_message', '')))
         else:
             _logger.error('Error: {}'.format(response.get('error_message', '')))
+    except UserError:
+        raise
     except Exception as e:
         _logger.error('Webhook Fulfilled orden de venta: order/fulfilled')
         _logger.error('Error al ejecutar endpoint SALE_ORDER_GET_SINGLE: {}'.format(str(e)))
@@ -784,24 +793,20 @@ model.search([('external_id','=', payload.get('store_id'))])
         <field name="model_id" ref="base.model_res_company"/>
         <field name="code"><![CDATA[_logger.info('Ejecutar Webhook order/paid.')
 if record.external_id and record.bearer_token and (str(record.external_id) == str(payload.get('store_id'))):
+    env.cr.execute("SELECT pg_advisory_xact_lock(hashtext(%s))", (str(payload.get('id')),))
     found_so_id = env['sale.order']
     try:
         admin_user = env.ref('base.user_admin')
         response = base_automation.with_company(record).with_user(admin_user).connector_id.execute_endpoint('SALE_ORDER_GET_SINGLE', record=record, data=payload)
         _logger.info('Response: {}'.format(response))
         found_so_id = env['sale.order'].search([('x_external_id', '=', payload.get('id')), ('state', 'not in', ['cancel'])])
+        if len(found_so_id) > 1:
+            _logger.warning('Se encontraron {} ordenes duplicadas con ID externo {}: {}. Usando la mas reciente.'.format(len(found_so_id), payload.get('id'), found_so_id.ids))
+            found_so_id = found_so_id.sorted('id', reverse=True)[:1]
         found_so_id = found_so_id.with_company(record).with_user(admin_user)
         if 200 <= response.get('status_code') < 300:
             if not found_so_id:
-                _logger.info('Orden no encontrada con ID externo {}!. Crear orden'.format(payload.get('id')))
-                found_so_id = env['sale.order'].with_context(mail_create_nosubscribe=True).with_company(record).with_user(admin_user).create(response['values'])
-                _logger.info('Orden {} sincronizado!.'.format(found_so_id.name))
-                if found_so_id:
-                    order_response_dict = {str(found_so_id.x_external_id): response['raw_response']}
-                    if found_so_id.state == 'draft':
-                        _logger.info('Orden a confirmar {}'.format(found_so_id.order_number))
-                        found_so_id.action_confirm()
-                        found_so_id.tiendanube_sync_picking_from_order(order_response_dict)
+                raise UserError('Orden con ID externo {} aun no existe en Odoo (probablemente order/created no se ha procesado todavia).'.format(payload.get('id')))
             if found_so_id and found_so_id.state == 'sale' and (response['raw_response'].get('payment_status') in ['paid']):
                 generated_invoices = found_so_id._generate_delivered_invoices()
                 _logger.info('Facturas creadas para la orden {}.'.format(found_so_id.name))
@@ -822,6 +827,8 @@ if record.external_id and record.bearer_token and (str(record.external_id) == st
                 found_so_id.sudo().write(sync_vals)
             _logger.error('Error: {}'.format(response.get('error_message', '')))
         _logger.error('Fin: Webhook Pagar orden de venta: order/paid')
+    except UserError:
+        raise
     except Exception as e:
         if found_so_id:
             sync_vals = {'x_state_sync': 'error', 'x_date_last_sync': datetime.datetime.now()}
@@ -834,7 +841,6 @@ else:
     </record>
 
     <record id="tn_wh_automation_order_edited" model="base.automation">
-        <field name="tn_webhook_optional" eval="True"/>
         <field name="name">WEBHOOK EVENTO: order/edited</field>
         <field name="active" eval="False"/>
         <field name="trigger">on_webhook</field>
@@ -853,12 +859,16 @@ model.search([('external_id','=', payload.get('store_id'))])
         <field name="model_id" ref="base.model_res_company"/>
         <field name="code"><![CDATA[_logger.info('Ejecutar Webhook order/edited.')
 if record.external_id and record.bearer_token and (str(record.external_id) == str(payload.get('store_id'))):
+    env.cr.execute("SELECT pg_advisory_xact_lock(hashtext(%s))", (str(payload.get('id')),))
     found_so_id = env['sale.order']
     try:
         admin_user = env.ref('base.user_admin')
         response = base_automation.with_company(record).with_user(admin_user).connector_id.execute_endpoint('SALE_ORDER_GET_SINGLE', record=record, data=payload)
         _logger.info('Response: {}'.format(response))
         found_so_id = env['sale.order'].search([('x_external_id', '=', payload.get('id')), ('state', 'not in', ['cancel'])])
+        if len(found_so_id) > 1:
+            _logger.warning('Se encontraron {} ordenes duplicadas con ID externo {}: {}. Usando la mas reciente.'.format(len(found_so_id), payload.get('id'), found_so_id.ids))
+            found_so_id = found_so_id.sorted('id', reverse=True)[:1]
         found_so_id = found_so_id.with_company(record).with_user(admin_user)
         if 200 <= response.get('status_code') < 300:
             order_status = response['raw_response'].get('status')
@@ -866,15 +876,7 @@ if record.external_id and record.bearer_token and (str(record.external_id) == st
             order_shipping = response['raw_response'].get('shipping')
             order_payment_status = response['raw_response'].get('payment_status')
             if not found_so_id and order_status in ['closed', 'open']:
-                _logger.info('Orden no encontrada con ID externo {}!. Crear orden'.format(payload.get('id')))
-                found_so_id = env['sale.order'].with_context(mail_create_nosubscribe=True).with_company(record).with_user(admin_user).create(response['values'])
-                _logger.info('Orden {} sincronizado!.'.format(found_so_id.name))
-                if found_so_id:
-                    order_response_dict = {str(found_so_id.x_external_id): response['raw_response']}
-                    if found_so_id.state == 'draft':
-                        _logger.info('Orden a confirmar {}'.format(found_so_id.order_number))
-                        found_so_id.action_confirm()
-                        found_so_id.tiendanube_sync_picking_from_order(order_response_dict)
+                raise UserError('Orden con ID externo {} aun no existe en Odoo (probablemente order/created no se ha procesado todavia).'.format(payload.get('id')))
             if found_so_id and order_status in ['open'] and (order_shipping_status in ['unpacked']):
                 new_order_id = found_so_id.action_new_version(response['values'])
                 order_response_dict = {str(found_so_id.x_external_id): response['raw_response']}
@@ -897,6 +899,8 @@ if record.external_id and record.bearer_token and (str(record.external_id) == st
                 found_so_id.sudo().write(sync_vals)
             _logger.error('Error: {}'.format(response.get('error_message', '')))
         _logger.error('Fin: Webhook Actualizar orden de venta: order/edited')
+    except UserError:
+        raise
     except Exception as e:
         if found_so_id:
             sync_vals = {'x_state_sync': 'error', 'x_date_last_sync': datetime.datetime.now()}
@@ -934,12 +938,15 @@ if record.external_id and record.bearer_token and (str(record.external_id) == st
         response = base_automation.with_company(record).with_user(admin_user).connector_id.execute_endpoint('SALE_ORDER_GET_SINGLE', record=record, data=data)
         _logger.info('Response: {}'.format(response))
         found_so_id = env['sale.order'].search([('x_external_id', '=', data.get('id')), ('state', 'not in', ['cancel'])])
+        if len(found_so_id) > 1:
+            _logger.warning('Se encontraron {} ordenes duplicadas con ID externo {}: {}. Usando la mas reciente.'.format(len(found_so_id), data.get('id'), found_so_id.ids))
+            found_so_id = found_so_id.sorted('id', reverse=True)[:1]
         found_so_id = found_so_id.with_company(record).with_user(admin_user)
         found_picking_id = env['stock.picking'].search([('x_external_id', '=', data.get('fulfillment_id')), ('state', 'not in', ['cancel'])])
         found_picking_id = found_picking_id.with_company(record).with_user(admin_user)
         if 200 <= response.get('status_code') < 300:
             if not found_so_id or not found_picking_id:
-                _logger.info('Orden no encontrada con ID externo {} o Entrega no encontrada con ID externo {}.'.format(data.get('id'), data.get('fulfillment_id')))
+                raise UserError('Orden con ID externo {} o entrega con ID externo {} aun no existe en Odoo (probablemente order/created no se ha procesado todavia).'.format(data.get('id'), data.get('fulfillment_id')))
             elif found_so_id and found_picking_id and (found_picking_id.state != 'done') and (response['raw_response'].get('shipping_status') in ['partially_fulfilled']):
                 order_response_dict = {str(found_so_id.x_external_id): response['raw_response']}
                 found_so_id.tiendanube_sync_picking_from_order(order_response_dict)
@@ -966,6 +973,8 @@ if record.external_id and record.bearer_token and (str(record.external_id) == st
                 found_picking_id.sudo().write(sync_vals)
             _logger.error('Error: {}'.format(response.get('error_message', '')))
         _logger.error('Fin: Webhook Actualizar orden de venta: fulfillment/updated')
+    except UserError:
+        raise
     except Exception as e:
         if found_so_id:
             sync_vals = {'x_state_sync': 'error', 'x_date_last_sync': datetime.datetime.now()}
@@ -2107,10 +2116,11 @@ for record in records:
                     else:
                         _logger.error('Error en {}: {}'.format(code_price, price_response.get('error_message', '')))
                         record.write({'x_date_last_sync': datetime.datetime.now(), 'x_state_sync': 'error'})
+            record.write({'is_being_synced': False, 'sync_source': False})
             _logger.info('Producto {} sincronizado!.'.format(record.name))
         except Exception as e:
             _logger.error('Error al actualizar Producto: {}'.format(str(e)))
-            record.write({'x_date_last_sync': datetime.datetime.now(), 'x_state_sync': 'error'})
+            record.write({'x_date_last_sync': datetime.datetime.now(), 'x_state_sync': 'error', 'is_being_synced': False, 'sync_source': False})
             raise UserError('Error: {}'.format(str(e)))
     else:
         _logger.info('RA Actualizar productos. Empresa {} no está asociada a una tienda en TN.'.format(env.company.name))]]></field>
@@ -2318,10 +2328,12 @@ for record in records:
                     record.write({'x_date_last_sync': datetime.datetime.now(), 'x_state_sync': 'error'})
                     _logger.error('Error ejecutando endpoint VARIANTE_PRODUCT_SINGLE_UPDATE: {}'.format(response.get('error_message', '')))
                 _logger.info('Ejecución del endpoint VARIANTE_PRODUCT_SINGLE_UPDATE finalizada.')
+                record.product_tmpl_id.write({'is_being_synced': False, 'sync_source': False})
                 _logger.info('Variante de producto {} sincronizado!.'.format(record.name))
         except Exception as e:
             _logger.error('Error al actualizar Variante de producto: {}'.format(str(e)))
             record.write({'x_date_last_sync': datetime.datetime.now(), 'x_state_sync': 'error'})
+            record.product_tmpl_id.write({'is_being_synced': False, 'sync_source': False})
             raise UserError('Error: {}'.format(str(e)))
     else:
         _logger.info('RA Actualizar variante producto. Empresa {} no esta asociada a una tienda en TN.'.format(env.company.name))]]></field>
@@ -2512,7 +2524,7 @@ for record in records:
         <field name="model_id" ref="stock.model_stock_quant"/>
         <field name="connector_id" ref="tn_connector_api"/>
         <field name="filter_domain"><![CDATA[
-["&", "&", "&", "&", "&", ("warehouse_id.x_exclud_from_sync", "=", False), ("warehouse_id.x_external_id", "not in", [False, ""]), ("product_id.x_exclud_from_sync", "=", False), ("product_id.x_external_id", "not in", [False, ""]), ("location_id.usage", "in", ["internal", "transit"]), ("quantity", ">=", 0)]
+["&", "&", "&", "&", ("product_id.x_exclud_from_sync", "=", False), ("product_id.x_external_id", "not in", [False, ""]), ("location_id.usage", "in", ["internal", "transit"]), ("quantity", ">=", 0), "|", "&", ("warehouse_id", "!=", False), ("warehouse_id.x_external_id", "not in", [False, ""]), "&", ("warehouse_id", "=", False), ("location_id.warehouse_id.x_external_id", "not in", [False, ""])]
 ]]></field>
         <field name="trigger_field_ids" eval="[Command.set([
                          ref('stock.field_stock_quant__quantity'),
@@ -2532,51 +2544,64 @@ for record in records:
             _logger.info('not_execute_quants_base_automation esta en el contexto. No ejecutar RA.')
             continue
         try:
+            # Diagnóstico: campos detectados por comparación directa de old_values
             modified_fields = base_automation.with_context(ignore_computed_fields=True)._get_trigger_fields(record)
             _logger.info('Campos a actualizar {}'.format(modified_fields))
-            if modified_fields:
-                _logger.info('Value de quantity {}'.format(record.quantity))
-                quantity = 0
-                request_data = {'action': 'replace', 'value': quantity, 'id': record.product_id.x_external_id, 'location_id': record.warehouse_id.x_external_id}
-                inventory_level = record.product_id._get_total_inventory_level_product_api(warehouse_external_id=record.warehouse_id.x_external_id)
-                if inventory_level:
-                    quantity = inventory_level[0].get('stock')
-                request_data.update({'value': quantity})
-                if quantity == 0:
-                    code = 'VARIANT_PROD_REPLACE_STOCKOUT_POST'
-                if quantity > 0:
-                    code = 'VARIANT_PROD_REPLACE_STOCK_POST'
-                if quantity < 0:
-                    _logger.info('quitar stock')
-                endpoint = env['solt.api.endpoint'].search([('code', '=', code), ('connector_id', '=', base_automation.connector_id.id)], limit=1)
-                if not endpoint:
-                    msg = 'Endpoint con código {} no configurado, para actualizar el stock de los productos.'.format(code)
-                    _logger.info(msg)
-                    raise UserError(msg)
-                if not record.product_tmpl_id.can_sync_to_store():
-                    _logger.info('Producto con ID {} ya está siendo sincronizada desde la tienda, saltando sincronización.'.format(record.product_tmpl_id.id))
-                    continue
-                record.product_tmpl_id.mark_as_syncing('odoo')
-                response = endpoint.execute_request(record=record, request_data=request_data)
-                _logger.info(response)
-                if 200 <= response.get('status_code') < 300:
-                    if isinstance(response['values'], list):
-                        for vals in response['values']:
-                            record.product_id.write(vals)
-                elif response.get('status_code') == 402:
-                    record.product_id.write({'x_date_last_sync': datetime.datetime.now(), 'x_state_sync': 'error'})
-                    _logger.error('Error ejecutando endpoint {}: {}'.format(code, response.get('error_message', '')))
-                elif response.get('status_code') == 422 or response.get('status_code') != 404:
-                    _logger.error('Error ejecutando endpoint {}: {}'.format(code, response.get('error_message', '')))
-                    raise UserError('Error ejecutando endpoint {}: {}'.format(code, response.get('error_message', '')))
-                else:
-                    record.product_id.write({'x_date_last_sync': datetime.datetime.now(), 'x_state_sync': 'error'})
-                    _logger.error('Error ejecutando endpoint {}: {}'.format(code, response.get('error_message', '')))
-                _logger.info('Ejecución del endpoint {} finalizada.'.format(code))
-                _logger.info('Ajuste de inventario a Variante de producto {} sincronizado!.'.format(name))
+            # Decisión final: usar _check_trigger_fields del engine (confiable en v19 multi-almacén)
+            should_sync = base_automation._check_trigger_fields(record)
+            _logger.info('Trigger valido? {}'.format(should_sync))
+            if not should_sync:
+                continue
+            # Fallback de warehouse: warehouse_id directo o a través de la ubicación
+            warehouse = record.warehouse_id or record.location_id.warehouse_id
+            if not warehouse or not warehouse.x_external_id or warehouse.x_exclud_from_sync:
+                _logger.info('Quant {} sin warehouse sincronizable, omitiendo.'.format(record.id))
+                continue
+            _logger.info('Value de quantity {}'.format(record.quantity))
+            quantity = 0
+            request_data = {'action': 'replace', 'value': quantity, 'id': record.product_id.x_external_id, 'location_id': warehouse.x_external_id}
+            inventory_level = record.product_id._get_total_inventory_level_product_api(warehouse_external_id=warehouse.x_external_id)
+            if inventory_level:
+                quantity = inventory_level[0].get('stock') or 0
+            request_data.update({'value': quantity})
+            if quantity == 0:
+                code = 'VARIANT_PROD_REPLACE_STOCKOUT_POST'
+            elif quantity > 0:
+                code = 'VARIANT_PROD_REPLACE_STOCK_POST'
+            else:
+                _logger.info('Stock negativo para {}, omitiendo sync inmediato.'.format(name))
+                continue
+            endpoint = env['solt.api.endpoint'].search([('code', '=', code), ('connector_id', '=', base_automation.connector_id.id)], limit=1)
+            if not endpoint:
+                msg = 'Endpoint con código {} no configurado, para actualizar el stock de los productos.'.format(code)
+                _logger.info(msg)
+                raise UserError(msg)
+            if not record.product_tmpl_id.can_sync_to_store():
+                _logger.info('Producto con ID {} ya está siendo sincronizada desde la tienda, saltando sincronización.'.format(record.product_tmpl_id.id))
+                continue
+            record.product_tmpl_id.mark_as_syncing('odoo')
+            response = endpoint.execute_request(record=record, request_data=request_data)
+            _logger.info(response)
+            if 200 <= response.get('status_code') < 300:
+                if isinstance(response['values'], list):
+                    for vals in response['values']:
+                        record.product_id.write(vals)
+            elif response.get('status_code') == 402:
+                record.product_id.write({'x_date_last_sync': datetime.datetime.now(), 'x_state_sync': 'error'})
+                _logger.error('Error ejecutando endpoint {}: {}'.format(code, response.get('error_message', '')))
+            elif response.get('status_code') == 422 or response.get('status_code') != 404:
+                _logger.error('Error ejecutando endpoint {}: {}'.format(code, response.get('error_message', '')))
+                raise UserError('Error ejecutando endpoint {}: {}'.format(code, response.get('error_message', '')))
+            else:
+                record.product_id.write({'x_date_last_sync': datetime.datetime.now(), 'x_state_sync': 'error'})
+                _logger.error('Error ejecutando endpoint {}: {}'.format(code, response.get('error_message', '')))
+            _logger.info('Ejecución del endpoint {} finalizada.'.format(code))
+            record.product_tmpl_id.write({'is_being_synced': False, 'sync_source': False})
+            _logger.info('Ajuste de inventario a Variante de producto {} sincronizado!.'.format(name))
         except Exception as e:
             _logger.error('Error al Ajuste de inventario a Variante de producto {}: {}'.format(name, str(e)))
             record.product_id.write({'x_date_last_sync': datetime.datetime.now(), 'x_state_sync': 'error'})
+            record.product_tmpl_id.write({'is_being_synced': False, 'sync_source': False})
             raise UserError('Error: {}'.format(str(e)))
     else:
         _logger.info('RA Ajuste de inventario de una variante producto. Empresa {} no esta asociada a una tienda en TN.'.format(env.company.name))]]></field>

@@ -45,6 +45,27 @@ class ServerAction(models.Model):
             eval_context["base_automation"] = action.base_automation_id
         return eval_context
 
+    def action_mark_initial_sync_completed(self):
+        return self._set_initial_sync_state('completed')
+
+    def action_mark_initial_sync_pending(self):
+        return self._set_initial_sync_state('not_executed')
+
+    def _set_initial_sync_state(self, state):
+        """Flag the initial sync of the current company as completed or pending.
+        The initial sync can be an import, an export or both, so it is marked by the user."""
+        company = self.env.company
+        company.sudo().state_initial_load = state
+        for connector in self.env['solt.api.connector'].search([('company_ids', 'in', company.id)]):
+            connector._onboarding_sync()
+        message = _("The initial sync of %s was marked as completed.", company.name) if state == 'completed' \
+            else _("The initial sync of %s was marked as pending.", company.name)
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {'title': _("Initial sync"), 'message': message, 'type': 'success', 'sticky': False},
+        }
+
     def execute_initial_import(self):
         """Programa la ejecución de la importación via cron - ASÍNCRONO
 
@@ -68,7 +89,7 @@ class ServerAction(models.Model):
         # CORRECTO: Programar cron para ejecución ASÍNCRONA
         # Usar _trigger() en lugar de method_direct_trigger()
         cron = self.env.ref('solt_api_connector.ir_cron_data_initial_import_check')
-        cron.write({'server_action_to_import_id': self.id, 'active': True})
+        cron.write({'server_action_to_import_id': self.id, 'import_company_id': self.env.company.id, 'active': True})
         cron._trigger()  # Programa ejecución asíncrona
 
         return {
@@ -80,6 +101,8 @@ class ServerAction(models.Model):
                             'Refresh the page in a few minutes to see the results.') % self.model_id.name,
                 'sticky': False,
                 'type': 'info',
+                # Reload the current view (keeping its breadcrumb) so it shows the scheduled state.
+                'next': {'type': 'ir.actions.client', 'tag': 'soft_reload'},
             }
         }
 
@@ -92,6 +115,8 @@ class ServerAction(models.Model):
         if server_action_id:
             # Ejecutar solo para la acción específica
             action = self.browse(server_action_id)
+            if cron.import_company_id:
+                action = action.with_company(cron.import_company_id)
             if action.exists() and action.use_for_initial_import:
                 try:
                     result = action._process_initial_import()
@@ -105,13 +130,8 @@ class ServerAction(models.Model):
                         deactivate=True
                     )
         else:
-            actions = self.sudo().search([('use_for_initial_import', '=', True), ('connector_id', '!=', False), ('importing_state', 'in', ['idle', 'done', 'error'])], order="id asc")
-            for action in actions:
-                try:
-                    result = action._process_initial_import()
-                    _logger.info(_("Import action '%s': %s") % (action.name, result))
-                except Exception as e:
-                    _logger.error(_("Error in import action '%s': %s") % (action.name, str(e)))
+            # The import is always scheduled for one action (and company) by execute_initial_import().
+            _logger.warning("Initial import cron ran without a scheduled action: nothing to do.")
         # Desactivar el cron al final
         self.env['ir.cron']._commit_progress(
             processed=1,
@@ -155,7 +175,7 @@ class ServerAction(models.Model):
 
         # Programar cron para ejecución ASÍNCRONA
         cron = self.env.ref('solt_api_connector.ir_cron_data_initial_export_check')
-        cron.write({'server_action_to_export_id': self.id, 'active': True})
+        cron.write({'server_action_to_export_id': self.id, 'export_company_id': self.env.company.id, 'active': True})
         cron._trigger()  # Programa ejecución asíncrona
 
         return {
@@ -167,6 +187,8 @@ class ServerAction(models.Model):
                             'Refresh the page in a few minutes to see the results.') % self.model_id.name,
                 'sticky': False,
                 'type': 'info',
+                # Reload the current view (keeping its breadcrumb) so it shows the scheduled state.
+                'next': {'type': 'ir.actions.client', 'tag': 'soft_reload'},
             }
         }
 
@@ -179,6 +201,8 @@ class ServerAction(models.Model):
         if server_action_id:
             # Ejecutar solo para la acción específica
             action = self.browse(server_action_id)
+            if cron.export_company_id:
+                action = action.with_company(cron.export_company_id)
             if action.exists() and action.use_for_initial_export:
                 try:
                     result = action._process_initial_export()
@@ -198,16 +222,10 @@ class ServerAction(models.Model):
                         deactivate=True
                     )
         else:
-            actions = self.sudo().search([('use_for_initial_export', '=', True), ('connector_id', '!=', False), ('exporting_state', 'in', ['idle', 'done', 'error'])], order="id asc")
-            for action in actions:
-                try:
-                    result = action._process_initial_export()
-                    _logger.info(_("Export action '%s': %s") % (action.name, result))
-                except Exception as e:
-                    _logger.error(_("Error in export action '%s': %s") % (action.name, str(e)))
-            # Desactivar el cron al final
+            # The export is always scheduled for one action (and company) by execute_initial_export().
+            _logger.warning("Initial export cron ran without a scheduled action: nothing to do.")
             self.env['ir.cron']._commit_progress(
-                processed=1,
+                processed=0,
                 remaining=0,
                 deactivate=True
             )

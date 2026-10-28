@@ -14,4 +14,12 @@ class IrCron(models.Model):
         string='Server action for export',
         help="Server action used for export via this cron"
     )
-
+    import_company_id = fields.Many2one(
+        'res.company', string='Company of the import',
+        help="Company that scheduled the import: the cron runs as the system user, so it is applied explicitly.",
+        prefetch='False'
+    )
+    export_company_id = fields.Many2one(
+        'res.company', string='Company of the export',
+        help="Company that scheduled the export: the cron runs as the system user, so it is applied explicitly.",
+        prefetch='False')
