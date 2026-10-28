@@ -3,9 +3,20 @@ import json
 import logging
 from datetime import timedelta
 
-from odoo import fields, models
+from odoo import api, fields, models
 
 _logger = logging.getLogger(__name__)
+
+# Eventos de orden que ya no crean una orden nueva si no la encuentran (ver
+# solt_tiendanube/data/base_automation_data.xml) — solo order/created crea.
+# Si después de esta ventana ninguno logró crear la orden, se hace como
+# último recurso vía cron_reconcile_incoming_order_webhooks. Coincide con la
+# ventana completa de reintentos que documenta Tiendanube (16 intentos / 48h):
+# https://tiendanube.github.io/api-documentation/resources/webhook
+_TN_ORDER_RECONCILE_EVENTS = (
+    'order/paid', 'order/fulfilled', 'order/updated', 'order/edited', 'order/cancelled',
+)
+_TN_ORDER_RECONCILE_WINDOW_HOURS = 48
 
 # -----------------------------------------------------------------------
 # Tiendanube-specific retry code classification
@@ -89,3 +100,65 @@ class SoltApiCallLogTiendanube(models.Model):
                 "Log %d: could not parse x-rate-limit-reset header: %s", self.id, exc
             )
             return False
+
+    # ------------------------------------------------------------------
+    # Reconciliación de webhooks entrantes de orden (red de seguridad)
+    # ------------------------------------------------------------------
+    @api.model
+    def cron_reconcile_incoming_order_webhooks(self):
+        """Último recurso para el caso raro en que `order/created` nunca haya
+        logrado crear una orden y ningún otro webhook (paid/fulfilled/updated/
+        edited/cancelled) haya podido crearla tampoco (por diseño, desde que
+        se quitó esa capacidad de los 5 eventos no-`created` para evitar
+        condiciones de carrera — ver base_automation_data.xml).
+
+        Solo actúa después de que se agotó la ventana completa de reintentos
+        de Tiendanube (48h), para no competir con sus propios reintentos.
+        """
+        cutoff = fields.Datetime.now() - timedelta(hours=_TN_ORDER_RECONCILE_WINDOW_HOURS)
+        failed_logs = self.search([
+            ('direction', '=', 'incoming'),
+            ('success', '=', False),
+            ('create_date', '<=', cutoff),
+            ('automation_id.event', 'in', list(_TN_ORDER_RECONCILE_EVENTS)),
+        ])
+        _logger.info("Reconciliación de webhooks de orden: %d log(s) fallidos a revisar.", len(failed_logs))
+
+        seen = set()
+        for log in failed_logs:
+            try:
+                payload = json.loads(log.request_body) if log.request_body else {}
+            except (ValueError, TypeError, json.JSONDecodeError):
+                continue
+            external_id = payload.get('id')
+            company = log.company_id
+            if not external_id or not company:
+                continue
+            key = (company.id, external_id)
+            if key in seen:
+                continue
+            seen.add(key)
+
+            existing = self.env['sale.order'].sudo().search([
+                ('x_external_id', '=', external_id),
+                ('state', 'not in', ['cancel']),
+            ], limit=1)
+            if existing:
+                # Se autorresolvió: algún reintento posterior de Tiendanube
+                # ya logró crearla normalmente vía order/created.
+                continue
+
+            try:
+                with self.env.cr.savepoint():
+                    order = self.env['sale.order']._tn_reconcile_missing_order(company, payload)
+                    if order:
+                        _logger.warning(
+                            "Reconciliación de último recurso: orden %s creada para ID externo %s "
+                            "(tienda %s) tras agotarse la ventana de 48h sin que ningún webhook "
+                            "lograra crearla.", order.name, external_id, company.name,
+                        )
+            except Exception as exc:
+                _logger.error(
+                    "Reconciliación de webhooks de orden: no se pudo crear la orden con ID "
+                    "externo %s (tienda %s): %s", external_id, company.name, exc,
+                )

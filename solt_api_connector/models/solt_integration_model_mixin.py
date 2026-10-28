@@ -11,11 +11,25 @@ class SoltIntegrationModelMixin(models.AbstractModel):
     _name = 'solt.integration.model.mixin'
     _description = 'Integration Model Mixin'
 
+    def _get_sync_language(self):
+        """Resolve the language to use for translation conversion during sync.
+
+        `env.lang` (== env.context.get('lang')) only reflects whoever happens
+        to be executing the code — for incoming webhooks that's the technical
+        `__system__` user, whose language has no relation to the store's real
+        language, so it can't be used as the primary source: it's basically
+        always set to *something*, so it would always win over any fallback
+        checked after it. Priority: the connected company's own configured
+        language (the actual source of truth for what language this store's
+        content should be in) → `env.lang` as a secondary fallback → None
+        (callers fall back to installed languages, same as before)."""
+        return self.env.company.partner_id.lang or self.env.context.get('lang') or None
+
     def convert_translated_field_to_odoo_format(self, value, split_code=True):
         """Return the best translation match for the current environment languages."""
         if not isinstance(value, dict):
             return value
-        languages = self.env.lang
+        languages = self._get_sync_language()
         if not languages:
             languages = self.env['res.lang'].get_installed()
 
@@ -36,12 +50,21 @@ class SoltIntegrationModelMixin(models.AbstractModel):
                 translation = value[code]
                 break
 
+        if not translation:
+            # No hay traduccion para el idioma activo (ej. un webhook corriendo sin
+            # el idioma correcto en contexto) — usar la primera disponible en vez
+            # de devolver vacio, para no borrar contenido real al sincronizar.
+            for v in value.values():
+                if v:
+                    translation = v
+                    break
+
         return translation
 
     def convert_translated_field_to_api_format(self, value, split_code=True):
         """Build a translation dict for API payloads based on installed languages."""
         translation = {}
-        languages = self.env.lang
+        languages = self._get_sync_language()
         if not languages:
             languages = self.env['res.lang'].get_installed()
 

@@ -114,6 +114,7 @@
                                 </group>
                                 <group string="Other Information">
                                     <field name="promotional_price"/>
+                                    <field name="visible"/>
                                 </group>
                             </group>
                         </page>
@@ -169,5 +170,176 @@
                 if records:
                     action = records.action_migrate_images()
             </field>
+        </record>
+
+        <record id="nube_product_template_search_inherit" model="ir.ui.view">
+            <field name="name">nube.product.template.search.inherit</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_search_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//search" position="inside">
+                    <field name="is_published"/>
+                    <separator/>
+                    <filter name="tn_published" string="Published in TN" domain="[('is_published', '=', True)]"/>
+                    <filter name="tn_not_published" string="Not Published in TN" domain="[('is_published', '=', False)]"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="nube_product_template_tree_inherit" model="ir.ui.view">
+            <field name="name">nube.product.template.list.inherit</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_tree_view"/>
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                    <field name="is_published" optional="hide"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="action_server_publish_selected_products" model="ir.actions.server">
+            <field name="name">Publish in TN</field>
+            <field name="model_id" ref="product.model_product_template"/>
+            <field name="binding_model_id" ref="product.model_product_template"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code"><![CDATA[
+if records:
+    # Solo se publican productos/variantes con stock disponible; los que no
+    # tienen stock se omiten por completo (no se tocan, no se reenvian a TN).
+    variants_with_stock = records.product_variant_ids.filtered(lambda v: v.qty_available > 0)
+    templates_with_stock = variants_with_stock.product_tmpl_id
+
+    templates_with_stock.write({'is_published': True})
+    variants_with_stock.write({'visible': True})
+
+    # Cada producto/variante se procesa dentro de su propio savepoint: si uno
+    # falla con una excepcion no controlada (ej. datos inconsistentes que
+    # vienen de TN), se revierte SOLO su parte y se sigue con el resto, en vez
+    # de perder toda la tanda por un solo producto con problemas.
+    template_results = {'ok': [], 'error': [], 'skipped': []}
+
+    # write() no alcanza para reenviar a TN si el valor ya era el mismo en Odoo
+    # (base_automation solo dispara cuando un campo vigilado cambia de valor).
+    # Se llama a los endpoints directo, para que "Publish in TN" siempre
+    # fuerce el reenvio sin importar el estado previo en Odoo.
+    for template in templates_with_stock:
+        # No se puede usar "with" (bloqueado por el sandbox de safe_eval de
+        # las acciones de servidor: opcodes WITH_EXCEPT_START/BEFORE_WITH no
+        # estan permitidos) — se maneja el savepoint a mano.
+        sp = env.cr.savepoint()
+        try:
+            company = template.company_id
+            connector = company.connector_id
+            if not (company.external_id and company.bearer_token and connector):
+                template_results['skipped'].append(template.name)
+                sp.close(rollback=False)
+                continue
+            if not template.can_sync_to_store():
+                _logger.info('Publish in TN: producto {} ya se esta sincronizando desde la tienda, se omite.'.format(template.name))
+                template_results['skipped'].append(template.name)
+                sp.close(rollback=False)
+                continue
+            template.mark_as_syncing('odoo')
+            endpoint = env['solt.api.endpoint'].search([('code', '=', 'PRODUCT_UPDATE'), ('connector_id', '=', connector.id)], limit=1)
+            if not endpoint:
+                _logger.error('Publish in TN: endpoint PRODUCT_UPDATE no configurado.')
+                template_results['error'].append((template.name, 'Endpoint PRODUCT_UPDATE no configurado'))
+                sp.close(rollback=False)
+                continue
+            response = endpoint.with_context(modified_fields=['is_published']).with_company(company).execute_request(record=template)
+            if 200 <= response.get('status_code', 0) < 300:
+                template.write(response['values'])
+                if isinstance(response['raw_response'], dict) and template.product_brand_id:
+                    template.product_brand_id.write({
+                        'x_state_sync': 'yes', 'x_date_last_sync': datetime.datetime.now(),
+                        'x_exclud_from_sync': False, 'x_store_external_id': company.external_id, 'company_id': company.id,
+                    })
+                template.create_product_variants_from_json(response['raw_response'], update_from_store=False)
+                template_results['ok'].append(template.name)
+            else:
+                template.write({'x_date_last_sync': datetime.datetime.now(), 'x_state_sync': 'error'})
+                err = response.get('error_message', '')
+                _logger.error('Publish in TN: error en PRODUCT_UPDATE para {}: {}'.format(template.name, err))
+                template_results['error'].append((template.name, err))
+            sp.close(rollback=False)
+        except Exception as e:
+            sp.close(rollback=True)
+            _logger.error('Publish in TN: excepcion no controlada procesando {}: {}'.format(template.name, str(e)))
+            template_results['error'].append((template.name, str(e)))
+            template.write({'is_being_synced': False, 'sync_source': False})
+
+    variant_results = {'ok': [], 'error': [], 'skipped': []}
+    for variant in variants_with_stock:
+        sp = env.cr.savepoint()
+        try:
+            template = variant.product_tmpl_id
+            company = variant.company_id
+            connector = company.connector_id
+            if not (company.external_id and company.bearer_token and connector):
+                variant_results['skipped'].append(variant.display_name)
+                sp.close(rollback=False)
+                continue
+            if not template.can_sync_to_store():
+                _logger.info('Publish in TN: variante {} ya se esta sincronizando desde la tienda, se omite.'.format(variant.display_name))
+                variant_results['skipped'].append(variant.display_name)
+                sp.close(rollback=False)
+                continue
+            template.mark_as_syncing('odoo')
+            endpoint = env['solt.api.endpoint'].search([('code', '=', 'VARIANTE_PRODUCT_SINGLE_UPDATE'), ('connector_id', '=', connector.id)], limit=1)
+            if not endpoint:
+                _logger.error('Publish in TN: endpoint VARIANTE_PRODUCT_SINGLE_UPDATE no configurado.')
+                variant_results['error'].append((variant.display_name, 'Endpoint VARIANTE_PRODUCT_SINGLE_UPDATE no configurado'))
+                sp.close(rollback=False)
+                continue
+            response = endpoint.with_context(modified_fields=['visible']).with_company(company).execute_request(record=variant)
+            if 200 <= response.get('status_code', 0) < 300:
+                variant.write(response['values'])
+                variant_results['ok'].append(variant.display_name)
+            else:
+                variant.write({'x_date_last_sync': datetime.datetime.now(), 'x_state_sync': 'error'})
+                err = response.get('error_message', '')
+                _logger.error('Publish in TN: error en VARIANTE_PRODUCT_SINGLE_UPDATE para {}: {}'.format(variant.display_name, err))
+                variant_results['error'].append((variant.display_name, err))
+            sp.close(rollback=False)
+        except Exception as e:
+            sp.close(rollback=True)
+            _logger.error('Publish in TN: excepcion no controlada procesando variante {}: {}'.format(variant.display_name, str(e)))
+            variant_results['error'].append((variant.display_name, str(e)))
+            variant.product_tmpl_id.write({'is_being_synced': False, 'sync_source': False})
+
+    _logger.info(
+        'Publish in TN - RESUMEN Productos: {} ok, {} error, {} omitidos. OK: {} | ERRORES: {} | OMITIDOS: {}'.format(
+            len(template_results['ok']), len(template_results['error']), len(template_results['skipped']),
+            template_results['ok'], template_results['error'], template_results['skipped'],
+        )
+    )
+    _logger.info(
+        'Publish in TN - RESUMEN Variantes: {} ok, {} error, {} omitidas. OK: {} | ERRORES: {} | OMITIDAS: {}'.format(
+            len(variant_results['ok']), len(variant_results['error']), len(variant_results['skipped']),
+            variant_results['ok'], variant_results['error'], variant_results['skipped'],
+        )
+    )
+
+    has_errors = bool(template_results['error'] or variant_results['error'])
+    message_lines = [
+        'Productos: {} ok, {} error, {} omitidos'.format(len(template_results['ok']), len(template_results['error']), len(template_results['skipped'])),
+        'Variantes: {} ok, {} error, {} omitidas'.format(len(variant_results['ok']), len(variant_results['error']), len(variant_results['skipped'])),
+    ]
+    if has_errors:
+        message_lines.append('Revisa el log del servidor (busca "Publish in TN - RESUMEN") para el detalle de los casos con error.')
+
+    action = {
+        'type': 'ir.actions.client',
+        'tag': 'display_notification',
+        'params': {
+            'title': 'Publish in TN - resultado',
+            'message': '\n'.join(message_lines),
+            'sticky': has_errors,
+            'type': 'warning' if has_errors else 'success',
+            'next': {'type': 'ir.actions.client', 'tag': 'soft_reload'},
+        },
+    }
+]]></field>
         </record>
 </odoo>
