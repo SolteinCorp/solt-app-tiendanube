@@ -2866,10 +2866,19 @@ if action_id and action_id.connector_id:
     _logger.info(res)
     to_create_values = []
     stock_warehouse_ids = None
+    # Locations that already have a mapping row of the company: importing again must not duplicate them.
+    known_location_ids = set()
+    for existing_mapping in env['solt.warehouse.sync.mapping'].search([('company_id', '=', env.company.id)]):
+        if isinstance(existing_mapping.response_mapping, dict) and existing_mapping.response_mapping.get('x_external_id'):
+            known_location_ids.add(str(existing_mapping.response_mapping['x_external_id']))
     if isinstance(res['values'], list):
         for response_data, val in zip(res['raw_response'], res['values']):
             stock_warehouse_id = env['stock.warehouse'].search([('x_external_id', '=', val['x_external_id'])], limit=1)
             if not stock_warehouse_id:
+                if str(val['x_external_id']) in known_location_ids:
+                    _logger.info('Ubicación {} ya tiene un mapeo de almacén: se omite.'.format(val['x_external_id']))
+                    continue
+                known_location_ids.add(str(val['x_external_id']))
                 create_val = {'tn_name': response_data.get('id') + ' | ' + stock_warehouse_id.convert_translated_field_to_odoo_format(response_data.get('name'), split_code=False), 'company_id': env.company.id, 'response_body': response_data, 'response_mapping': val}
                 to_create_values.append(create_val)
             else:
