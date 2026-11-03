@@ -2572,3 +2572,9 @@ msgstr "Importa o exporta productos, clientes y pedidos, y luego marca la sincro
 #: code:addons/solt_tiendanube/models/solt_api_connector_onboarding.py:0
 msgid "Completed from the Warehouses step."
 msgstr "Completado desde el paso de Almacenes."
+
+#. module: solt_tiendanube
+#. odoo-python
+#: code:addons/solt_tiendanube/models/warehouse_sync_mapping.py:0
+msgid "The location %s has no valid address to create the warehouse."
+msgstr "La ubicación %s no tiene una dirección válida para crear el almacén."
