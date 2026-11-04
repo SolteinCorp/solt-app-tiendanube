@@ -32,7 +32,7 @@
         <field name="response_mapping"><![CDATA[
 {
 "name": "data.get('name')",
-"email": "data.get('email', '').strip()",
+"tn_email": "data.get('email', '').strip()",
 "phone": "data.get('phone')",
 "country_id": "env['res.country'].sudo().search([('code', '=', data.get('country'))],limit=1).id",
 "street": "data.get('address', '')",
@@ -464,6 +464,7 @@
 "partner_invoice_id": "method('_find_or_create_partners_from_data', data, type='invoice')[2]",
 "fiscal_position_id":"method('_find_fiscal_position_from_data', data)",
 "user_id": "env.user.id",
+"x_tn_salesperson_id": "method('_find_or_create_tn_salesperson_partner', (data.get('origin') or {}).get('sold_by'))",
 "date_order": "method('_get_date_from_data', data.get('created_at'))",
 "currency_id": "env['res.currency'].with_context(active_test=False).search([('name', '=', data.get('currency'))], limit=1).id",
 "order_line": "method('_prepare_order_lines_values', data)",
@@ -516,6 +517,7 @@
 "partner_invoice_id": "method('_find_or_create_partners_from_data', data, type='invoice')[2]",
 "fiscal_position_id":"method('_find_fiscal_position_from_data', data)",
 "user_id": "env.user.id",
+"x_tn_salesperson_id": "method('_find_or_create_tn_salesperson_partner', (data.get('origin') or {}).get('sold_by'))",
 "date_order": "method('_get_date_from_data', data.get('created_at'))",
 "currency_id": "env['res.currency'].with_context(active_test=False).search([('name', '=', data.get('currency'))], limit=1).id",
 "order_line": "method('_prepare_order_lines_values', data)",

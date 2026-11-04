@@ -1,0 +1,69 @@
+<odoo>
+    <record id="solt_tn_webhook_wizard_view_form" model="ir.ui.view">
+        <field name="name">solt.tn.webhook.wizard.form</field>
+        <field name="model">solt.tn.webhook.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <p class="text-muted">Choose the Tiendanube events you want to receive in Odoo. Checked webhooks are published in Tiendanube; unchecked ones that are already published are removed from Tiendanube. Required events cannot be unchecked. Automations are activated later, in the Activate automations step.</p>
+                <field name="line_ids" nolabel="1">
+                    <list create="0" delete="0" editable="bottom">
+                        <field name="selected" readonly="locked"/>
+                        <field name="name"/>
+                        <field name="event"/>
+                        <field name="state_sync"/>
+                        <field name="locked" column_invisible="True"/>
+                    </list>
+                </field>
+                <footer>
+                    <button string="Apply" name="action_confirm" type="object" class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" special="cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="solt_tn_warehouse_wizard_view_form" model="ir.ui.view">
+        <field name="name">solt.tn.warehouse.wizard.form</field>
+        <field name="model">solt.tn.warehouse.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <p class="text-muted">For each Tiendanube location, link an existing warehouse or let Odoo create a new one. Locations left unchecked and without a warehouse are skipped.</p>
+                <field name="line_ids" nolabel="1">
+                    <list create="0" delete="0" editable="bottom">
+                        <field name="tn_name"/>
+                        <field name="warehouse_id" options="{'no_create': True}"/>
+                        <field name="create_new" readonly="warehouse_id"/>
+                    </list>
+                </field>
+                <footer>
+                    <button string="Apply" name="action_confirm" type="object" class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" special="cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="solt_tn_automation_wizard_view_form" model="ir.ui.view">
+        <field name="name">solt.tn.automation.wizard.form</field>
+        <field name="model">solt.tn.automation.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <p class="text-muted">Choose the automations to activate. The ones of your published webhooks come checked. The other automations send changes from Odoo to Tiendanube. Do it after the initial sync, so the imported records do not trigger them.</p>
+                <field name="line_ids" nolabel="1">
+                    <list create="0" delete="0" editable="bottom">
+                        <field name="selected" readonly="locked"/>
+                        <field name="name"/>
+                        <field name="trigger"/>
+                        <field name="model_name"/>
+                        <field name="is_active"/>
+                        <field name="locked" column_invisible="True"/>
+                    </list>
+                </field>
+                <footer>
+                    <button string="Apply" name="action_confirm" type="object" class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" special="cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

@@ -12,3 +12,4 @@ from . import solt_api_meta_fields
 from . import solt_integration_model_mixin
 from . import ir_cron
 from . import sync_mixin
+from . import solt_api_connector_onboarding
