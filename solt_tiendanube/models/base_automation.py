@@ -1,4 +1,16 @@
-from odoo import models, fields
+import hashlib
+import hmac
+import logging
+
+from odoo import models, fields, api
+from odoo.exceptions import UserError
+from odoo.http import request
+
+_logger = logging.getLogger(__name__)
+
+# The app secret is read from the 'solt_tiendanube.client_secret' System Parameter; it is not
+# part of the code.
+TN_SIGNATURE_HEADER = 'X-Linkedstore-Hmac-Sha256'
 
 
 class BaseAutomation(models.Model):
@@ -33,3 +45,29 @@ class BaseAutomation(models.Model):
             if company:
                 vals['company_id'] = company.id
         return vals
+
+    def _verify_webhook_signature(self, payload):
+        """Validate the 'X-Linkedstore-Hmac-Sha256' header TiendaNube sends on
+        every webhook delivery: HMAC-SHA256 of the raw request body, keyed with
+        the app's client secret."""
+        self.ensure_one()
+        tn_connector = self.env.ref('solt_tiendanube.tn_connector_api', raise_if_not_found=False)
+        if not self.connector_id or self.connector_id != tn_connector:
+            return super()._verify_webhook_signature(payload)
+
+        # "Actualizar Tienda" is not called by Tiendanube: /tiendanube/sync/install
+        # invokes it internally, already authenticated by the Ed25519 signature of
+        # the central server, so it carries no Tiendanube HMAC header.
+        if self == self.env.ref('solt_tiendanube.tn_automation_update_store', raise_if_not_found=False):
+            return
+
+        secret = self.env['ir.config_parameter'].sudo().get_param('solt_tiendanube.client_secret')
+        if not secret:
+            # The secret is not shipped in the code: without the system parameter the signature
+            # is not verified (rejecting every webhook would break the stores already installed).
+            _logger.warning("solt_tiendanube.client_secret is not set: the Tiendanube webhook signature is not verified.")
+            return
+        received = request.httprequest.headers.get(TN_SIGNATURE_HEADER, '')
+        computed = hmac.new(secret.encode(), request.httprequest.get_data(), hashlib.sha256).hexdigest()
+        if not received or not hmac.compare_digest(computed, received):
+            raise UserError('Firma de webhook invalida.')

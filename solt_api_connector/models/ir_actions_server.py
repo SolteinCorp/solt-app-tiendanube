@@ -45,6 +45,27 @@ class ServerAction(models.Model):
             eval_context["base_automation"] = action.base_automation_id
         return eval_context
 
+    def action_mark_initial_sync_completed(self):
+        return self._set_initial_sync_state('completed')
+
+    def action_mark_initial_sync_pending(self):
+        return self._set_initial_sync_state('not_executed')
+
+    def _set_initial_sync_state(self, state):
+        """Flag the initial sync of the current company as completed or pending.
+        The initial sync can be an import, an export or both, so it is marked by the user."""
+        company = self.env.company
+        company.sudo().state_initial_load = state
+        for connector in self.env['solt.api.connector'].search([('company_ids', 'in', company.id)]):
+            connector._onboarding_sync()
+        message = _("The initial sync of %s was marked as completed.", company.name) if state == 'completed' \
+            else _("The initial sync of %s was marked as pending.", company.name)
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {'title': _("Initial sync"), 'message': message, 'type': 'success', 'sticky': False},
+        }
+
     def execute_initial_import(self):
         """Programa la ejecución de la importación via cron"""
         self.ensure_one()
@@ -58,7 +79,7 @@ class ServerAction(models.Model):
         cron = self.env.ref('solt_api_connector.ir_cron_data_initial_import_check')
         cron.with_context(server_action_id=self.id).method_direct_trigger()
 
-        return {'type': 'ir.actions.client', 'tag': 'display_notification', 'params': {'title': _('Import scheduled'), 'message': _('The import of %s was scheduled and will run in the background.') % self.model_id.name, 'sticky': False, 'type': 'info', }}
+        return {'type': 'ir.actions.client', 'tag': 'display_notification', 'params': {'title': _('Import scheduled'), 'message': _('The import of %s was scheduled and will run in the background.') % self.model_id.name, 'sticky': False, 'type': 'info', 'next': {'type': 'ir.actions.client', 'tag': 'soft_reload'}, }}
 
     def cron_execute_initial_imports(self, automatic=False):
         """Método para ser llamado por el cron job"""
@@ -116,7 +137,7 @@ class ServerAction(models.Model):
         cron = self.env.ref('solt_api_connector.ir_cron_data_initial_export_check')
         cron.with_context(server_action_export_id=self.id).method_direct_trigger()
 
-        return {'type': 'ir.actions.client', 'tag': 'display_notification', 'params': {'title': _('Export scheduled'), 'message': _('The export of %s was scheduled and will run in the background.') % self.model_id.name, 'sticky': False, 'type': 'info', }}
+        return {'type': 'ir.actions.client', 'tag': 'display_notification', 'params': {'title': _('Export scheduled'), 'message': _('The export of %s was scheduled and will run in the background.') % self.model_id.name, 'sticky': False, 'type': 'info', 'next': {'type': 'ir.actions.client', 'tag': 'soft_reload'}, }}
 
     def cron_execute_initial_exports(self, automatic=False):
         """Método para ser llamado por el cron job de exportación"""
