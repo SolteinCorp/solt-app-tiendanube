@@ -17,8 +17,9 @@ class SoltTnWarehouseWizard(models.TransientModel):
         res = super().default_get(fields_list)
         company = self.env.company
         Mapping = self.env['solt.warehouse.sync.mapping'].sudo()
-        if not Mapping.search_count([('company_id', '=', company.id)]):
-            self._import_locations(company)
+        self._import_locations(company)
+        # Rows repeated by older imports are removed, so each location appears once.
+        Mapping._cleanup_duplicate_pending(company)
         pending = Mapping.search([('company_id', '=', company.id)]).filtered(lambda m: not m.is_synchronized)
         res['line_ids'] = [
             Command.create({'mapping_id': mapping.id, 'warehouse_id': mapping.warehouse_id.id, 'create_new': not mapping.warehouse_id})
@@ -28,7 +29,13 @@ class SoltTnWarehouseWizard(models.TransientModel):
 
     @api.model
     def _import_locations(self, company):
-        """Run the connector's 'import warehouses' action to fill the mappings."""
+        """Run the connector's 'import warehouses' action to fill the mappings, only when the
+        company has none yet."""
+        # One import at a time per company: opening the wizard twice in a row (double click) would
+        # otherwise import the locations twice. The second call waits for the first and then sees its rows.
+        self.env.cr.execute("SELECT pg_advisory_xact_lock(hashtext(%s))", ('tn_warehouse_import_%s' % company.id,))
+        if self.env['solt.warehouse.sync.mapping'].sudo().search_count([('company_id', '=', company.id)]):
+            return
         action = self.env.ref('solt_tiendanube.tn_ir_actions_server_init_load_warehouse', raise_if_not_found=False)
         warehouse = self.env['stock.warehouse'].search([('company_id', '=', company.id)], limit=1)
         if action and warehouse:
@@ -40,11 +47,13 @@ class SoltTnWarehouseWizard(models.TransientModel):
         for line in self.line_ids:
             mapping = line.mapping_id
             try:
-                if line.warehouse_id:
-                    mapping.warehouse_id = line.warehouse_id
-                    mapping.action_sync_warehouse()
-                elif line.create_new:
-                    mapping.action_create_warehouse()
+                # A failing location must not leave the transaction in a bad state for the others.
+                with self.env.cr.savepoint():
+                    if line.warehouse_id:
+                        mapping.warehouse_id = line.warehouse_id
+                        mapping.action_sync_warehouse()
+                    elif line.create_new:
+                        mapping.action_create_warehouse()
             except Exception as error:
                 _logger.warning("Location %s could not be processed: %s", mapping.tn_name, error)
                 errors.append("%s: %s" % (mapping.tn_name, error))
