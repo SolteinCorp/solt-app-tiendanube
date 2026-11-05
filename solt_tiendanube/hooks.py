@@ -37,5 +37,6 @@ def post_init_hook(env):
         try:
             connector.action_create_all_meta_fields()
             _logger.info("Tiendanube meta-fields created on install.")
+            connector._onboarding_sync()
         except Exception as meta_error:
             _logger.warning("Could not create Tiendanube meta-fields on install: %s", str(meta_error))

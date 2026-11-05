@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- Panels shown as a banner on the connector form. Connector-specific
+             modules link their steps to them (see solt_tiendanube). -->
+        <record id="onboarding_onboarding_connector" model="onboarding.onboarding">
+            <field name="name">Connector setup</field>
+            <field name="route_name">solt_connector</field>
+            <field name="text_completed">Your connector is configured. You can close this panel.</field>
+        </record>
+
+        <!-- Steps shown apart: they do not block the completion of the panel. -->
+        <record id="onboarding_onboarding_connector_optional" model="onboarding.onboarding">
+            <field name="name">Connector optional steps</field>
+            <field name="route_name">solt_connector_optional</field>
+            <field name="sequence">20</field>
+        </record>
+    </data>
+</odoo>

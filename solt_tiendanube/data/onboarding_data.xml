@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <record id="onboarding_step_meta_fields" model="onboarding.onboarding.step">
+            <field name="title">Sync fields</field>
+            <field name="description">Create the fields that track the synchronization state in your records.</field>
+            <field name="button_text">Check fields</field>
+            <field name="done_text">Fields ready!</field>
+            <field name="panel_step_open_action_name">action_open_step_meta_fields</field>
+            <field name="step_image" type="base64" file="base/static/img/onboarding_chart-of-accounts.png"/>
+            <field name="step_image_filename">onboarding_chart-of-accounts.png</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="onboarding_step_connect_store" model="onboarding.onboarding.step">
+            <field name="title">Connect your store</field>
+            <field name="description">Only if you installed the module from the Odoo app store and have not started the installation from Tiendanube yet: opens the Tiendanube partners portal to install the app.</field>
+            <field name="button_text">Install app</field>
+            <field name="done_text">Store connected!</field>
+            <field name="panel_step_open_action_name">action_open_step_connect_store</field>
+            <field name="step_image" type="base64" file="base/static/img/onboarding_puzzle.png"/>
+            <field name="step_image_filename">onboarding_puzzle.png</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <record id="onboarding_step_webhooks" model="onboarding.onboarding.step">
+            <field name="title">Webhooks</field>
+            <field name="description">Choose which Tiendanube events are published and automated.</field>
+            <field name="button_text">Choose webhooks</field>
+            <field name="done_text">Webhooks published!</field>
+            <field name="panel_step_open_action_name">action_open_step_webhooks</field>
+            <field name="step_image" type="base64" file="base/static/img/onboarding_cog.png"/>
+            <field name="step_image_filename">onboarding_cog.png</field>
+            <field name="sequence">30</field>
+        </record>
+
+        <record id="onboarding_step_warehouses" model="onboarding.onboarding.step">
+            <field name="title">Warehouses</field>
+            <field name="description">Import your Tiendanube locations and link them to Odoo warehouses.</field>
+            <field name="button_text">Link warehouses</field>
+            <field name="done_text">Warehouses linked!</field>
+            <field name="panel_step_open_action_name">action_open_step_warehouses</field>
+            <field name="step_image" type="base64" file="base/static/img/onboarding_company-data.png"/>
+            <field name="step_image_filename">onboarding_company-data.png</field>
+            <field name="sequence">40</field>
+        </record>
+
+        <record id="onboarding_step_initial_sync" model="onboarding.onboarding.step">
+            <field name="title">Initial sync</field>
+            <field name="description">Import or export products, customers and orders, then mark the sync as completed.</field>
+            <field name="button_text">Open sync</field>
+            <field name="done_text">Initial sync done!</field>
+            <field name="panel_step_open_action_name">action_open_step_initial_sync</field>
+            <field name="step_image" type="base64" file="base/static/img/onboarding_sample-quotation.png"/>
+            <field name="step_image_filename">onboarding_sample-quotation.png</field>
+            <field name="sequence">50</field>
+        </record>
+
+        <record id="onboarding_step_activate_automations" model="onboarding.onboarding.step">
+            <field name="title">Activate automations</field>
+            <field name="description">Turn on the automations of your published webhooks so Odoo starts processing Tiendanube events. Do it after the initial sync.</field>
+            <field name="button_text">Activate</field>
+            <field name="done_text">Automations active!</field>
+            <field name="panel_step_open_action_name">action_open_step_activate_automations</field>
+            <field name="step_image" type="base64" file="base/static/img/onboarding_taxes.png"/>
+            <field name="step_image_filename">onboarding_taxes.png</field>
+            <field name="sequence">55</field>
+        </record>
+
+        <record id="onboarding_step_review" model="onboarding.onboarding.step">
+            <field name="title">Review</field>
+            <field name="description">Check that everything is configured.</field>
+            <field name="button_text">Review</field>
+            <field name="done_text">All set!</field>
+            <field name="panel_step_open_action_name">action_open_step_review</field>
+            <field name="step_image" type="base64" file="base/static/img/onboarding_looking_glass.png"/>
+            <field name="step_image_filename">onboarding_looking_glass.png</field>
+            <field name="sequence">60</field>
+        </record>
+
+        <!-- The store connection is optional: it lives in its own panel so it
+             does not block the completion of the main one. -->
+        <record id="solt_api_connector.onboarding_onboarding_connector" model="onboarding.onboarding">
+            <field name="step_ids" eval="[
+                Command.link(ref('solt_tiendanube.onboarding_step_meta_fields')),
+                Command.link(ref('solt_tiendanube.onboarding_step_webhooks')),
+                Command.link(ref('solt_tiendanube.onboarding_step_warehouses')),
+                Command.link(ref('solt_tiendanube.onboarding_step_initial_sync')),
+                Command.link(ref('solt_tiendanube.onboarding_step_activate_automations')),
+                Command.link(ref('solt_tiendanube.onboarding_step_review')),
+            ]"/>
+        </record>
+        <record id="solt_api_connector.onboarding_onboarding_connector_optional" model="onboarding.onboarding">
+            <field name="step_ids" eval="[Command.link(ref('solt_tiendanube.onboarding_step_connect_store'))]"/>
+        </record>
+    </data>
+</odoo>

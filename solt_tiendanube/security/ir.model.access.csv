@@ -17,3 +17,15 @@ access_product_brand_product_manager,product.brand.manager,model_solt_product_br
 access_product_brand_user,product.brand.user,model_solt_product_brand,base.group_user,1,0,0,0
 
 access_solt_tiendanube_sync_nonce_admin,solt.tiendanube.sync.nonce admin,model_solt_tiendanube_sync_nonce,base.group_system,1,1,1,1
+access_solt_tn_webhook_wizard_manager,solt.tn.webhook.wizard manager,model_solt_tn_webhook_wizard,solt_api_connector.group_api_integration_manager,1,1,1,1
+access_solt_tn_webhook_wizard_group_system,solt.tn.webhook.wizard group system,model_solt_tn_webhook_wizard,base.group_system,1,1,1,1
+access_solt_tn_webhook_wizard_line_manager,solt.tn.webhook.wizard.line manager,model_solt_tn_webhook_wizard_line,solt_api_connector.group_api_integration_manager,1,1,1,1
+access_solt_tn_webhook_wizard_line_group_system,solt.tn.webhook.wizard.line group system,model_solt_tn_webhook_wizard_line,base.group_system,1,1,1,1
+access_solt_tn_warehouse_wizard_manager,solt.tn.warehouse.wizard manager,model_solt_tn_warehouse_wizard,solt_api_connector.group_api_integration_manager,1,1,1,1
+access_solt_tn_warehouse_wizard_group_system,solt.tn.warehouse.wizard group system,model_solt_tn_warehouse_wizard,base.group_system,1,1,1,1
+access_solt_tn_warehouse_wizard_line_manager,solt.tn.warehouse.wizard.line manager,model_solt_tn_warehouse_wizard_line,solt_api_connector.group_api_integration_manager,1,1,1,1
+access_solt_tn_warehouse_wizard_line_group_system,solt.tn.warehouse.wizard.line group system,model_solt_tn_warehouse_wizard_line,base.group_system,1,1,1,1
+access_solt_tn_automation_wizard_manager,solt.tn.automation.wizard manager,model_solt_tn_automation_wizard,solt_api_connector.group_api_integration_manager,1,1,1,1
+access_solt_tn_automation_wizard_group_system,solt.tn.automation.wizard group system,model_solt_tn_automation_wizard,base.group_system,1,1,1,1
+access_solt_tn_automation_wizard_line_manager,solt.tn.automation.wizard.line manager,model_solt_tn_automation_wizard_line,solt_api_connector.group_api_integration_manager,1,1,1,1
+access_solt_tn_automation_wizard_line_group_system,solt.tn.automation.wizard.line group system,model_solt_tn_automation_wizard_line,base.group_system,1,1,1,1

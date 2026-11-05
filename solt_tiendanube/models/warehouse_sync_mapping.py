@@ -3,7 +3,7 @@
 import json
 import logging
 from odoo import models, fields, api, _
-from odoo.exceptions import ValidationError
+from odoo.exceptions import UserError, ValidationError
 
 _logger = logging.getLogger(__name__)
 
@@ -46,6 +46,35 @@ class WarehouseSyncMapping(models.Model):
             record = record.with_company(record.company_id or self.env.comapny)
             record.is_synchronized = bool(record.warehouse_id and record.warehouse_id.x_external_id)
 
+    @api.model
+    def _cleanup_duplicate_pending(self, company):
+        """Remove the mapping rows that repeat a Tiendanube location of the company.
+
+        Importing the locations twice used to create a second row per pending location. When
+        a location has several rows, the one already linked to a warehouse is kept (or, if none
+        is linked, the oldest); rows linked to different warehouses are left alone.
+        Returns the number of rows removed.
+        """
+        kept_by_location = {}
+        duplicates = self.browse()
+        for mapping in self.sudo().search([('company_id', '=', company.id)], order='id'):
+            mapped = mapping.response_mapping if isinstance(mapping.response_mapping, dict) else {}
+            location_id = str(mapped.get('x_external_id') or '')
+            if not location_id:
+                continue
+            kept = kept_by_location.get(location_id)
+            if not kept:
+                kept_by_location[location_id] = mapping
+            elif mapping.warehouse_id and not kept.warehouse_id:
+                duplicates |= kept
+                kept_by_location[location_id] = mapping
+            elif not mapping.warehouse_id:
+                duplicates |= mapping
+        if duplicates:
+            _logger.info("Removing %s duplicated warehouse mapping rows: %s", len(duplicates), duplicates.mapped('tn_name'))
+            duplicates.unlink()
+        return len(duplicates)
+
     def action_sync_warehouse(self):
         self.ensure_one()
         response_body = self.response_body
@@ -81,12 +110,17 @@ class WarehouseSyncMapping(models.Model):
         self.ensure_one()
 
         response_body = self.response_body
-        response_mapping = self.response_mapping
+        response_mapping = dict(self.response_mapping)
 
         address = response_body.get('address')
-        name = response_body.get('name')
+        # Tiendanube sends the name as a dict by language ({"es_MX": "..."}): convert it before
+        # using it as a search value.
+        name = self.warehouse_id.convert_translated_field_to_odoo_format(
+            response_body.get('name'), split_code=False)
 
         partner_vals = self.warehouse_id._get_or_create_partner_from_api(address, name)
+        if not partner_vals:
+            raise UserError(_("The location %s has no valid address to create the warehouse.", self.tn_name))
         partner = self.env['res.partner'].sudo().search(
             [('name', '=', name), ('company_id', 'in', [False, self.company_id.id])], limit=1)
         if not partner:

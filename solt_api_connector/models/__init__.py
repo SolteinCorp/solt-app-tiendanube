@@ -11,4 +11,5 @@ from . import solt_api_connector  # noqa: F401
 from . import solt_api_endpoint  # noqa: F401
 from . import solt_api_meta_fields  # noqa: F401
 from . import solt_integration_model_mixin  # noqa: F401
+from . import solt_api_connector_onboarding  # noqa: F401
 from . import sync_mixin  # noqa: F401
