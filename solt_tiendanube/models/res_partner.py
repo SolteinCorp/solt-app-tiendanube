@@ -493,12 +493,18 @@ class Respartner(models.Model):
         # preferred over updating the personal information with new values because it allows using
         # the correct contact details when invoicing the customer for an earlier order, should there
         # be a change in the personal information.
+        # A contact under a company is never matched: its RFC and its address are the company's,
+        # and writing them on the contact would write them on the company. Neither is a contact
+        # whose RFC differs from the order's identification.
         contact = self.env['res.partner'].search([
             *self.env['res.partner']._check_company_domain(self.env.company),
             ('type', '=', 'contact'),
+            ('parent_id', '=', False),
             ('name', '=', name),
             ('email', '=', email),
         ], limit=1) if email and name else None  # Don't match random partners.
+        if contact and vat and contact.vat and contact.vat.strip().upper() != vat.strip().upper():
+            contact = None
         if not contact:
             partner_vals['name'] = name
             partner_vals['email'] = email
@@ -510,12 +516,14 @@ class Respartner(models.Model):
                 **partner_vals, **sync_vals
             })
         else:
-            contact.with_context(not_execute_base_automation=True).write({
+            contact_vals = {
                 "phone": phone,
-                "vat": vat,
                 "comment": note,
                 **sync_vals
-            })
+            }
+            if vat:
+                contact_vals["vat"] = vat
+            contact.with_context(not_execute_base_automation=True).write(contact_vals)
 
         # The contact partner acts as delivery partner if the address is strictly equal to that of
         # the contact partner. If not, a delivery partner is created.
@@ -551,10 +559,9 @@ class Respartner(models.Model):
             customs = shipping_address.get('customs')
             default_ref = customs.get('reference', '')
             default_street2 = customs.get('between_streets', '')
-            partner_vals.update({
-                'street2': ','.join([default_ref, default_street2]),
-                # 'ref': default_ref,
-            })
+        delivery_street2 = ','.join(part for part in (default_ref, default_street2) if part)
+        if delivery_street2:
+            partner_vals['street2'] = delivery_street2
         if not delivery:
             delivery = self.env['res.partner'].with_context(tracking_disable=True, not_execute_base_automation=True).create({
                 'type': 'delivery',
@@ -562,11 +569,10 @@ class Respartner(models.Model):
                 **partner_vals, **sync_vals
             })
         else:
-            delivery.with_context(not_execute_base_automation=True).write({
-                'street2': ','.join([default_ref, default_street2]),
-                # 'ref': default_ref,
-                **sync_vals
-            })
+            delivery_vals = {**sync_vals}
+            if delivery_street2:
+                delivery_vals['street2'] = delivery_street2
+            delivery.with_context(not_execute_base_automation=True).write(delivery_vals)
 
         # The contact partner acts as invoice partner if the address is strictly equal to that of
         # the contact partner. If not, a invoice partner is created.

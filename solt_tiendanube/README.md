@@ -16,6 +16,7 @@ The **Soltein Tiendanube Connector** keeps Odoo 19.0 synchronized with Tiendanub
 - **Multi-warehouse orders** – Split sales fulfillment by warehouse with per-line delivery dates and routing.
 - **Inventory orchestration** – Publish stock figures per warehouse, reserve units, and keep availability aligned with Tiendanube.
 - **Order intake** – Import orders, customers, payment references, coupons, and delivery methods into native sales orders.
+  An order reuses a customer with the same name and email, never a contact under a company nor one whose RFC differs from the order's identification, and writes the RFC on it only when the order brings one.
 - **Logistics bridge** – Trigger deliveries, update tracking numbers, and notify Tiendanube via secure webhooks.
 - **Workflow automation** – Base automations, cron jobs, and webhooks keep both systems aligned without manual clicks.
 - **Localization helpers** – Address formatting, measurement units, and regional settings designed for LATAM stores.
